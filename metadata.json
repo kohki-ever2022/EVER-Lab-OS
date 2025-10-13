@@ -1,0 +1,7 @@
+{
+  "name": "EVER-Lab OS",
+  "description": "EVER-Lab OSは、共同利用型研究施設向けの統合管理アプリケーションです。備品・消耗品の在庫管理から、施設・機器の利用予約、各種申請業務までを円滑にします。",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
