@@ -1,0 +1,136 @@
+import React, { useState, useMemo } from 'react';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useQmsContext } from '../../contexts/AppProviders';
+import { useUserContext } from '../../contexts/UserContext';
+import { useModalContext } from '../../contexts/ModalContext';
+import { useCertificates } from '../../contexts/CertificateContext';
+import { CertificateStatus } from '../../types/qms';
+
+const CertificateManagement: React.FC = () => {
+    const { 
+      isJapanese, 
+      currentUser, 
+      isFacilityStaff, 
+    } = useSessionContext();
+    const { qualifications, userCertifications } = useQmsContext();
+    const { certificates } = useCertificates();
+    const { users } = useUserContext();
+    const { openModal } = useModalContext();
+
+    const [filter, setFilter] = useState<'all' | 'my' | 'expiring'>('my');
+
+    const getStatus = (expiryDate: Date) => {
+        const now = new Date();
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(now.getDate() + 30);
+        
+        if (new Date(expiryDate) < now) {
+            return { text: isJapanese ? '期限切れ' : 'Expired', color: 'bg-red-100 text-red-700' };
+        } else if (new Date(expiryDate) <= thirtyDaysFromNow) {
+            return { text: isJapanese ? '期限間近' : 'Expiring Soon', color: 'bg-yellow-100 text-yellow-700' };
+        } else {
+            return { text: isJapanese ? '有効' : 'Valid', color: 'bg-green-100 text-green-700' };
+        }
+    };
+
+    const displayCertificates = useMemo(() => {
+        let certs = isFacilityStaff ? certificates : certificates.filter(c => c.userId === currentUser?.id);
+
+        if (filter === 'my' && !isFacilityStaff) {
+             certs = certs.filter(c => c.userId === currentUser?.id);
+        } else if (filter === 'expiring') {
+            const now = new Date();
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(now.getDate() + 30);
+            certs = certs.filter(c => new Date(c.expiryDate) < thirtyDaysFromNow);
+        }
+        
+        return certs.map(cert => {
+            const userCertification = userCertifications.find(uc => uc.userId === cert.userId && new Date(uc.expiresAt).getTime() === new Date(cert.expiryDate).getTime());
+            const qualification = qualifications.find(q => q.id === userCertification?.qualificationId);
+            const user = users.find(u => u.id === cert.userId);
+            return {
+                ...cert,
+                qualificationName: qualification ? (isJapanese ? qualification.nameJP : qualification.nameEN) : cert.certificateType,
+                userName: user?.name || 'Unknown User',
+                status: getStatus(new Date(cert.expiryDate)),
+            };
+        }).sort((a,b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
+
+    }, [certificates, qualifications, userCertifications, users, isJapanese, currentUser, filter, isFacilityStaff]);
+
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold text-ever-black">
+                    {isJapanese ? '資格・証明書管理' : 'Certifications'}
+                </h2>
+                <button 
+                    onClick={() => openModal({ type: 'uploadCertificate', props: {} })}
+                    className="bg-ever-blue hover:bg-ever-blue-dark text-white font-bold py-2 px-4 rounded-lg"
+                >
+                    {isJapanese ? '新規アップロード' : 'Upload New'}
+                </button>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+                <div className="flex items-center space-x-4">
+                    {isFacilityStaff && (
+                         <button onClick={() => setFilter('all')} className={`px-4 py-2 text-sm font-medium rounded-md ${filter === 'all' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                            {isJapanese ? '全証明書' : 'All Certificates'}
+                         </button>
+                    )}
+                    <button onClick={() => setFilter('my')} className={`px-4 py-2 text-sm font-medium rounded-md ${filter === 'my' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                        {isJapanese ? '自分の証明書' : 'My Certificates'}
+                    </button>
+                     <button onClick={() => setFilter('expiring')} className={`px-4 py-2 text-sm font-medium rounded-md ${filter === 'expiring' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+                        {isJapanese ? '期限間近・切れ' : 'Expiring / Expired'}
+                    </button>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow overflow-x-auto">
+                 <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            {isFacilityStaff && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>}
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{isJapanese ? '資格名' : 'Qualification'}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{isJapanese ? '有効期限' : 'Expiry Date'}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{isJapanese ? 'ステータス' : 'Status'}</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{isJapanese ? '操作' : 'Actions'}</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {displayCertificates.map(cert => (
+                            <tr key={cert.id}>
+                                {isFacilityStaff && <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cert.userName}</td>}
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{cert.qualificationName}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(cert.expiryDate).toLocaleDateString()}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${cert.status.color}`}>{cert.status.text}</span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button 
+                                        onClick={() => openModal({ type: 'uploadCertificate', props: { certificateToEdit: cert as any } })} 
+                                        className="text-indigo-600 hover:text-indigo-900"
+                                    >
+                                        {isJapanese ? '詳細・更新' : 'View/Renew'}
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                         {displayCertificates.length === 0 && (
+                            <tr>
+                                <td colSpan={isFacilityStaff ? 5 : 4} className="text-center py-12 text-gray-500">
+                                    {isJapanese ? '表示する証明書はありません。' : 'No certificates to display.'}
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                 </table>
+            </div>
+        </div>
+    );
+};
+
+export default CertificateManagement;
