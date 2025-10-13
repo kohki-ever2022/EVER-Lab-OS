@@ -31,36 +31,42 @@ import './firebase';
 // Dynamically import the App component to code-split the main app bundle from the login page.
 const App = lazy(() => import('./App').then(module => ({ default: module.App })));
 
-const CoreProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <CertificateProvider>
-    <QmsProvider>
-      <LabStateProvider>
-        <UserProvider>
-          <CompanyProvider>
-            <EquipmentProvider>
-              <ReservationProvider>
-                <ConsumableProvider>
-                  <ProjectProvider>
-                    <AnnouncementProvider>
-                      <MaintenanceLogProvider>
-                        <OrderProvider>
-                          <UsageProvider>
-                            <ModalProvider>
-                              {children}
-                            </ModalProvider>
-                          </UsageProvider>
-                        </OrderProvider>
-                      </MaintenanceLogProvider>
-                    </AnnouncementProvider>
-                  </ProjectProvider>
-                </ConsumableProvider>
-              </ReservationProvider>
-            </EquipmentProvider>
-          </CompanyProvider>
-        </UserProvider>
-      </LabStateProvider>
-    </QmsProvider>
-  </CertificateProvider>
+const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <AdminProvider>
+    <BillingProvider>
+      <PurchasingProvider>
+        <QmsProvider>
+          <LabStateProvider>
+            <UserProvider>
+              <CompanyProvider>
+                <EquipmentProvider>
+                  <ReservationProvider>
+                    <ConsumableProvider>
+                      <ProjectProvider>
+                        <AnnouncementProvider>
+                          <MaintenanceLogProvider>
+                            <OrderProvider>
+                              <UsageProvider>
+                                <CertificateProvider>
+                                  <ModalProvider>
+                                    {children}
+                                  </ModalProvider>
+                                </CertificateProvider>
+                              </UsageProvider>
+                            </OrderProvider>
+                          </MaintenanceLogProvider>
+                        </AnnouncementProvider>
+                      </ProjectProvider>
+                    </ConsumableProvider>
+                  </ReservationProvider>
+                </EquipmentProvider>
+              </CompanyProvider>
+            </UserProvider>
+          </LabStateProvider>
+        </QmsProvider>
+      </PurchasingProvider>
+    </BillingProvider>
+  </AdminProvider>
 );
 
 
@@ -77,11 +83,11 @@ const AppShell: React.FC = () => {
         path="/*"
         element={
           currentUser ? (
-            <CoreProviders>
+            <AppProviders>
               <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading Application...</div>}>
                 <App />
               </Suspense>
-            </CoreProviders>
+            </AppProviders>
           ) : (
             <Navigate to="/login" replace />
           )

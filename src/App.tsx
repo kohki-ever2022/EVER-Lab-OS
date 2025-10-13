@@ -18,7 +18,6 @@ import MonthlyReportGenerator from './components/reports/MonthlyReportGenerator'
 import { useSessionContext } from './contexts/SessionContext';
 import Toast from './components/Toast';
 import ModalRenderer from './components/common/ModalRenderer';
-import { AdminProvider, BillingProvider, PurchasingProvider } from './contexts/AppProviders';
 
 // --- Lazy-loaded View Components ---
 
@@ -101,9 +100,7 @@ export const App: React.FC = () => {
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="equipment" element={<Equipment />} />
                     <Route path="reservations" element={<Reservations />} />
-                    <Route element={<BillingProvider><Outlet /></BillingProvider>}>
-                      <Route path="billing" element={<Billing />} />
-                    </Route>
+                    <Route path="billing" element={<Billing />} />
                     <Route path="memberManagement" element={<MemberManagement />} />
                     <Route path="projects" element={<Projects />} />
                     <Route path="certificateManagement" element={<CertificateManagement />} />
@@ -115,27 +112,21 @@ export const App: React.FC = () => {
                     <Route path="projectGanttChart" element={<ProjectGanttChart />} />
                     
                     {/* Admin Routes */}
-                    <Route element={<AdminProvider><Outlet /></AdminProvider>}>
-                        <Route path="adminDashboard" element={<AdminDashboard />} />
-                        <Route path="equipmentManagement" element={<EquipmentManagement />} />
-                        <Route path="userManagement" element={<UserManagement />} />
-                        <Route path="settings" element={<Settings />} />
-                        <Route path="auditLog" element={<AuditLog />} />
-                        <Route path="maintenanceLog" element={<MaintenanceLogViewer />} />
-                        <Route path="hazardousMaterialsDashboard" element={<HazardousMaterialsDashboard />} />
-                        <Route path="compliance" element={<RegulatoryCompliance />} />
-                        <Route path="facilityLayout" element={<FacilityLayout />} />
-                        <Route path="inventoryLockManager" element={<InventoryLockManager />} />
-                        <Route path="co2IncubatorManagement" element={<CO2IncubatorManagement />} />
-                        <Route element={<BillingProvider><Outlet /></BillingProvider>}>
-                            <Route path="monthlyReportGenerator" element={<MonthlyReportGenerator />} />
-                        </Route>
-                    </Route>
+                    <Route path="adminDashboard" element={<AdminDashboard />} />
+                    <Route path="equipmentManagement" element={<EquipmentManagement />} />
+                    <Route path="userManagement" element={<UserManagement />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="auditLog" element={<AuditLog />} />
+                    <Route path="maintenanceLog" element={<MaintenanceLogViewer />} />
+                    <Route path="hazardousMaterialsDashboard" element={<HazardousMaterialsDashboard />} />
+                    <Route path="compliance" element={<RegulatoryCompliance />} />
+                    <Route path="facilityLayout" element={<FacilityLayout />} />
+                    <Route path="inventoryLockManager" element={<InventoryLockManager />} />
+                    <Route path="co2IncubatorManagement" element={<CO2IncubatorManagement />} />
+                    <Route path="monthlyReportGenerator" element={<MonthlyReportGenerator />} />
                     
                     {/* Supplier Routes */}
-                    <Route element={<PurchasingProvider><Outlet /></PurchasingProvider>}>
-                        <Route path="supplierDashboard" element={<SupplierDashboard />} />
-                    </Route>
+                    <Route path="supplierDashboard" element={<SupplierDashboard />} />
                     
                     {/* Fallback for unknown routes */}
                     <Route path="*" element={<Navigate to={defaultView} replace />} />

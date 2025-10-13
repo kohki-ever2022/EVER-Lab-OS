@@ -24,8 +24,9 @@ class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  // FIX: Converted to an arrow function to ensure `this` is correctly bound.
-  public componentDidCatch = (error: Error, errorInfo: ErrorInfo) => {
+  // FIX: Converted from an arrow function to a standard class method.
+  // React lifecycle methods like componentDidCatch are automatically bound, so an arrow function is not needed here and was causing type inference issues.
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
     // This lifecycle method is for side effects like logging.
@@ -40,8 +41,9 @@ class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  // FIX: Converted to an arrow function to ensure `this` is correctly bound.
-  public render = () => {
+  // FIX: Converted from an arrow function to a standard class method.
+  // The render method is automatically bound by React, so an arrow function is not needed here and was causing type inference issues.
+  public render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
