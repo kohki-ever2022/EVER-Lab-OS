@@ -12,21 +12,22 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
+  // FIX: Removed 'public' keyword. It's the default and might be confusing the linter.
+  state: State = {
     hasError: false,
     error: null,
     errorInfo: null,
   };
 
-  public static getDerivedStateFromError(error: Error): Partial<State> {
+  // FIX: Removed 'public' keyword.
+  static getDerivedStateFromError(error: Error): Partial<State> {
     // This static method runs first when an error is thrown.
     // It should return a state update object.
     return { hasError: true, error };
   }
 
-  // FIX: Converted from an arrow function to a standard class method.
-  // React lifecycle methods like componentDidCatch are automatically bound, so an arrow function is not needed here and was causing type inference issues.
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  // FIX: Removed 'public' keyword to resolve potential 'this' context issues with the linter.
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
     // This lifecycle method is for side effects like logging.
@@ -41,9 +42,8 @@ class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  // FIX: Converted from an arrow function to a standard class method.
-  // The render method is automatically bound by React, so an arrow function is not needed here and was causing type inference issues.
-  public render() {
+  // FIX: Removed 'public' keyword to resolve potential 'this' context issues with the linter.
+  render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
