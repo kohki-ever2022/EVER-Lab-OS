@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>EVER-Lab OS</title>
+    <style>
+      /* CJK-friendly Typography & Word Wrapping */
+      body {
+        font-family: 'Noto Sans JP', -apple-system, sans-serif;
+        letter-spacing: 0.05em;
+        word-break: break-word;
+        line-break: strict;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-weight: 300;
+        color: #0A0A0A; /* ever-black */
+        text-wrap: balance;
+      }
+      .break-anywhere {
+        /* For long URLs or tokens that must wrap */
+        overflow-wrap: anywhere;
+        word-break: break-all; /* Fallback */
+      }
+      
+      /* Fluid Typography - overriding Tailwind classes */
+      .text-3xl { font-size: clamp(1.6rem, 1.2vw + 1rem, 1.875rem) !important; }
+      .text-2xl { font-size: clamp(1.3rem, 1vw + 0.9rem, 1.5rem) !important; }
+      .text-xl { font-size: clamp(1.1rem, 0.8vw + 0.8rem, 1.25rem) !important; }
+      .text-lg { font-size: clamp(1rem, 0.6vw + 0.75rem, 1.125rem) !important; }
+      
+      /* Improved Focus Visibility */
+      :focus-visible {
+        outline: 3px solid #60a5fa; /* A lighter blue for better visibility */
+        outline-offset: 2px;
+        border-radius: 6px;
+      }
+
+      /* Subtle button press animation */
+      button {
+        transition: all 0.15s ease-out;
+      }
+      button:active, .button-active {
+        transform: scale(0.97);
+        opacity: 0.9;
+      }
+      
+      /* Modal animation */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes scaleUp {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .modal-backdrop {
+        animation: fadeIn 0.2s ease-out forwards;
+      }
+      .modal-content {
+        animation: scaleUp 0.2s ease-out forwards;
+      }
+
+      /* Improved Toast animation */
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes fadeOutToast {
+        to {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+      }
+      .toast-animation {
+        animation: slideInRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
+                   fadeOutToast 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) 4.5s forwards;
+      }
+
+      /* Print-specific styles for Invoice and Reports */
+      @page {
+        margin: 15mm 10mm;
+        size: A4 portrait;
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        .printable-area, .printable-area * {
+          visibility: visible;
+        }
+        .printable-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^6.25.1",
+    "react-router/": "https://aistudiocdn.com/react-router@^6.25.1/",
+    "recharts": "https://aistudiocdn.com/recharts@^3.1.2",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.3.0/",
+    "path": "https://aistudiocdn.com/path@^0.12.7",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.0.4",
+    "vite": "https://aistudiocdn.com/vite@^7.1.7",
+    "vite-tsconfig-paths": "https://aistudiocdn.com/vite-tsconfig-paths@^5.1.4",
+    "firebase-functions/": "https://aistudiocdn.com/firebase-functions@^6.4.0/",
+    "tailwindcss": "https://aistudiocdn.com/tailwindcss@^4.1.14",
+    "autoprefixer": "https://aistudiocdn.com/autoprefixer@^10.4.21"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/index.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

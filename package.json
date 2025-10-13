@@ -1,0 +1,20 @@
+{
+  "name": "ever-lab-os",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "analyze:unused": "npx knip",
+    "analyze:circular": "npx madge --circular --extensions ts,tsx src/",
+    "analyze:duplication": "npx jscpd src/",
+    "analyze:all": "npm run analyze:unused && npm run analyze:circular && npm run analyze:duplication"
+  },
+  "devDependencies": {
+    "autoprefixer": "latest",
+    "jscpd": "latest",
+    "knip": "latest",
+    "madge": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest"
+  }
+}
