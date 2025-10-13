@@ -3,15 +3,15 @@ import {
   Manual, 
   ManualCategory, 
   ManualTargetAudience
-} from '@/types';
+} from '../types';
 import { 
   Role,
   Language 
-} from '@/types';
+} from '../types';
 import MarkdownRenderer from './common/MarkdownRenderer';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useQmsContext } from '@/contexts/AppProviders';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useSessionContext } from '../contexts/SessionContext';
+import { useQmsContext } from '../contexts/AppProviders';
+import { usePermissions } from '../hooks/usePermissions';
 
 export const ManualManagement: React.FC = () => {
   const { currentUser, isFacilityStaff, isJapanese } = useSessionContext();

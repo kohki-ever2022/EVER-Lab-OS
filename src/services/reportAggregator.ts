@@ -1,10 +1,10 @@
 // src/services/reportAggregator.ts
-import { Reservation, Equipment, ReservationStatus } from '@/types';
-import { Consumable } from '@/types';
-import { SDS, Certificate, CertificateStatus, EhsIncident, SDSStatus } from '@/types';
-import { Invoice } from '@/types';
-import { User } from '@/types';
-import { Language } from '@/types';
+import { Reservation, Equipment, ReservationStatus } from '../types';
+import { Consumable } from '../types';
+import { SDS, Certificate, CertificateStatus, EhsIncident, SDSStatus } from '../types';
+import { Invoice } from '../types';
+import { User } from '../types';
+import { Language } from '../types';
 
 /**
  * 月次レポートのデータ集計に必要な入力データ

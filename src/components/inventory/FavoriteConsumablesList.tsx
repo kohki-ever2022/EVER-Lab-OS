@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Consumable } from '@/types';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useConsumableContext } from '@/contexts/ConsumableContext';
-import { useToast } from '@/contexts/ToastContext';
-import { useInventoryActions } from '@/hooks/useInventoryActions';
-import { useFavorites } from '@/hooks/useFavorites';
+import { Consumable } from '../../types';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useConsumableContext } from '../../contexts/ConsumableContext';
+import { useToast } from '../../contexts/ToastContext';
+import { useInventoryActions } from '../../hooks/useInventoryActions';
+import { useFavorites } from '../../hooks/useFavorites';
 
 const FavoriteConsumablesList: React.FC = () => {
     const { currentUser, isJapanese } = useSessionContext();

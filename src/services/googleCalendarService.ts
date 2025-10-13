@@ -1,7 +1,7 @@
 // src/services/googleCalendarService.ts
 
-import { CalendarEvent, CalendarEventType, CalendarSyncResult } from '@/types';
-import { Language } from '@/types';
+import { CalendarEvent, CalendarEventType, CalendarSyncResult } from '../types';
+import { Language } from '../types';
 
 // Helper to generate a simple UUID
 const simpleUUID = () => `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

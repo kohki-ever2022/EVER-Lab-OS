@@ -23,7 +23,7 @@ import {
   ChatMessage,
   Invoice,
   Result,
-} from '@/types';
+} from '../types';
 
 /**
  * データ永続化層の抽象インターフェース (Repository Pattern)。

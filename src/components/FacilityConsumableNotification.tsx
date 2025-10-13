@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { ConsumableNotification } from '@/types';
-import { Language } from '@/types';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useLabStateContext } from '@/contexts/AppProviders';
-import { useToast } from '@/contexts/ToastContext';
-import { useAdminActions } from '@/hooks/useAdminActions';
+import { ConsumableNotification } from '../types';
+import { Language } from '../types';
+import { useSessionContext } from '../contexts/SessionContext';
+import { useLabStateContext } from '../contexts/AppProviders';
+import { useToast } from '../contexts/ToastContext';
+import { useAdminActions } from '../hooks/useAdminActions';
 
 export const FacilityConsumableNotification: React.FC = () => {
   const { currentUser, isFacilityStaff, isJapanese } = useSessionContext();

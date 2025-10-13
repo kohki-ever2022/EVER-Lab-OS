@@ -1,20 +1,20 @@
 // src/components/reports/MonthlyReportGenerator.tsx
 import React, { useState } from 'react';
-import { aggregateMonthlyData } from '@/services/reportAggregator';
-import { generateMonthlyReport } from '@/services/geminiReportService';
-import MarkdownRenderer from '@/components/common/MarkdownRenderer';
-import { MonthlyReport } from '@/types/reports';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useReservationContext } from '@/contexts/ReservationContext';
-import { useEquipmentContext } from '@/contexts/EquipmentContext';
-import { useConsumableContext } from '@/contexts/ConsumableContext';
-import { useUserContext } from '@/contexts/UserContext';
-import { useToast } from '@/contexts/ToastContext';
-import { useAdminActions } from '@/hooks/useAdminActions';
-import { useAdminContext } from '@/contexts/AppProviders';
-import { useQmsContext } from '@/contexts/AppProviders';
-import { useBillingContext } from '@/contexts/AppProviders';
-import { useCertificates } from '@/contexts/CertificateContext';
+import { aggregateMonthlyData } from '../../services/reportAggregator';
+import { generateMonthlyReport } from '../../services/geminiReportService';
+import MarkdownRenderer from '../common/MarkdownRenderer';
+import { MonthlyReport } from '../../types/reports';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useReservationContext } from '../../contexts/ReservationContext';
+import { useEquipmentContext } from '../../contexts/EquipmentContext';
+import { useConsumableContext } from '../../contexts/ConsumableContext';
+import { useUserContext } from '../../contexts/UserContext';
+import { useToast } from '../../contexts/ToastContext';
+import { useAdminActions } from '../../hooks/useAdminActions';
+import { useAdminContext } from '../../contexts/AppProviders';
+import { useQmsContext } from '../../contexts/AppProviders';
+import { useBillingContext } from '../../contexts/AppProviders';
+import { useCertificates } from '../../contexts/CertificateContext';
 
 
 const MonthlyReportGenerator: React.FC = () => {

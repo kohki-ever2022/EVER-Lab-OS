@@ -1,4 +1,4 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -11,23 +11,25 @@ interface State {
   errorInfo: ErrorInfo | null;
 }
 
-class ErrorBoundary extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    };
-  }
+class ErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false,
+    error: null,
+    errorInfo: null,
+  };
 
-  static getDerivedStateFromError(error: Error): Partial<State> {
+  public static getDerivedStateFromError(error: Error): Partial<State> {
+    // This static method runs first when an error is thrown.
+    // It should return a state update object.
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  // FIX: Converted to an arrow function to ensure `this` is correctly bound.
+  public componentDidCatch = (error: Error, errorInfo: ErrorInfo) => {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
+    // This lifecycle method is for side effects like logging.
+    // We can also set state here.
     this.setState({
       errorInfo
     });
@@ -38,7 +40,8 @@ class ErrorBoundary extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  // FIX: Converted to an arrow function to ensure `this` is correctly bound.
+  public render = () => {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
@@ -66,7 +69,7 @@ class ErrorBoundary extends React.Component<Props, State> {
               </details>
             )}
             <button
-              onClick={() => window.location.href = '/'}
+              onClick={() => window.location.reload()}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
             >
               ページを再読み込み

@@ -1,9 +1,9 @@
 import React from 'react';
-import { BenchAssignment } from '@/types';
-import { useModalContext } from '@/contexts/ModalContext';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useAdminContext } from '@/contexts/AppProviders';
-import { useCompanyContext } from '@/contexts/CompanyContext';
+import { BenchAssignment } from '../types';
+import { useModalContext } from '../contexts/ModalContext';
+import { useSessionContext } from '../contexts/SessionContext';
+import { useAdminContext } from '../contexts/AppProviders';
+import { useCompanyContext } from '../contexts/CompanyContext';
 
 interface BenchItem {
   id: string;

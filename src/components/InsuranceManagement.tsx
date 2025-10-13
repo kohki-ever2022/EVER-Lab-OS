@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useQmsContext } from '@/contexts/AppProviders';
-import { useToast } from '@/contexts/ToastContext';
-import { useComplianceActions } from '@/hooks/useComplianceActions';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useQmsContext } from '../../contexts/AppProviders';
+import { useToast } from '../../contexts/ToastContext';
+import { useComplianceActions } from '../../hooks/useComplianceActions';
 
-import { InsuranceType, InsuranceCertificate } from '@/types';
-import { CalendarEventType } from '@/types';
-import { Role } from '@/types';
-import { googleCalendarService, createCalendarEventFromSchedule } from '@/services/googleCalendarService';
-import { useCompanyContext } from '@/contexts/CompanyContext';
+import { InsuranceType, InsuranceCertificate } from '../../types';
+import { CalendarEventType } from '../../types';
+import { Role } from '../../types';
+import { googleCalendarService, createCalendarEventFromSchedule } from '../../services/googleCalendarService';
+import { useCompanyContext } from '../../contexts/CompanyContext';
 
 export const InsuranceManagement: React.FC = () => {
   const { language, currentUser, isFacilityStaff } = useSessionContext();

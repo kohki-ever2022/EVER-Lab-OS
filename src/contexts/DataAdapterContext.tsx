@@ -1,7 +1,7 @@
 // src/contexts/DataAdapterContext.tsx
 import React, { createContext, useContext, ReactNode } from 'react';
-import { IDataAdapter } from '@/adapters/IDataAdapter';
-import AdapterFactory from '@/config/adapterFactory';
+import { IDataAdapter } from '../adapters/IDataAdapter';
+import AdapterFactory from '../config/adapterFactory';
 
 // DataAdapterのインスタンスを保持するためのReact Contextを作成
 // 初期値はnullとし、Providerが提供する値で上書きされる

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CO2IncubatorTracking, CalendarEventType } from '@/types';
-import { Language } from '@/types';
-import { googleCalendarService, createCalendarEventFromSchedule } from '@/services/googleCalendarService';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useLabStateContext } from '@/contexts/AppProviders';
-import { useEquipmentContext } from '@/contexts/EquipmentContext';
-import { useToast } from '@/contexts/ToastContext';
-import { useEquipmentActions } from '@/hooks/useEquipmentActions';
+import { CO2IncubatorTracking, CalendarEventType } from '../types';
+import { Language } from '../types';
+import { googleCalendarService, createCalendarEventFromSchedule } from '../services/googleCalendarService';
+import { useSessionContext } from '../contexts/SessionContext';
+import { useLabStateContext } from '../contexts/AppProviders';
+import { useEquipmentContext } from '../contexts/EquipmentContext';
+import { useToast } from '../contexts/ToastContext';
+import { useEquipmentActions } from '../hooks/useEquipmentActions';
 
 export const CO2IncubatorManagement: React.FC = () => {
   const { language, currentUser } = useSessionContext();
@@ -193,132 +193,4 @@ export const CO2IncubatorManagement: React.FC = () => {
       showToast(
         isJapanese 
           ? '交換スケジュールを設定しました（カレンダー同期はオフライン）' 
-          : 'Replacement scheduled (Calendar sync offline)',
-        'info'
-      );
-    }
-  };
-
-  const overviewCounts = useMemo(() => {
-    const counts = { normal: 0, caution: 0, warning: 0, critical: 0 };
-    co2IncubatorTrackingData.forEach(t => {
-      const warning = getWarningLevel(t.currentLevel, t.minimumLevel, t.cylinderSize);
-      counts[warning.level]++;
-    });
-    return counts;
-  }, [co2IncubatorTrackingData]);
-
-
-  return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">{isJapanese ? 'CO2インキュベーター ガス管理' : 'CO2 Incubator Gas Management'}</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-          <div className="text-sm text-green-600 font-medium">{isJapanese ? '正常' : 'Normal'}</div>
-          <div className="text-2xl font-bold text-green-700">{overviewCounts.normal}</div>
-        </div>
-        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-          <div className="text-sm text-yellow-600 font-medium">{isJapanese ? '要注意' : 'Caution'}</div>
-          <div className="text-2xl font-bold text-yellow-700">{overviewCounts.caution}</div>
-        </div>
-        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-          <div className="text-sm text-orange-600 font-medium">{isJapanese ? '交換推奨' : 'Warning'}</div>
-          <div className="text-2xl font-bold text-orange-700">{overviewCounts.warning}</div>
-        </div>
-        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-          <div className="text-sm text-red-600 font-medium">{isJapanese ? '緊急' : 'Critical'}</div>
-          <div className="text-2xl font-bold text-red-700">{overviewCounts.critical}</div>
-        </div>
-      </div>
-
-      {showRecordForm && selectedIncubator && (
-        <div className="bg-white p-6 rounded-lg shadow mb-6 border-2 border-blue-200">
-          <h3 className="text-lg font-bold mb-4">{isJapanese ? `ガス残量記録 (${co2IncubatorTrackingData.find(d => d.equipmentId === selectedIncubator)?.equipmentName})` : `Record Gas Level (${co2IncubatorTrackingData.find(d => d.equipmentId === selectedIncubator)?.equipmentName})`}</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">{isJapanese ? '現在の残量（kg）' : 'Current Level (kg)'} *</label>
-              <input type="number" min="0" step="0.1" value={formData.currentLevel} onChange={(e) => setFormData({...formData, currentLevel: parseFloat(e.target.value) || 0})} className="w-full border rounded p-2" placeholder="0.0" />
-              <p className="text-xs text-gray-500 mt-1">{isJapanese ? 'ボンベに表示されている残量を入力してください' : 'Enter the level shown on the cylinder'}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">{isJapanese ? '備考' : 'Notes'}</label>
-              <textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="w-full border rounded p-2" rows={2} placeholder={isJapanese ? '気づいた点があれば記入' : 'Optional notes'} />
-            </div>
-          </div>
-          <div className="flex justify-end gap-2 mt-4">
-            <button onClick={() => { setShowRecordForm(false); setSelectedIncubator(null); }} className="px-4 py-2 border rounded hover:bg-gray-50">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-            <button onClick={handleSubmitRecord} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{isJapanese ? '記録する' : 'Record'}</button>
-          </div>
-        </div>
-      )}
-
-      <div className="space-y-4">
-        {co2IncubatorTrackingData.map(item => {
-          const warningStatus = getWarningLevel(item.currentLevel, item.minimumLevel, item.cylinderSize);
-          const percentage = (item.currentLevel / item.cylinderSize) * 100;
-
-          return (
-            <div key={item.id} className={`bg-white rounded-lg shadow border-l-4 ${warningStatus.color.replace('bg-', 'border-').replace('-100', '-300')}`}>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">{warningStatus.icon}</span>
-                      <h3 className="text-xl font-bold">{item.equipmentName}</h3>
-                    </div>
-                    <div className="text-sm text-gray-600">{isJapanese ? gasTypeLabels[item.gasType].jp : gasTypeLabels[item.gasType].en}</div>
-                  </div>
-                  <span className={`px-3 py-1 text-sm font-medium rounded ${warningStatus.color}`}>{isJapanese ? warningStatus.labelJP : warningStatus.labelEN}</span>
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium">{isJapanese ? '残量' : 'Current Level'}</span>
-                    <span className="font-bold">{item.currentLevel.toFixed(1)} kg / {item.cylinderSize} kg ({percentage.toFixed(1)}%)</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden"><div className={`h-full transition-all duration-500 ${percentage <= 10 ? 'bg-red-500' : percentage <= 20 ? 'bg-orange-500' : percentage <= 40 ? 'bg-yellow-500' : 'bg-green-500'}`} style={{ width: `${percentage}%` }} /></div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="bg-gray-50 p-3 rounded"><div className="text-xs text-gray-600 mb-1">{isJapanese ? '最終記録' : 'Last Measured'}</div><div className="text-sm font-medium">{new Date(item.lastMeasuredDate).toLocaleString(isJapanese ? 'ja-JP' : 'en-US')}</div></div>
-                  {item.estimatedEmptyDate && (<div className="bg-gray-50 p-3 rounded"><div className="text-xs text-gray-600 mb-1">{isJapanese ? '予測空き日' : 'Estimated Empty'}</div><div className="text-sm font-medium">{new Date(item.estimatedEmptyDate).toLocaleDateString(isJapanese ? 'ja-JP' : 'en-US')}</div></div>)}
-                  {item.replacementScheduled && item.replacementDate && (
-                    <div className="bg-blue-50 p-3 rounded">
-                      <div className="text-xs text-blue-600 mb-1 flex items-center justify-between">
-                        <span>{isJapanese ? '交換予定日' : 'Replacement Scheduled'}</span>
-                        {item.googleCalendarEventId && (
-                          <span className="flex items-center gap-1 text-green-600">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            {isJapanese ? 'カレンダー同期済み' : 'Synced'}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm font-medium text-blue-700">
-                        {new Date(item.replacementDate).toLocaleDateString(isJapanese ? 'ja-JP' : 'en-US')}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-2">
-                  <button onClick={() => { setSelectedIncubator(item.equipmentId); setShowRecordForm(true); setFormData({ currentLevel: item.currentLevel, notes: '' }); }} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{isJapanese ? '残量を記録' : 'Record Level'}</button>
-                  {!item.replacementScheduled && (warningStatus.level === 'warning' || warningStatus.level === 'critical') && (<button onClick={() => { const scheduledDate = new Date(); scheduledDate.setDate(scheduledDate.getDate() + 7); scheduleReplacement(item.id, scheduledDate); }} className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">{isJapanese ? '交換予約' : 'Schedule Replacement'}</button>)}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
-        <p className="text-sm text-blue-800 mb-2">{isJapanese ? '※ CO2インキュベーターのガスボンベ残量を定期的に記録してください。残量が少なくなると自動的に警告が表示され、空き日の予測が行われます。' : '※ Please record the gas cylinder levels regularly. Warnings will be displayed automatically when levels are low, and empty dates will be estimated.'}</p>
-        <p className="text-sm text-blue-800">{isJapanese ? '緊急レベルに達した場合は、速やかにボンベの交換を行ってください。' : 'When critical level is reached, please replace the cylinder immediately.'}</p>
-      </div>
-    </div>
-  );
-};
-
-export default CO2IncubatorManagement;
+          : 'Replacement scheduled (Calendar sync

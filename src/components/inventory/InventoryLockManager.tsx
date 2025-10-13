@@ -1,12 +1,12 @@
 import React from 'react';
-import { InventorySnapshot } from '@/types';
-import { useModalContext } from '@/contexts/ModalContext';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useUserContext } from '@/contexts/UserContext';
-import { useConsumableContext } from '@/contexts/ConsumableContext';
-import { useToast } from '@/contexts/ToastContext';
-import { usePermissions } from '@/hooks/usePermissions';
-import { useInventorySnapshots } from '@/hooks/useInventorySnapshots';
+import { InventorySnapshot } from '../../types';
+import { useModalContext } from '../../contexts/ModalContext';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useUserContext } from '../../contexts/UserContext';
+import { useConsumableContext } from '../../contexts/ConsumableContext';
+import { useToast } from '../../contexts/ToastContext';
+import { usePermissions } from '../../hooks/usePermissions';
+import { useInventorySnapshots } from '../../hooks/useInventorySnapshots';
 
 const InventoryLockManager: React.FC = () => {
   const { isJapanese, currentUser } = useSessionContext();

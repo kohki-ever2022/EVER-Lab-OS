@@ -1,21 +1,21 @@
 import React, { useState, FormEvent, useEffect, useMemo } from 'react';
-import { Role, Language } from '@/types/core';
-import { Equipment as EquipmentType, EquipmentStatus, ReservationStatus, MaintenanceLogStatus, Usage, EquipmentManual, ManualType } from '@/types/equipment';
-import { Protocol } from '@/types/research';
-import { UserCertification } from '@/types/user';
-import { NotificationType } from '@/types/common';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useToast } from '@/contexts/ToastContext';
-import { useNotifications } from '@/hooks/useNotifications';
-import { useReservationActions } from '@/hooks/useReservationActions';
-import { useEquipmentActions } from '@/hooks/useEquipmentActions';
-import { useBillingActions } from '@/hooks/useBillingActions';
-import { useUserContext } from '@/contexts/UserContext';
-import { useProjectContext } from '@/contexts/ProjectContext';
-import { useEquipmentContext } from '@/contexts/EquipmentContext';
-import { useModalContext } from '@/contexts/ModalContext';
-import { useQmsContext } from '@/contexts/AppProviders';
-import { useAdminContext } from '@/contexts/AppProviders';
+import { Role, Language } from '../types/core';
+import { Equipment as EquipmentType, EquipmentStatus, ReservationStatus, MaintenanceLogStatus, Usage, EquipmentManual, ManualType } from '../types/equipment';
+import { Protocol } from '../types/research';
+import { UserCertification } from '../types/user';
+import { NotificationType } from '../types/common';
+import { useSessionContext } from '../contexts/SessionContext';
+import { useToast } from '../contexts/ToastContext';
+import { useNotifications } from '../hooks/useNotifications';
+import { useReservationActions } from '../hooks/useReservationActions';
+import { useEquipmentActions } from '../hooks/useEquipmentActions';
+import { useBillingActions } from '../hooks/useBillingActions';
+import { useUserContext } from '../contexts/UserContext';
+import { useProjectContext } from '../contexts/ProjectContext';
+import { useEquipmentContext } from '../contexts/EquipmentContext';
+import { useModalContext } from '../contexts/ModalContext';
+import { useQmsContext } from '../contexts/AppProviders';
+import { useAdminContext } from '../contexts/AppProviders';
 
 
 const YoutubeIcon: React.FC<{className?: string}> = ({className}) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2ZM17.2,9.47,14.8,11.2,12,9.36,9.2,11.2,6.8,9.47l-2,5.85,5.4,3.21,5.4,3.21Z" opacity=".3"/><path d="M12,22A10,10,0,1,1,22,12,10,10,0,0,1,12,22ZM12,4a8,8,0,1,0,8,8A8,8,0,0,0,12,4Z"/><path d="M12,15.64,6.6,18.85l2-5.85L4,9.47,10,9,2-6,2,6,6,0-4.59,3.53,2,5.85Z"/></svg>);

@@ -1,9 +1,9 @@
 // src/services/geminiService.ts
 
 import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
-import { Usage, Equipment } from "@/types";
-import { Language } from "@/types";
-import { SDSSummary } from "@/types";
+import { Usage, Equipment } from "../types";
+import { Language } from "../types";
+import { SDSSummary } from "../types";
 import { logger } from './logger';
 
 // --- Interface Definition ---

@@ -5,13 +5,13 @@ import {
   RegulatoryRequirement,
   SupportStaffType,
   RegulatorySupport,
-} from '@/types';
-import { Role } from '@/types';
-import { useSessionContext } from '@/contexts/SessionContext';
-import { useQmsContext } from '@/contexts/AppProviders';
-import { usePermissions } from '@/hooks/usePermissions';
-import { useToast } from '@/contexts/ToastContext';
-import { useComplianceActions } from '@/hooks/useComplianceActions';
+} from '../types';
+import { Role } from '../types';
+import { useSessionContext } from '../contexts/SessionContext';
+import { useQmsContext } from '../contexts/AppProviders';
+import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../contexts/ToastContext';
+import { useComplianceActions } from '../hooks/useComplianceActions';
 
 export const RegulatoryCompliance: React.FC = () => {
   const { currentUser, isFacilityStaff, isJapanese } = useSessionContext();

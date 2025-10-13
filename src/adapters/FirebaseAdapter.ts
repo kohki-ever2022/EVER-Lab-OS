@@ -25,7 +25,7 @@ import {
 } from 'firebase/firestore';
 
 // 実際のFirebase設定ファイルからdbインスタンスをインポート
-import { db } from '@/firebase';
+import { db } from '../firebase';
 
 // 必要な型定義とインターフェースをインポート
 import {
@@ -51,7 +51,7 @@ import {
   ChatMessage,
   Invoice,
   Result,
-} from '@/types';
+} from '../types';
 import { IDataAdapter } from './IDataAdapter';
 
 

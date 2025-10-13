@@ -1,7 +1,7 @@
 // src/config/adapterFactory.ts
-import { IDataAdapter } from '@/adapters/IDataAdapter';
-import { MockAdapter } from '@/adapters/MockAdapter';
-import { FirebaseAdapter } from '@/adapters/FirebaseAdapter';
+import { IDataAdapter } from '../adapters/IDataAdapter';
+import { MockAdapter } from '../adapters/MockAdapter';
+import { FirebaseAdapter } from '../adapters/FirebaseAdapter';
 
 /**
  * データアダプターのファクトリークラス (Singleton Pattern)

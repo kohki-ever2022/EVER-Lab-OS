@@ -1,5 +1,5 @@
 // src/services/geminiReportService.ts
-import { Language } from '@/types';
+import { Language } from '../types';
 import { MonthlyReportData } from './reportAggregator';
 import { geminiService } from './geminiService';
 

@@ -24,10 +24,10 @@ import {
   ChatMessage,
   Invoice,
   Result,
-} from '@/types';
+} from '../types';
 import { IDataAdapter } from './IDataAdapter';
-import { getMockData } from '@/data/mockData';
-import { ValidationError, validatePassword, validateDateRange } from '@/utils/validation';
+import { getMockData } from '../data/mockData';
+import { ValidationError, validatePassword, validateDateRange } from '../utils/validation';
 
 // ID生成用のヘルパー関数
 const simpleUUID = () => `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
