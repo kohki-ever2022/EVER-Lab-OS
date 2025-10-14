@@ -124,5 +124,6 @@ export const FacilityLayout:React.FC = () => {
             </div>
         </div>
     </div>
+    </div>
   );
 };

@@ -4,17 +4,24 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "analyze:unused": "npx knip",
     "analyze:circular": "npx madge --circular --extensions ts,tsx src/",
     "analyze:duplication": "npx jscpd src/",
     "analyze:all": "npm run analyze:unused && npm run analyze:circular && npm run analyze:duplication"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "latest",
     "jscpd": "latest",
     "knip": "latest",
     "madge": "latest",
     "postcss": "latest",
-    "tailwindcss": "latest"
+    "tailwindcss": "latest",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }
