@@ -107,6 +107,7 @@ export interface IDataAdapter {
   deleteTask(id: string): Promise<Result<void>>;
   
   // --- Lab Notebook Operations ---
+  getLabNotebookEntries(): Promise<Result<LabNotebookEntry[]>>;
   createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>>;
   updateLabNotebookEntry(entry: LabNotebookEntry): Promise<Result<LabNotebookEntry>>;
   deleteLabNotebookEntry(id: string): Promise<Result<void>>;

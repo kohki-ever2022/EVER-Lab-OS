@@ -16,12 +16,15 @@ export const UsageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = adapter.subscribeToUsages((data) => {
-      setUsage(data);
-      if (loading) setLoading(false);
+    setLoading(true);
+    adapter.getUsages().then(result => {
+        if (result.success) {
+            setUsage(result.data);
+        }
+    }).finally(() => {
+        setLoading(false);
     });
-    return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
   
   const value = useMemo(() => ({ usage, loading }), [usage, loading]);
 

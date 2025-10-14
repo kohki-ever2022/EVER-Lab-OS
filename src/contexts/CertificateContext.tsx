@@ -29,14 +29,8 @@ export const CertificateProvider: React.FC<{ children: ReactNode }> = ({ childre
   }, [adapter]);
 
   useEffect(() => {
-    setLoading(true);
-    const unsubscribe = adapter.subscribeToCertificates(data => {
-      setCertificates(data);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, [adapter]);
+    fetchCertificates();
+  }, [fetchCertificates]);
   
   // Moved from useAppEffects.ts
   useEffect(() => {

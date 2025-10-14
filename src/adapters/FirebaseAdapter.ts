@@ -769,6 +769,17 @@ export class FirebaseAdapter implements IDataAdapter {
   }
   
   // --- Lab Notebook Operations ---
+  async getLabNotebookEntries(): Promise<Result<LabNotebookEntry[]>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const q = query(collection(db, LAB_NOTEBOOK_COLLECTION), orderBy('experimentDate', 'desc'));
+      const snapshot = await getDocs(q);
+      return { success: true, data: this.fromSnapshot<LabNotebookEntry>(snapshot) };
+    } catch (error) {
+      console.error('Error fetching lab notebook entries:', error);
+      return { success: false, error: error as Error };
+    }
+  }
   async createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>> {
     if (!db) return { success: false, error: new Error("Firebase not configured.") };
     try {

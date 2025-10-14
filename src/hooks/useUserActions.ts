@@ -2,7 +2,7 @@
 import { useCallback, useMemo } from 'react';
 // FIX: import from barrel file
 import { User, Result, Role } from '../types';
-import { ValidationError, validateEmail as validateEmailFormat, validatePassword } from '../utils/validation';
+import { ValidationError, validateEmail as validateEmailFormat } from '../utils/validation';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { usePermissions } from './usePermissions';
@@ -51,11 +51,6 @@ export const useUserActions = () => {
             if (user.name.length < 2) throw new ValidationError('name', 'TOO_SHORT', 'Name must be at least 2 characters.');
             validateEmailFormat(user.email);
             
-            if (!user.password) {
-                 throw new ValidationError('password', 'REQUIRED', 'Password is required.');
-            }
-            validatePassword(user.password);
-
             // FIX: Explicitly type userPayload to avoid type inference issue.
             const userPayload: Omit<User, 'id'> = { ...user, name: escapeHtml(user.name) };
             const result = await adapter.createUser(userPayload);
@@ -95,9 +90,6 @@ export const useUserActions = () => {
             validateEmailFormat(user.email);
             if (users.some(u => u.email.toLowerCase() === user.email.toLowerCase() && u.id !== user.id)) {
                 throw new ValidationError('email', 'EXISTS', 'Email already exists.');
-            }
-            if (user.password && user.password.length > 0) {
-                validatePassword(user.password);
             }
 
             const updatedUser = { ...user, name: escapeHtml(user.name) };

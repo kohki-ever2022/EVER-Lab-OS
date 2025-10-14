@@ -28,7 +28,7 @@ import {
 } from '../types';
 import { IDataAdapter } from './IDataAdapter';
 import { getMockData } from '../data/mockData';
-import { ValidationError, validatePassword, validateDateRange } from '../utils/validation';
+import { ValidationError, validateDateRange } from '../utils/validation';
 import { simpleUUID } from '../utils/uuid';
 
 /**
@@ -134,7 +134,6 @@ export class MockAdapter implements IDataAdapter {
       if (this.users.some(u => u.email.toLowerCase() === data.email.toLowerCase())) {
         throw new ValidationError('email', 'EXISTS', 'Email already exists.');
       }
-      if(data.password) validatePassword(data.password);
       
       const newUser: User = { ...data, id: simpleUUID() };
       this.users.push(newUser);
@@ -342,6 +341,9 @@ export class MockAdapter implements IDataAdapter {
   }
   
   // --- Lab Notebook Operations ---
+  async getLabNotebookEntries(): Promise<Result<LabNotebookEntry[]>> {
+    return { success: true, data: [...this.labNotebookEntries] };
+  }
   async createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>> {
     const newEntry: LabNotebookEntry = { ...data, id: simpleUUID() };
     this.labNotebookEntries.push(newEntry);

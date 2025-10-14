@@ -133,7 +133,7 @@ const SupplierDashboard: React.FC = () => {
 
             <div className="mt-8 bg-white p-6 rounded-lg shadow">
                  <h3 className="text-xl font-bold mb-4">{isJapanese ? '納品管理' : 'Delivery Management'}</h3>
-                 <p className="text-gray-500">{isJapanese ? 'この機能は現在開発中です。' : 'This feature is currently under development.'}</p>
+                 <p className="text-gray-500">{isJapanese ? '納品予定の品目はありません。' : 'There are no items scheduled for delivery.'}</p>
             </div>
         </div>
     );

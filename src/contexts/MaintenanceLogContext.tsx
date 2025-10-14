@@ -16,12 +16,15 @@ export const MaintenanceLogProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = adapter.subscribeToMaintenanceLogs((data) => {
-      setMaintenanceLogs(data);
-      if (loading) setLoading(false);
+    setLoading(true);
+    adapter.getMaintenanceLogs().then(result => {
+        if (result.success) {
+            setMaintenanceLogs(result.data);
+        }
+    }).finally(() => {
+        setLoading(false);
     });
-    return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
   
   const value = useMemo(() => ({ maintenanceLogs, loading }), [maintenanceLogs, loading]);
 

@@ -10,6 +10,9 @@ import EquipmentManualsModal from '../modals/EquipmentManualsModal';
 import UploadCertificateModal from '../modals/UploadCertificateModal';
 import ScheduleEquipmentModal from '../modals/ScheduleEquipmentModal';
 import EditTaskModal from '../modals/EditTaskModal';
+import BookEquipmentModal from '../modals/BookEquipmentModal';
+import ReportIssueModal from '../modals/ReportIssueModal';
+import SdsDetailsModal from '../modals/SdsDetailsModal';
 
 const ModalRenderer: React.FC = () => {
     const { activeModal, closeModal } = useModalContext();
@@ -25,7 +28,10 @@ const ModalRenderer: React.FC = () => {
         case 'equipmentManuals': return <EquipmentManualsModal equipment={activeModal.props.equipment} onClose={closeModal} />;
         case 'uploadCertificate': return <UploadCertificateModal certificateToEdit={activeModal.props.certificateToEdit} onClose={closeModal} />;
         case 'scheduleEquipment': return <ScheduleEquipmentModal equipment={activeModal.props.equipment} onClose={closeModal} />;
+        case 'bookEquipment': return <BookEquipmentModal equipment={activeModal.props.equipment} onClose={closeModal} />;
+        case 'reportIssue': return <ReportIssueModal equipment={activeModal.props.equipment} onClose={closeModal} />;
         case 'editTask': return <EditTaskModal {...activeModal.props} onClose={closeModal} />;
+        case 'sdsDetails': return <SdsDetailsModal sds={activeModal.props.sds} onClose={closeModal} />;
 
         // Handle other modals with a placeholder to prevent silent failures
         case 'qrScanner': return <PlaceholderModal title="QR Code Scanner" onClose={closeModal} />;

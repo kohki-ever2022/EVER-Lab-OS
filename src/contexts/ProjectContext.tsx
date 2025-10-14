@@ -24,30 +24,28 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   useEffect(() => {
     setLoading(true);
-    const unsubProjects = adapter.subscribeToProjects(setProjects);
-    const unsubTasks = adapter.subscribeToTasks(setTasks);
-    const unsubEntries = adapter.subscribeToLabNotebookEntries(setLabNotebookEntries);
-    // TODO: The adapter should be updated to provide subscriptions for protocols.
-    // For now, this will allow the app to run without crashing.
-    
-    // A simple loading indicator; assumes data arrives reasonably quickly.
-    const timer = setTimeout(() => {
-      if (loading) setLoading(false);
-    }, 2000);
-
-    return () => {
-      unsubProjects();
-      unsubTasks();
-      unsubEntries();
-      clearTimeout(timer);
+    const fetchData = async () => {
+        const [
+            projectsResult,
+            tasksResult,
+            entriesResult,
+        ] = await Promise.all([
+            adapter.getProjects(),
+            adapter.getTasks(),
+            adapter.getLabNotebookEntries(),
+        ]);
+        
+        if (projectsResult.success) setProjects(projectsResult.data);
+        if (tasksResult.success) setTasks(tasksResult.data);
+        if (entriesResult.success) setLabNotebookEntries(entriesResult.data);
+        
+        // Protocols are not fetched yet, but this follows the original structure.
+        
+        setLoading(false);
     };
-  }, [adapter, loading]);
 
-  useEffect(() => {
-      if(projects.length > 0 && tasks.length > 0 && labNotebookEntries.length > 0 && loading) {
-          setLoading(false);
-      }
-  }, [projects, tasks, labNotebookEntries, loading]);
+    fetchData();
+  }, [adapter]);
 
   const value = useMemo(() => ({ projects, tasks, loading, labNotebookEntries, protocols }), [projects, tasks, loading, labNotebookEntries, protocols]);
 

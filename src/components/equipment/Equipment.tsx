@@ -1,20 +1,10 @@
-import React, { useState, FormEvent, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 // FIX: import from barrel file
 import { Role, Language, View, NotificationType } from '../../types';
 // FIX: import from barrel file
-import { Equipment as EquipmentType, EquipmentStatus, ReservationStatus, MaintenanceLogStatus, Usage, EquipmentManual, ManualType } from '../../types';
-// FIX: import from barrel file
-import { Protocol } from '../../types';
-// FIX: import from barrel file
-import { UserCertification } from '../../types';
+import { Equipment as EquipmentType, EquipmentStatus, ManualType } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useToast } from '../../contexts/ToastContext';
-import { useNotifications } from '../../hooks/useNotifications';
-import { useReservationActions } from '../../hooks/useReservationActions';
-import { useEquipmentActions } from '../../hooks/useEquipmentActions';
-import { useBillingActions } from '../../hooks/useBillingActions';
 import { useUserContext } from '../../contexts/UserContext';
-import { useProjectContext } from '../../contexts/ProjectContext';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useQmsContext } from '../../contexts/AppProviders';
@@ -69,74 +59,16 @@ const StatusBadge: React.FC<{ status: EquipmentStatus }> = ({ status }) => {
 
 const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) => {
     const { language, currentUser } = useSessionContext();
-    const { qualifications, userCertifications, protocols } = useQmsContext();
+    const { qualifications, userCertifications } = useQmsContext();
     const { users } = useUserContext();
-    const { projects } = useProjectContext();
-    const { showToast } = useToast();
-    const { addNotification } = useNotifications();
-    const { addReservation, addToWaitlist } = useReservationActions();
-    const { updateEquipment, addMaintenanceLog } = useEquipmentActions();
-    const { calculateCostForUsage } = useBillingActions();
-
     const { openModal } = useModalContext();
     
     const isJapanese = language === Language.JA;
-    
-    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-    const [bookingStartTime, setBookingStartTime] = useState('');
-    const [bookingEndTime, setBookingEndTime] = useState('');
-    const [bookingProjectId, setBookingProjectId] = useState<string>('');
-    const [bookingNotes, setBookingNotes] = useState('');
-    const [reportNotes, setReportNotes] = useState('');
-    const [estimatedCost, setEstimatedCost] = useState(0);
-    const [bookingError, setBookingError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (isBookingModalOpen) {
-            setBookingError(null);
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + 5); // Start 5 mins from now
-            now.setSeconds(0);
-            now.setMilliseconds(0);
-            const start = now.toISOString().slice(0, 16);
-
-            const endDt = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour duration
-            const end = endDt.toISOString().slice(0, 16);
-
-            setBookingStartTime(start);
-            setBookingEndTime(end);
-        }
-    }, [isBookingModalOpen]);
-
-    useEffect(() => {
-        if (isBookingModalOpen && bookingStartTime && bookingEndTime && equipment && currentUser && calculateCostForUsage) {
-            const start = new Date(bookingStartTime);
-            const end = new Date(bookingEndTime);
-            if (end > start) {
-                const durationMinutes = (end.getTime() - start.getTime()) / 60000;
-                const tempUsage: Usage = {
-                    id: '',
-                    userId: currentUser.id,
-                    equipmentId: equipment.id,
-                    reservationId: '',
-                    durationMinutes: durationMinutes,
-                    date: start,
-                };
-                const cost = calculateCostForUsage(tempUsage, equipment);
-                setEstimatedCost(cost);
-            } else {
-                setEstimatedCost(0);
-            }
-        } else {
-            setEstimatedCost(0);
-        }
-    }, [bookingStartTime, bookingEndTime, equipment, calculateCostForUsage, currentUser, isBookingModalOpen]);
 
     const requiredQualId = equipment.requiredQualificationId;
     const userCertification = userCertifications.find(cert => 
         cert.userId === currentUser?.id &&
-        (cert as any).qualificationId === requiredQualId && // Mock data inconsistency
+        (cert as any).qualificationId === requiredQualId &&
         new Date() < new Date(cert.expiresAt)
     );
     const userHasQualification = !requiredQualId || !!userCertification;
@@ -146,92 +78,12 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
 
     const isAvailableForBooking = equipment.isReservable && equipment.status === EquipmentStatus.Available && userHasQualification && !isCalibrationOverdue;
 
-    const userProjects = projects.filter(p => p.companyId === currentUser?.companyId);
-
     const equipmentName = isJapanese ? equipment.nameJP : equipment.nameEN;
     const equipmentCategory = isJapanese ? equipment.categoryJP : equipment.categoryEN;
     const rateUnit = isJapanese ? equipment.rateUnitJP : equipment.rateUnitEN;
     const requiredQualName = requiredQual ? (isJapanese ? requiredQual.nameJP : requiredQual.nameEN) : '';
     const personInCharge = equipment.personInChargeUserId ? users.find(u => u.id === equipment.personInChargeUserId) : null;
     const locationDetails = isJapanese ? equipment.locationDetailsJP : equipment.locationDetailsEN;
-
-    const handleBookingSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        setBookingError(null);
-        if (!currentUser || !bookingStartTime || !bookingEndTime || !addReservation) return;
-        
-        const result = await addReservation({
-            userId: currentUser.id,
-            equipmentId: equipment.id,
-            projectId: bookingProjectId || undefined,
-            startTime: new Date(bookingStartTime),
-            endTime: new Date(bookingEndTime),
-            status: ReservationStatus.AwaitingCheckIn,
-            notes: bookingNotes,
-        });
-
-        if (result.success === false) {
-            setBookingError(result.error.message);
-        } else {
-            setIsBookingModalOpen(false);
-            setBookingNotes('');
-            setBookingProjectId('');
-        }
-    };
-
-    const handleAddToWaitlist = async () => {
-        if (!bookingStartTime || !bookingEndTime || !addToWaitlist) return;
-        const result = await addToWaitlist(equipment.id, new Date(bookingStartTime), new Date(bookingEndTime));
-        if (result.success === false) {
-            setBookingError(result.error.message);
-            showToast(isJapanese ? '待機リストへの追加に失敗しました。' : 'Failed to add to waitlist.', 'error');
-        } else {
-            showToast(isJapanese ? '待機リストに追加しました。' : 'Added to waitlist.', 'success');
-            setIsBookingModalOpen(false);
-        }
-    };
-
-    const handleReportSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        if (!reportNotes || !currentUser || !updateEquipment || !addMaintenanceLog || !addNotification) return;
-
-        const updateResult = await updateEquipment({ ...equipment, status: EquipmentStatus.Maintenance });
-        if (updateResult.success === false) {
-            showToast(isJapanese ? `機器ステータスの更新に失敗しました: ${updateResult.error.message}` : `Failed to update equipment status: ${updateResult.error.message}`, 'error');
-            return;
-        }
-    
-        const logResult = await addMaintenanceLog({
-            equipmentId: equipment.id,
-            logType: 'Repair',
-            status: MaintenanceLogStatus.Reported,
-            reportedByUserId: currentUser.id,
-            reportDate: new Date(),
-            notes: reportNotes,
-        });
-
-        if (logResult.success === false) {
-            showToast(isJapanese ? `メンテナンスログの追加に失敗しました: ${logResult.error.message}` : `Failed to add maintenance log: ${logResult.error.message}`, 'error');
-            return;
-        }
-
-        const labAdmins = users.filter(u => u.role === Role.FacilityDirector || u.role === Role.LabManager);
-        labAdmins.forEach(admin => {
-            addNotification({
-                recipientUserId: admin.id,
-                type: NotificationType.EquipmentMalfunction,
-                priority: 'HIGH',
-                titleJP: '不具合報告',
-                titleEN: 'Malfunction Report',
-                messageJP: `【不具合報告】${equipment.nameJP}に問題が報告されました。`,
-                messageEN: `[Malfunction Report] An issue has been reported for ${equipment.nameEN}.`
-            })
-        });
-
-        showToast(isJapanese ? '不具合を報告しました。' : 'Issue reported successfully.', 'success');
-        setIsReportModalOpen(false);
-        setReportNotes('');
-    };
 
     const getBookingButtonTitle = () => {
         if (!equipment.isReservable) return isJapanese ? 'この機器は予約不要です' : 'This equipment does not require reservation';
@@ -273,7 +125,7 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
                     </div>
                     <div className="flex space-x-2">
                         <button 
-                            onClick={() => setIsBookingModalOpen(true)}
+                            onClick={() => openModal({ type: 'bookEquipment', props: { equipment } })}
                             disabled={!isAvailableForBooking}
                             className={`w-full font-bold py-2 px-4 rounded-full transition-all duration-300 ${
                                 isAvailableForBooking
@@ -285,7 +137,7 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
                             {isJapanese ? '予約する' : 'Book'}
                         </button>
                         <button 
-                            onClick={() => setIsReportModalOpen(true)}
+                            onClick={() => openModal({ type: 'reportIssue', props: { equipment } })}
                             className="flex-shrink-0 bg-yellow-500 hover:bg-yellow-600 text-white font-bold p-2 rounded-lg"
                             title={isJapanese ? "不具合を報告" : "Report Issue"}
                         >
@@ -294,72 +146,6 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
                     </div>
                 </div>
             </div>
-
-            {isBookingModalOpen && (
-                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md max-h-full overflow-y-auto">
-                        <h3 className="text-2xl font-bold mb-6 text-ever-black">{isJapanese ? '機器予約' : 'Book Equipment'}</h3>
-                        <form onSubmit={handleBookingSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">{isJapanese ? '開始日時' : 'Start Time'}</label>
-                                <input type="datetime-local" value={bookingStartTime} onChange={e => setBookingStartTime(e.target.value)} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">{isJapanese ? '終了日時' : 'End Time'}</label>
-                                <input type="datetime-local" value={bookingEndTime} onChange={e => setBookingEndTime(e.target.value)} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
-                            </div>
-                             <div className="border-t pt-4">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-lg font-medium text-gray-700">{isJapanese ? '概算料金' : 'Estimated Cost'}</span>
-                                    <span className="text-2xl font-bold text-ever-blue font-mono">¥{Math.round(estimatedCost).toLocaleString()}</span>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'プロジェクト' : 'Project'}</label>
-                                <select value={bookingProjectId} onChange={e => setBookingProjectId(e.target.value)} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                                    <option value="">{isJapanese ? '選択しない' : 'None'}</option>
-                                    {userProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'メモ（任意）' : 'Notes (Optional)'}</label>
-                                <textarea value={bookingNotes} onChange={e => setBookingNotes(e.target.value)} rows={3} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
-                            </div>
-                            {bookingError && (
-                                <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400">
-                                    <p className="font-semibold text-yellow-800">{isJapanese ? '予約不可' : 'Slot Unavailable'}</p>
-                                    <p className="text-sm text-yellow-700">{bookingError === 'OVERLAP_ERROR' ? (isJapanese ? 'この時間帯は既に予約されています。待機リストに追加しますか？' : 'This time slot is already booked. Would you like to be added to the waitlist?') : bookingError}</p>
-                                </div>
-                            )}
-                            <div className="mt-8 flex justify-end space-x-3">
-                                <button type="button" onClick={() => setIsBookingModalOpen(false)} className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-                                {bookingError === 'OVERLAP_ERROR' ? (
-                                     <button type="button" onClick={handleAddToWaitlist} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">{isJapanese ? '待機リストに追加' : 'Add to Waitlist'}</button>
-                                ) : (
-                                    <button type="submit" className="bg-gradient-to-r from-ever-blue to-ever-purple text-white font-bold py-2 px-4 rounded-full">{isJapanese ? '予約を確定' : 'Confirm Booking'}</button>
-                                )}
-                            </div>
-                        </form>
-                    </div>
-                 </div>
-            )}
-            {isReportModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-                        <h3 className="text-2xl font-bold mb-6 text-ever-black">{isJapanese ? '不具合を報告' : 'Report Issue'}</h3>
-                        <form onSubmit={handleReportSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">{isJapanese ? '問題の詳細' : 'Details of the issue'}</label>
-                                <textarea value={reportNotes} onChange={e => setReportNotes(e.target.value)} rows={5} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
-                            </div>
-                            <div className="mt-8 flex justify-end space-x-3">
-                                <button type="button" onClick={() => setIsReportModalOpen(false)} className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-                                <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">{isJapanese ? '報告する' : 'Report'}</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

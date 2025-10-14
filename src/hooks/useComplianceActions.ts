@@ -14,6 +14,7 @@ import {
   CalendarEventType,
   NotificationType,
   Certificate,
+  SDS,
 } from '../types';
 import { googleCalendarService, createCalendarEventFromSchedule } from '../services/googleCalendarService';
 import { useCompanyContext } from '../contexts/CompanyContext';
@@ -129,12 +130,21 @@ export const useComplianceActions = () => {
         return result;
     }, [adapter, addAuditLog]);
 
+    const updateSds = useCallback(async (sds: SDS): Promise<Result<SDS, Error>> => {
+        const result = await adapter.updateSds(sds);
+        if (result.success) {
+            addAuditLog('SDS_UPDATE', `Updated SDS for '${sds.chemicalName}'`);
+        }
+        return result;
+    }, [adapter, addAuditLog]);
+
     return useMemo(() => ({
         acknowledgeRule,
         addRegulatoryRequirement,
         addInsuranceCertificate,
         updateInsuranceCertificate,
         addCertificate,
-        updateCertificate
-    }), [acknowledgeRule, addRegulatoryRequirement, addInsuranceCertificate, updateInsuranceCertificate, addCertificate, updateCertificate]);
+        updateCertificate,
+        updateSds
+    }), [acknowledgeRule, addRegulatoryRequirement, addInsuranceCertificate, updateInsuranceCertificate, addCertificate, updateCertificate, updateSds]);
 };

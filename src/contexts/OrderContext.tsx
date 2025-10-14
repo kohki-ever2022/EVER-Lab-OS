@@ -16,12 +16,15 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = adapter.subscribeToOrders((data) => {
-      setOrders(data);
-      if (loading) setLoading(false);
+    setLoading(true);
+    adapter.getOrders().then(result => {
+        if (result.success) {
+            setOrders(result.data);
+        }
+    }).finally(() => {
+        setLoading(false);
     });
-    return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
   
   const value = useMemo(() => ({ orders, loading }), [orders, loading]);
 

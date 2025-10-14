@@ -7,14 +7,18 @@
     "analyze:unused": "npx knip",
     "analyze:circular": "npx madge --circular --extensions ts,tsx src/",
     "analyze:duplication": "npx jscpd src/",
-    "analyze:all": "npm run analyze:unused && npm run analyze:circular && npm run analyze:duplication"
+    "analyze:all": "npm run analyze:unused && npm run analyze:circular && npm run analyze:duplication",
+    "test": "vitest"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.0.0",
     "autoprefixer": "latest",
+    "jsdom": "^24.1.1",
     "jscpd": "latest",
     "knip": "latest",
     "madge": "latest",
     "postcss": "latest",
-    "tailwindcss": "latest"
+    "tailwindcss": "latest",
+    "vitest": "^2.0.4"
   }
 }

@@ -28,15 +28,3 @@ export const validateDateRange = (start: Date, end: Date): void => {
     throw new ValidationError('startTime', 'PAST_DATE', 'Cannot create reservations in the past');
   }
 };
-
-export const validatePassword = (password: string): void => {
-  if (password.length < 8) {
-    throw new ValidationError('password', 'TOO_SHORT', 'Password must be at least 8 characters');
-  }
-  if (!/[A-Z]/.test(password)) {
-    throw new ValidationError('password', 'NO_UPPERCASE', 'Password must contain at least one uppercase letter');
-  }
-  if (!/[0-9]/.test(password)) {
-    throw new ValidationError('password', 'NO_NUMBER', 'Password must contain at least one number');
-  }
-};

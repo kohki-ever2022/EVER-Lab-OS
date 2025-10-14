@@ -2,6 +2,8 @@ import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useConsumableContext } from '../../contexts/ConsumableContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
+import { useQmsContext } from '../../contexts/AppProviders';
+import { useModalContext } from '../../contexts/ModalContext';
 
 // FIX: import from barrel file
 import { View } from '../../types';
@@ -12,6 +14,8 @@ export const HazardousMaterialsDashboard: React.FC = () => {
   const { isJapanese } = useSessionContext();
   const { consumables } = useConsumableContext();
   const { companies } = useCompanyContext();
+  const { sds } = useQmsContext();
+  const { openModal } = useModalContext();
 
   const handleNavigate = (view: View) => {
     window.location.hash = view;
@@ -47,6 +51,19 @@ export const HazardousMaterialsDashboard: React.FC = () => {
     if (id === 'facility') return isJapanese ? '施設' : 'Facility';
     const company = companies.find(c => c.id === id);
     return company ? (isJapanese ? company.nameJP : company.nameEN) : 'Unknown';
+  };
+  
+  const handleViewSds = (sdsId?: string) => {
+    if (!sdsId) {
+        alert(isJapanese ? 'SDSが関連付けられていません。' : 'No SDS associated.');
+        return;
+    }
+    const sdsDoc = sds.find(s => s.id === sdsId);
+    if (sdsDoc) {
+        openModal({ type: 'sdsDetails', props: { sds: sdsDoc } });
+    } else {
+        alert(isJapanese ? 'SDS情報が見つかりません。' : 'SDS information not found.');
+    }
   };
 
   return (
@@ -86,6 +103,7 @@ export const HazardousMaterialsDashboard: React.FC = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '分類' : 'Category'}</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '在庫量' : 'Stock'}</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '倍率' : 'Multiple'}</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '操作' : 'Actions'}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -95,6 +113,11 @@ export const HazardousMaterialsDashboard: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.hazardousCategory}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{item.stock * (item.packageSize || 0)} {item.packageUnit}</td>
                       <td className="px-6 py-4 whitespace-nowrap font-mono">{item.multiple.toFixed(3)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onClick={() => handleViewSds(item.sdsId)} className="text-indigo-600 hover:text-indigo-900">
+                          {isJapanese ? 'SDS詳細' : 'SDS Details'}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

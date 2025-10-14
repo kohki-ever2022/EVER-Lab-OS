@@ -16,12 +16,15 @@ export const AnnouncementProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = adapter.subscribeToAnnouncements((data) => {
-      setAnnouncements(data);
-      if (loading) setLoading(false);
+    setLoading(true);
+    adapter.getAnnouncements().then(result => {
+        if (result.success) {
+            setAnnouncements(result.data);
+        }
+    }).finally(() => {
+        setLoading(false);
     });
-    return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
   
   const value = useMemo(() => ({ announcements, loading }), [announcements, loading]);
 

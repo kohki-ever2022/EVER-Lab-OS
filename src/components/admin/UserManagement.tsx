@@ -131,11 +131,6 @@ export const UserManagement: React.FC = () => {
                                 <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'メールアドレス' : 'Email'}</label>
                                 <input type="email" name="email" value={currentUser.email || ''} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'パスワード' : 'Password'}</label>
-
-                                <input type="password" name="password" onChange={handleChange} placeholder={currentUser.id ? (isJapanese ? '変更する場合のみ入力' : 'Fill only to change') : ''} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required={!currentUser.id} />
-                            </div>
                              <div>
                                 <label className="block text-sm font-medium text-gray-700">{isJapanese ? '所属企業' : 'Company'}</label>
                                 <select name="companyId" value={currentUser.companyId || ''} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>

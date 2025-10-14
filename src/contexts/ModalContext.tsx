@@ -28,6 +28,8 @@ import {
 export type ModalPayload =
   | { type: 'sendMemo'; props: { recipient: User } }
   | { type: 'scheduleEquipment'; props: { equipment: Equipment } }
+  | { type: 'bookEquipment'; props: { equipment: Equipment } }
+  | { type: 'reportIssue'; props: { equipment: Equipment } }
   | { type: 'equipmentHistory'; props: { equipment: Equipment } }
   | { type: 'equipmentManuals'; props: { equipment: Equipment } }
   | { type: 'viewInvoice'; props: { invoice: Invoice } }
