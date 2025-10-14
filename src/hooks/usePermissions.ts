@@ -7,9 +7,10 @@ import { Resource, Action } from '../types/common';
 import { useSessionContext } from '../contexts/SessionContext';
 
 /**
- * 権限チェックのためのカスタムフック
- * このフックは、現在ログインしているユーザーの権限に関する全てのチェックロジックを集約します。
- * コンポーネントは、このフックを通じて「何ができるか」を問い合わせるだけでよくなります。
+ * Custom hook for checking user permissions.
+ * This hook centralizes all permission logic for the currently logged-in user.
+ * Components should use this hook to determine what actions the user is allowed to perform.
+ * @returns An object containing functions for various permission checks.
  */
 export const usePermissions = () => {
   const { currentUser } = useSessionContext();

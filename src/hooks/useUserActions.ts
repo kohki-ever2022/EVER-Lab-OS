@@ -1,4 +1,3 @@
-
 // src/hooks/useUserActions.ts
 import { useCallback, useMemo } from 'react';
 import { User } from '../types/user';
@@ -20,6 +19,11 @@ const escapeHtml = (unsafe: string): string => {
       .replace(/'/g, "&#039;");
 }
 
+/**
+ * Custom hook for managing user-related actions such as creating, updating, and deleting users.
+ * It encapsulates permission checks, validation, and data adapter calls.
+ * @returns An object containing functions for user management.
+ */
 export const useUserActions = () => {
     const adapter = useDataAdapter();
     const { users } = useUserContext();
@@ -27,6 +31,11 @@ export const useUserActions = () => {
     const { hasPermission, canAccessData } = usePermissions();
     const { addAuditLog } = useAudit();
     
+    /**
+     * Adds a new user to the system.
+     * @param user - The user data to create (without id).
+     * @returns A Result object containing the new user or an error.
+     */
     const addUser = useCallback(async (user: Omit<User, 'id'>): Promise<Result<User, ValidationError | Error>> => {
         try {
             if (!hasPermission('users', 'create')) {
@@ -60,6 +69,11 @@ export const useUserActions = () => {
         }
     }, [hasPermission, currentUser, adapter, addAuditLog]);
 
+    /**
+     * Updates an existing user's information.
+     * @param user - The complete user object with updated data.
+     * @returns A Result object containing the updated user or an error.
+     */
     const updateUser = useCallback(async (user: User): Promise<Result<User, ValidationError | Error>> => {
         try {
             const originalUser = users.find(u => u.id === user.id);
@@ -97,6 +111,11 @@ export const useUserActions = () => {
         }
     }, [users, currentUser, hasPermission, canAccessData, adapter, addAuditLog]);
 
+    /**
+     * Deletes a user from the system.
+     * @param userId - The ID of the user to delete.
+     * @returns A Result object indicating success or failure.
+     */
     const deleteUser = useCallback(async (userId: string): Promise<Result<void, Error>> => {
         try {
             if (!hasPermission('users', 'delete')) {

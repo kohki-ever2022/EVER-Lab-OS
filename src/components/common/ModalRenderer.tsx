@@ -2,7 +2,7 @@ import React from 'react';
 import { useModalContext } from '../../contexts/ModalContext';
 
 // Import all modals
-import ProjectDetailsModal from '../ProjectDetailsModal';
+import ProjectDetailsModal from '../modals/ProjectDetailsModal';
 import ConfirmModal from './ConfirmModal';
 import PromptModal from './PromptModal';
 import PlaceholderModal from '../modals/PlaceholderModal';

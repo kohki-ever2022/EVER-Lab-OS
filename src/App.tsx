@@ -1,53 +1,58 @@
+
 import React, { useState, lazy, Suspense } from 'react';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
-import Header from './components/Header';
-import { Sidebar } from './components/Sidebar';
-import UserProfile from './components/UserProfile';
-import Billing from './components/Billing';
-import Settings from './components/Settings';
-import AuditLog from './components/AuditLog';
-import NotificationCenter from './components/NotificationCenter';
-import MaintenanceLogViewer from './components/MaintenanceLogViewer';
-import MaintenanceStatus from './components/MaintenanceStatus';
-import Projects from './components/Projects';
-import Tasks from './components/Tasks';
+import Header from './components/layout/Header';
+import { Sidebar } from './components/layout/Sidebar';
 import { RoleCategory } from './types/core';
-import InventoryLockManager from './components/inventory/InventoryLockManager';
-import FavoriteConsumablesList from './components/inventory/FavoriteConsumablesList';
-import MonthlyReportGenerator from './components/reports/MonthlyReportGenerator';
 import { useSessionContext } from './contexts/SessionContext';
-import Toast from './components/Toast';
+import Toast from './components/common/Toast';
 import ModalRenderer from './components/common/ModalRenderer';
 
 // --- Lazy-loaded View Components ---
 
 // Default Exports
-const Dashboard = lazy(() => import('./components/Dashboard'));
-const Equipment = lazy(() => import('./components/Equipment'));
-const Announcements = lazy(() => import('./components/Announcements'));
-const ManualManagement = lazy(() => import('./components/ManualManagement'));
-const UserManagement = lazy(() => import('./components/UserManagement'));
-// FIX: Changed lazy import to handle named export
-const CO2IncubatorManagement = lazy(() => import('./components/CO2IncubatorManagement').then(m => ({ default: m.CO2IncubatorManagement })));
-const FacilityConsumableNotification = lazy(() => import('./components/FacilityConsumableNotification'));
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
+const Equipment = lazy(() => import('./components/equipment/Equipment'));
+const Announcements = lazy(() => import('./components/dashboard/Announcements'));
+const UserProfile = lazy(() => import('./components/user/UserProfile'));
+const Billing = lazy(() => import('./components/billing/Billing'));
+const Projects = lazy(() => import('./components/project/Projects'));
+const Tasks = lazy(() => import('./components/project/Tasks'));
+const Reservations = lazy(() => import('./components/reservations/Reservations'));
+const FavoriteConsumablesList = lazy(() => import('./components/inventory/FavoriteConsumablesList'));
+// FIX: Corrected import path for ElectronicLabNotebook. The component is in `./components` not `./components/project`.
 const ElectronicLabNotebook = lazy(() => import('./components/ElectronicLabNotebook'));
-const ProjectProgressDashboard = lazy(() => import('./components/ProjectProgressDashboard'));
-const ProjectGanttChart = lazy(() => import('./components/ProjectGanttChart').then(m => ({ default: m.ProjectGanttChart })));
-const SupplierDashboard = lazy(() => import('./components/SupplierDashboard'));
+const ProjectProgressDashboard = lazy(() => import('./components/dashboard/ProjectProgressDashboard'));
+const SupplierDashboard = lazy(() => import('./components/supplier/SupplierDashboard'));
+const ReorderSuggestions = lazy(() => import('./components/inventory/ReorderSuggestions'));
+const CertificateManagement = lazy(() => import('./components/certificates/CertificateManagement'));
 
 // Named Exports
-const EquipmentManagement = lazy(() => import('./components/EquipmentManagement').then(module => ({ default: module.EquipmentManagement })));
-const Reservations = lazy(() => import('./components/Reservations'));
-const MemberManagement = lazy(() => import('./components/MemberManagement').then(module => ({ default: module.MemberManagement })));
-const AdminDashboard = lazy(() => import('./components/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
-const HazardousMaterialsDashboard = lazy(() => import('./components/HazardousMaterialsDashboard').then(module => ({ default: module.HazardousMaterialsDashboard })));
-const RegulatoryCompliance = lazy(() => import('./components/RegulatoryCompliance').then(module => ({ default: module.RegulatoryCompliance })));
-const FacilityLayout = lazy(() => import('./components/FacilityLayout').then(module => ({ default: module.FacilityLayout })));
-const InsuranceManagement = lazy(() => import('./components/InsuranceManagement').then(module => ({ default: module.InsuranceManagement })));
-const LabRuleManagement = lazy(() => import('./components/LabRuleManagement').then(module => ({ default: module.LabRuleManagement })));
-const ChatInterface = lazy(() => import('./components/ChatInterface').then(module => ({ default: module.ChatInterface })));
-const CertificateManagement = lazy(() => import('./components/certificates/CertificateManagement'));
-const ReorderSuggestions = lazy(() => import('./components/ReorderSuggestions'));
+const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const EquipmentManagement = lazy(() => import('./components/admin/EquipmentManagement').then(m => ({ default: m.EquipmentManagement })));
+const UserManagement = lazy(() => import('./components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
+// FIX: Corrected import for Settings. It's a default export and the path was incorrect.
+const Settings = lazy(() => import('./components/Settings'));
+// FIX: Corrected import for AuditLog. It's a default export, not a named export.
+const AuditLog = lazy(() => import('./components/admin/AuditLog'));
+const MaintenanceLogViewer = lazy(() => import('./components/equipment/MaintenanceLogViewer').then(m => ({ default: m.MaintenanceLogViewer })));
+// FIX: Corrected import for MaintenanceStatus. It's a default export, not a named export.
+const MaintenanceStatus = lazy(() => import('./components/equipment/MaintenanceStatus'));
+const MemberManagement = lazy(() => import('./components/user/MemberManagement').then(m => ({ default: m.MemberManagement })));
+const ManualManagement = lazy(() => import('./components/qms/ManualManagement').then(m => ({ default: m.ManualManagement })));
+const LabRuleManagement = lazy(() => import('./components/qms/LabRuleManagement').then(m => ({ default: m.LabRuleManagement })));
+const FacilityConsumableNotification = lazy(() => import('./components/facility/FacilityConsumableNotification').then(m => ({ default: m.FacilityConsumableNotification })));
+const ChatInterface = lazy(() => import('./components/chat/ChatInterface').then(m => ({ default: m.ChatInterface })));
+// FIX: Corrected import for InventoryLockManager. It's a default export, not a named export.
+const InventoryLockManager = lazy(() => import('./components/admin/InventoryLockManager'));
+const MonthlyReportGenerator = lazy(() => import('./components/admin/MonthlyReportGenerator'));
+const HazardousMaterialsDashboard = lazy(() => import('./components/inventory/HazardousMaterialsDashboard').then(m => ({ default: m.HazardousMaterialsDashboard })));
+const RegulatoryCompliance = lazy(() => import('./components/compliance/RegulatoryCompliance').then(m => ({ default: m.RegulatoryCompliance })));
+const FacilityLayout = lazy(() => import('./components/facility/FacilityLayout').then(m => ({ default: m.FacilityLayout })));
+const InsuranceManagement = lazy(() => import('./components/compliance/InsuranceManagement').then(m => ({ default: m.InsuranceManagement })));
+const CO2IncubatorManagement = lazy(() => import('./components/equipment/CO2IncubatorManagement').then(m => ({ default: m.CO2IncubatorManagement })));
+const ProjectGanttChart = lazy(() => import('./components/project/ProjectGanttChart').then(m => ({ default: m.ProjectGanttChart })));
+const NotificationCenter = lazy(() => import('./components/notifications/NotificationCenter'));
 
 const AppLayout: React.FC = () => {
     const { isJapanese } = useSessionContext();
@@ -61,7 +66,11 @@ const AppLayout: React.FC = () => {
                 <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} onNotificationsClick={() => setIsNotificationsOpen(p => !p)} />
                 {isNotificationsOpen && <NotificationCenter onClose={() => setIsNotificationsOpen(false)} />}
                 <main className="flex-1 overflow-y-auto p-8">
-                    <Suspense fallback={<div className="p-8 text-center text-gray-500">{isJapanese ? '読み込み中...' : 'Loading...'}</div>}>
+                    <Suspense fallback={
+                        <div className="flex justify-center items-center h-full">
+                            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-ever-blue"></div>
+                        </div>
+                    }>
                         <Outlet />
                     </Suspense>
                 </main>

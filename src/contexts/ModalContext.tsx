@@ -32,7 +32,7 @@ export type ModalPayload =
   | { type: 'equipmentManuals'; props: { equipment: Equipment } }
   | { type: 'viewInvoice'; props: { invoice: Invoice } }
   | { type: 'purchaseConsumable'; props: { consumable: Consumable } }
-  | { type: 'projectDetails'; props: { project: Project } }
+  | { type: 'projectDetails'; props: { project: Project | null } }
   | { type: 'logProtocol'; props: { protocol: Protocol } }
   | { type: 'editTask'; props: { task: Task | null, prefilledData?: Partial<Task> | null } }
   | { type: 'eSignature'; props: { request: { type: 'DocumentVersion' | 'LegalDocument', entity: DocumentVersion | LegalDocument } } }
@@ -66,6 +66,10 @@ interface ModalContextType {
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
+/**
+ * Provides a global system for managing and displaying modals.
+ * Allows any component to open a modal without complex prop drilling.
+ */
 export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeModal, setActiveModal] = useState<ModalPayload | null>(null);
   const openModal = useCallback((payload: ModalPayload) => setActiveModal(payload), []);
@@ -80,6 +84,10 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   );
 };
 
+/**
+ * Hook to access the modal context.
+ * Provides `openModal` and `closeModal` functions.
+ */
 export const useModalContext = (): ModalContextType => {
   const context = useContext(ModalContext);
   if (!context) throw new Error('useModalContext must be used within a ModalProvider');

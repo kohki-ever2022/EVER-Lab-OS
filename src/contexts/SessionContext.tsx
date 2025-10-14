@@ -18,6 +18,10 @@ interface SessionProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Provides session-related state and actions to the application,
+ * such as current user, language, and authentication methods.
+ */
 export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [language, setLanguage] = useState<Language>(Language.JA);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -61,6 +65,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 };
 
+/**
+ * Hook to access the session context.
+ * Provides current user, language, and auth functions.
+ */
 export const useSessionContext = (): SessionContextType => {
   const context = useContext(SessionContext);
   if (context === undefined) {

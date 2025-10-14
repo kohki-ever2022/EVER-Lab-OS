@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSessionContext } from '../contexts/SessionContext';
-import { usePermissions } from '../hooks/usePermissions';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { usePermissions } from '../../hooks/usePermissions';
 import {
   HomeIcon, BeakerIcon, CalendarIcon, FolderIcon, CheckSquareIcon, BookOpenIcon,
   ShoppingCartIcon, StarIcon, ArchiveIcon, FileTextIcon, ShieldIcon, SettingsIcon,
   UsersIcon, MessageSquareIcon, CloseIcon
-} from './common/Icons';
+} from '../common/Icons';
 
 interface SidebarProps {
     isOpen: boolean;

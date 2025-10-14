@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Language, Role } from '../types/core';
-import { UserAvailabilityStatus } from '../types/common';
-import UserStatusUpdater from './user/UserStatusUpdater';
-import { useSessionContext } from '../contexts/SessionContext';
-import { useNotificationsContext } from '../contexts/NotificationContext';
-import { useCompanyContext } from '../contexts/CompanyContext';
-import { useModalContext } from '../contexts/ModalContext';
-import { BellIcon, QrCodeIcon, MenuIcon, LabIcon } from './common/Icons';
+import { Language, Role } from '../../types/core';
+import { UserAvailabilityStatus } from '../../types/common';
+import UserStatusUpdater from '../user/UserStatusUpdater';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useNotificationsContext } from '../../contexts/NotificationContext';
+import { useCompanyContext } from '../../contexts/CompanyContext';
+import { useModalContext } from '../../contexts/ModalContext';
+import { BellIcon, QrCodeIcon, MenuIcon, LabIcon } from '../common/Icons';
 
 interface HeaderProps {
   onMenuClick: () => void;

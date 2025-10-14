@@ -15,6 +15,9 @@ export interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
+/**
+ * Provides a global system for displaying temporary toast notifications.
+ */
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -35,6 +38,10 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   );
 };
 
+/**
+ * Hook to access the toast context.
+ * Provides a `showToast` function to display notifications.
+ */
 export const useToast = (): ToastContextType => {
   const context = useContext(ToastContext);
   if (context === undefined) {

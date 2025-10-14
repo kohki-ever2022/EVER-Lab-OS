@@ -7,7 +7,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import { SessionProvider, useSessionContext } from './contexts/SessionContext';
 import { DataAdapterProvider } from './contexts/DataAdapterContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import Login from './components/Login';
+import Login from './components/user/Login';
 
 // New Context Providers
 import { CompanyProvider } from './contexts/CompanyContext';

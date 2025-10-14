@@ -12,21 +12,21 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Explicitly declare state as public. While this is the default, some toolchains might misinterpret the class structure without it.
+  // State is explicitly declared as public for clarity across different TypeScript toolchains.
   public state: State = {
     hasError: false,
     error: null,
     errorInfo: null,
   };
 
-  // FIX: Explicitly declare static method as public for consistency.
+  // Static method is explicitly declared public for class structure consistency.
   public static getDerivedStateFromError(error: Error): Partial<State> {
     // This static method runs first when an error is thrown.
     // It should return a state update object.
     return { hasError: true, error };
   }
 
-  // FIX: Reverted to a standard class method. Lifecycle methods are automatically bound by React, so `this` is correctly typed.
+  // Standard class method for lifecycle events to ensure correct `this` context.
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
@@ -42,7 +42,7 @@ class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  // FIX: Reverted to a standard class method to ensure `this.props` and `this.state` are correctly typed from the base `Component` class.
+  // Standard class method to ensure `this.props` and `this.state` are correctly typed from the base `Component` class.
   public render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
