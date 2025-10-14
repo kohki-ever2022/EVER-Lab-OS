@@ -18,6 +18,7 @@ import {
 } from '../types';
 import { googleCalendarService, createCalendarEventFromSchedule } from '../services/googleCalendarService';
 import { useCompanyContext } from '../contexts/CompanyContext';
+import { useTranslation } from './useTranslation';
 
 const simpleUUID = () => `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -29,6 +30,7 @@ export const useComplianceActions = () => {
     const { addAuditLog } = useAudit();
     const { addNotification } = useNotifications();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     const acknowledgeRule = useCallback(async (ruleId: string): Promise<Result<LabRule, Error>> => {
         if (!currentUser) return { success: false, error: new Error('User not logged in.') };
@@ -69,14 +71,14 @@ export const useComplianceActions = () => {
             const syncResult = await googleCalendarService.createEvent(calendarEvent, language);
             if (syncResult.success) {
                 newReqWithCalendar.googleCalendarEventId = syncResult.googleCalendarEventId;
-                showToast(isJapanese ? '提出期限をカレンダーに登録しました。' : 'Submission deadline added to calendar.', 'success');
+                showToast(t('deadlineAddedToCalendar'), 'success');
             } else {
-                showToast(isJapanese ? 'カレンダーへの登録に失敗しました。' : 'Failed to add to calendar.', 'warning');
+                showToast(t('failedToAddToCalendar'), 'warning');
             }
         }
     
         return await adapter.createRegulatoryRequirement(newReqWithCalendar);
-    }, [adapter, companies, isJapanese, language, showToast]);
+    }, [adapter, companies, isJapanese, language, showToast, t]);
 
     const checkAndNotifyForCertificate = useCallback((cert: InsuranceCertificate) => {
         const now = new Date();

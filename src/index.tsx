@@ -9,6 +9,7 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 import Login from './components/user/Login';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { AppProviders } from './contexts/AppProviders';
+import { useTranslation } from './hooks/useTranslation';
 
 // Initialize Firebase. This must run before any other Firebase services are used.
 import './firebase';
@@ -19,6 +20,7 @@ const App = lazy(() => import('./App').then(module => ({ default: module.App }))
 
 const AppShell: React.FC = () => {
   const { currentUser } = useSessionContext();
+  const { t } = useTranslation();
 
   return (
     <Routes>
@@ -31,7 +33,7 @@ const AppShell: React.FC = () => {
         element={
           currentUser ? (
             <AppProviders>
-              <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading Application...</div>}>
+              <Suspense fallback={<div className="min-h-screen flex items-center justify-center">{t('loadingApplication')}</div>}>
                 <App />
               </Suspense>
             </AppProviders>

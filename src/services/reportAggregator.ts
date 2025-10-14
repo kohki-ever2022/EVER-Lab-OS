@@ -118,13 +118,15 @@ export const aggregateMonthlyData = (
   const allStockoutItems = consumables.filter(c => c.stock <= 0);
   const stockoutItems = allStockoutItems.slice(0, 10).map(c => isJapanese(language) ? c.nameJP : c.nameEN);
   if (allStockoutItems.length > 10) {
-      stockoutItems.push(isJapanese(language) ? `...他${allStockoutItems.length - 10}件` : `...and ${allStockoutItems.length - 10} more`);
+      const remainingCount = allStockoutItems.length - 10;
+      stockoutItems.push(isJapanese(language) ? `...他${remainingCount}件` : `...and ${remainingCount} more`);
   }
 
   const allReorderItems = consumables.filter(c => c.stock > 0 && c.stock <= c.lowStockThreshold);
   const reorderNeededItems = allReorderItems.slice(0, 10).map(c => isJapanese(language) ? c.nameJP : c.nameEN);
   if (allReorderItems.length > 10) {
-      reorderNeededItems.push(isJapanese(language) ? `...他${allReorderItems.length - 10}件` : `...and ${allReorderItems.length - 10} more`);
+      const remainingCount = allReorderItems.length - 10;
+      reorderNeededItems.push(isJapanese(language) ? `...他${remainingCount}件` : `...and ${remainingCount} more`);
   }
 
 

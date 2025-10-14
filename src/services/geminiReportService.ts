@@ -12,6 +12,9 @@ export const generateMonthlyReport = async (
 ): Promise<string> => {
   const isJapanese = language === Language.JA;
   const lang = isJapanese ? '日本語' : '英語';
+  const errorMsg = isJapanese 
+      ? 'レポートの生成に失敗しました。時間をおいて再度お試しください。' 
+      : 'Failed to generate the report. Please try again later.';
   
   const prompt = `
 あなたはBSL-2対応の共同利用型研究施設の運営コンサルタントです。
@@ -38,9 +41,7 @@ Markdown形式で、見出し、太字、箇条書きを効果的に使用して
 
   if (!reportText || reportText.includes("Error:") || reportText.includes("エラー:")) {
       console.error('Failed to generate monthly report:', reportText);
-      return isJapanese 
-        ? 'レポートの生成に失敗しました。時間をおいて再度お試しください。' 
-        : 'Failed to generate the report. Please try again later.';
+      return errorMsg;
   }
   
   return reportText;

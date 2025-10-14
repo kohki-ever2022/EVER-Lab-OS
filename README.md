@@ -64,7 +64,7 @@ EVER-Lab OSは、共同利用型研究施設向けの統合管理アプリケー
 
 ## 👤 デモ用ログイン情報
 
-`VITE_USE_MOCK_DATA=true` を設定している場合、以下のメールアドレスで各役割のユーザーとしてログインできます。（パスワードは不要です）
+`VITE_USE_MOCK_DATA=true` を設定している場合、以下のメールアドレスで各役割のユーザーとしてログインできます。パスワードは `password` です。
 
 *   **施設責任者 (Facility Director)**: `taro.suzuki@ever.com`
 *   **ラボマネージャー (Lab Manager)**: `jiro.tanaka@ever.com`

@@ -1,5 +1,3 @@
-
-
 import React, { useState, lazy, Suspense } from 'react';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
@@ -9,6 +7,7 @@ import { RoleCategory } from './types';
 import { useSessionContext } from './contexts/SessionContext';
 import Toast from './components/common/Toast';
 import ModalRenderer from './components/common/ModalRenderer';
+import { useTranslation } from './hooks/useTranslation';
 
 // --- Lazy-loaded View Components ---
 
@@ -53,6 +52,7 @@ const NotificationCenter = lazy(() => import('./components/notifications/Notific
 
 const AppLayout: React.FC = () => {
     const { isJapanese } = useSessionContext();
+    const { t } = useTranslation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
@@ -66,6 +66,7 @@ const AppLayout: React.FC = () => {
                     <Suspense fallback={
                         <div className="flex justify-center items-center h-full">
                             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-ever-blue"></div>
+                            <span className="ml-4 text-gray-500">{t('loadingApplication')}</span>
                         </div>
                     }>
                         <Outlet />

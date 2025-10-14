@@ -8,6 +8,7 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { usePermissions } from './usePermissions';
 import { useAudit } from './useAudit';
 import { useUserContext } from '../contexts/UserContext';
+import { useTranslation } from './useTranslation';
 
 const escapeHtml = (unsafe: string): string => {
     if (!unsafe) return '';
@@ -27,7 +28,8 @@ const escapeHtml = (unsafe: string): string => {
 export const useUserActions = () => {
     const adapter = useDataAdapter();
     const { users } = useUserContext();
-    const { currentUser, isJapanese } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t } = useTranslation();
     const { hasPermission, canAccessData } = usePermissions();
     const { addAuditLog } = useAudit();
     
@@ -112,7 +114,8 @@ export const useUserActions = () => {
     const deleteUser = useCallback(async (userId: string): Promise<Result<void, Error>> => {
         try {
             if (!hasPermission('users', 'delete')) {
-                throw new Error(isJapanese ? 'ユーザーを削除する権限がありません。' : 'You do not have permission to delete users.');
+                // FIX: Use a valid translation key. 'permissionDeniedDeleteUser' has been added to translations.ts.
+                throw new Error(t('permissionDeniedDeleteUser'));
             }
 
             const userToDelete = users.find(u => u.id === userId);
@@ -127,7 +130,7 @@ export const useUserActions = () => {
         } catch (e) {
             return { success: false, error: e instanceof Error ? e : new Error(String(e)) };
         }
-    }, [hasPermission, isJapanese, users, adapter, addAuditLog]);
+    }, [hasPermission, t, users, adapter, addAuditLog]);
 
     return useMemo(() => ({
         addUser,

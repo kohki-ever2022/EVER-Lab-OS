@@ -3,12 +3,12 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useMe
 import { User } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-interface UserContextValue {
+export interface UserContextValue {
   users: User[];
   loading: boolean;
 }
 
-const UserContext = createContext<UserContextValue | null>(null);
+export const UserContext = createContext<UserContextValue | null>(null);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();

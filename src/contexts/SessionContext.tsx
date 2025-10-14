@@ -12,7 +12,7 @@ export interface SessionContextType {
   isTenantStaff: boolean;
 }
 
-const SessionContext = createContext<SessionContextType | undefined>(undefined);
+export const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 interface SessionProviderProps {
   children: ReactNode;

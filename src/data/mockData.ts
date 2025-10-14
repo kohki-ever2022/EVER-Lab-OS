@@ -64,19 +64,19 @@ export function getMockData() {
 
     const users: User[] = [
         // Facility Staff
-        { id: 'user-director', name: 'Taro Suzuki', email: 'taro.suzuki@ever.com', companyId: 'company-lab', role: Role.FacilityDirector, roleCategory: RoleCategory.Facility, availabilityStatus: UserAvailabilityStatus.Available, qualificationIds: ['qual-bsl2', 'qual-autoclave'] },
-        { id: 'user-lab-manager', name: 'Jiro Tanaka', email: 'jiro.tanaka@ever.com', companyId: 'company-lab', role: Role.LabManager, roleCategory: RoleCategory.Facility, availabilityStatus: UserAvailabilityStatus.Busy, statusMessage: 'Meeting until 3pm', qualificationIds: ['qual-bsl2', 'qual-autoclave'] },
+        { id: 'user-director', name: 'Taro Suzuki', email: 'taro.suzuki@ever.com', password: 'password', companyId: 'company-lab', role: Role.FacilityDirector, roleCategory: RoleCategory.Facility, availabilityStatus: UserAvailabilityStatus.Available, qualificationIds: ['qual-bsl2', 'qual-autoclave'] },
+        { id: 'user-lab-manager', name: 'Jiro Tanaka', email: 'jiro.tanaka@ever.com', password: 'password', companyId: 'company-lab', role: Role.LabManager, roleCategory: RoleCategory.Facility, availabilityStatus: UserAvailabilityStatus.Busy, statusMessage: 'Meeting until 3pm', qualificationIds: ['qual-bsl2', 'qual-autoclave'] },
     
         // Tenant A
-        { id: 'user-pm-a', name: 'Hanako Yamada', email: 'hanako.yamada@tenant-a.com', companyId: 'company-a', role: Role.ProjectManager, roleCategory: RoleCategory.Tenant, qualificationIds: ['qual-bsl2'] },
-        { id: 'user-res-a', name: 'Ichiro Sato', email: 'ichiro.sato@tenant-a.com', companyId: 'company-a', role: Role.Researcher, roleCategory: RoleCategory.Tenant },
+        { id: 'user-pm-a', name: 'Hanako Yamada', email: 'hanako.yamada@tenant-a.com', password: 'password', companyId: 'company-a', role: Role.ProjectManager, roleCategory: RoleCategory.Tenant, qualificationIds: ['qual-bsl2'] },
+        { id: 'user-res-a', name: 'Ichiro Sato', email: 'ichiro.sato@tenant-a.com', password: 'password', companyId: 'company-a', role: Role.Researcher, roleCategory: RoleCategory.Tenant },
     
         // Tenant B
-        { id: 'user-pm-b', name: 'John Doe', email: 'john.doe@biofuture.com', companyId: 'company-b', role: Role.ProjectManager, roleCategory: RoleCategory.Tenant, qualificationIds: ['qual-bsl2', 'qual-autoclave'] },
-        { id: 'user-res-b', name: 'Jane Smith', email: 'jane.smith@biofuture.com', companyId: 'company-b', role: Role.Researcher, roleCategory: RoleCategory.Tenant },
+        { id: 'user-pm-b', name: 'John Doe', email: 'john.doe@biofuture.com', password: 'password', companyId: 'company-b', role: Role.ProjectManager, roleCategory: RoleCategory.Tenant, qualificationIds: ['qual-bsl2', 'qual-autoclave'] },
+        { id: 'user-res-b', name: 'Jane Smith', email: 'jane.smith@biofuture.com', password: 'password', companyId: 'company-b', role: Role.Researcher, roleCategory: RoleCategory.Tenant },
     
         // Supplier
-        { id: 'user-supplier', name: 'Supplier Rep', email: 'rep@supplier.com', companyId: 'company-s', role: Role.Supplier, roleCategory: RoleCategory.External },
+        { id: 'user-supplier', name: 'Supplier Rep', email: 'rep@supplier.com', password: 'password', companyId: 'company-s', role: Role.Supplier, roleCategory: RoleCategory.External },
     ];
     
     const projects: Project[] = [

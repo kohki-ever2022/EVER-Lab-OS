@@ -8,6 +8,7 @@ const Login: React.FC = () => {
     const { login, isJapanese } = useSessionContext();
     const adapter = useDataAdapter();
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -25,22 +26,21 @@ const Login: React.FC = () => {
               return;
             }
 
-            // Simplified login for demo purposes, only checking email.
             const userToLogin = result.data.find(u => u.email.toLowerCase() === email.toLowerCase());
 
-            if (userToLogin) {
+            if (userToLogin && userToLogin.password === password) {
                 const success = login(userToLogin);
                 if (!success) {
                     setError(isJapanese ? 'ログインセッションの開始に失敗しました。' : 'Failed to start login session.');
-                    setIsLoading(false);
                 }
+                // On successful login, AppShell handles redirection.
             } else {
-                setError(isJapanese ? 'メールアドレスが正しくありません。' : 'Invalid email address.');
-                setIsLoading(false);
+                setError(isJapanese ? 'メールアドレスまたはパスワードが正しくありません。' : 'Invalid email address or password.');
             }
         } catch (err) {
             setError(isJapanese ? 'ログイン処理中にエラーが発生しました。' : 'An error occurred during login.');
             console.error('Login error:', err);
+        } finally {
             setIsLoading(false);
         }
     };
@@ -77,6 +77,24 @@ const Login: React.FC = () => {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-ever-purple focus:border-ever-purple sm:text-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                {isJapanese ? 'パスワード' : 'Password'}
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-ever-purple focus:border-ever-purple sm:text-sm"
                                 />
                             </div>

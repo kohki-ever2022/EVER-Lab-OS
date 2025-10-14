@@ -1,6 +1,6 @@
 // src/components/common/PromptModal.tsx
 import React, { useState } from 'react';
-import { useSessionContext } from '../../contexts/SessionContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface Props {
   title: string;
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const PromptModal: React.FC<Props> = ({ title, message, onConfirm, onClose, confirmText, cancelText, inputLabel }) => {
-  const { isJapanese } = useSessionContext();
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
 
   const handleConfirm = () => {
@@ -29,7 +29,7 @@ const PromptModal: React.FC<Props> = ({ title, message, onConfirm, onClose, conf
         <h3 className="text-xl font-bold text-gray-800 mb-4">{title}</h3>
         <p className="text-gray-600 mb-4">{message}</p>
         <div>
-          <label className="block text-sm font-medium text-gray-700">{inputLabel || (isJapanese ? '理由' : 'Reason')}</label>
+          <label className="block text-sm font-medium text-gray-700">{inputLabel || t('unlockReason')}</label>
           <input
             type="text"
             value={inputValue}
@@ -42,14 +42,14 @@ const PromptModal: React.FC<Props> = ({ title, message, onConfirm, onClose, conf
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
           >
-            {cancelText || (isJapanese ? 'キャンセル' : 'Cancel')}
+            {cancelText || t('cancel')}
           </button>
           <button
             onClick={handleConfirm}
             disabled={!inputValue.trim()}
             className="px-4 py-2 bg-ever-blue text-white font-semibold rounded-lg hover:bg-ever-blue-dark transition-colors disabled:bg-gray-400"
           >
-            {confirmText || (isJapanese ? '確認' : 'Confirm')}
+            {confirmText || t('confirm')}
           </button>
         </div>
       </div>

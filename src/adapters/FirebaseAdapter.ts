@@ -130,6 +130,62 @@ export class FirebaseAdapter implements IDataAdapter {
     }
     return { id: docSnap.id, ...data } as T;
   }
+  
+  // --- Generic CRUD Helpers ---
+  private async getGenericDocById<T>(collectionName: string, id: string): Promise<Result<T | null>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const docRef = doc(db, collectionName, id);
+      const data = await this.getDocAndConvert<T>(docRef);
+      return { success: true, data };
+    } catch (error) {
+      if (error instanceof Error && (error.message.includes('not found') || error.message.includes('no such document'))) {
+        return { success: true, data: null };
+      }
+      console.error(`Error getting doc by id ${id} from ${collectionName}:`, error);
+      return { success: false, error: error as Error };
+    }
+  }
+
+  private async createGenericDoc<T>(collectionName: string, data: Omit<T, 'id'>): Promise<Result<T>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const docRef = await addDoc(collection(db, collectionName), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      const newItem = await this.getDocAndConvert<T>(docRef);
+      return { success: true, data: newItem };
+    } catch (error) {
+      console.error(`Error creating doc in ${collectionName}:`, error);
+      return { success: false, error: error as Error };
+    }
+  }
+
+  private async updateGenericDoc<T extends { id: string }>(collectionName: string, item: T): Promise<Result<T>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const { id, ...updateData } = item;
+      const docRef = doc(db, collectionName, id);
+      await updateDoc(docRef, {
+        ...updateData,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true, data: item };
+    } catch (error) {
+      console.error(`Error updating doc ${item.id} in ${collectionName}:`, error);
+      return { success: false, error: error as Error };
+    }
+  }
+
+  private async deleteGenericDoc(collectionName: string, id: string): Promise<Result<void>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      await deleteDoc(doc(db, collectionName, id));
+      return { success: true, data: undefined };
+    } catch (error) {
+      console.error(`Error deleting doc ${id} from ${collectionName}:`, error);
+      return { success: false, error: error as Error };
+    }
+  }
+
 
   // --- User Operations ---
   async getUsers(): Promise<Result<User[]>> {
@@ -145,15 +201,7 @@ export class FirebaseAdapter implements IDataAdapter {
   }
   
   async getUserById(id: string): Promise<Result<User | null>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = doc(db, USERS_COLLECTION, id);
-      const user = await this.getDocAndConvert<User>(docRef);
-      return { success: true, data: user };
-    } catch (error) {
-      console.error(`Error getting user by id ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<User>(USERS_COLLECTION, id);
   }
 
   async createUser(data: Omit<User, 'id'>): Promise<Result<User>> {
@@ -179,30 +227,11 @@ export class FirebaseAdapter implements IDataAdapter {
   }
 
   async updateUser(user: User): Promise<Result<User>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = user;
-      const docRef = doc(db, USERS_COLLECTION, id);
-      await updateDoc(docRef, {
-        ...updateData,
-        updatedAt: serverTimestamp(),
-      });
-      return { success: true, data: user };
-    } catch (error) {
-      console.error(`Error updating user ${user.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<User>(USERS_COLLECTION, user);
   }
 
   async deleteUser(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, USERS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting user ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(USERS_COLLECTION, id);
   }
 
   subscribeToUsers(callback: (data: User[]) => void): () => void {
@@ -236,48 +265,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getCompanyById(id: string): Promise<Result<Company | null>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, COMPANIES_COLLECTION, id);
-        const company = await this.getDocAndConvert<Company>(docRef);
-        return { success: true, data: company };
-    } catch (error) {
-      console.error(`Error getting company by id ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Company>(COMPANIES_COLLECTION, id);
   }
   async createCompany(data: Omit<Company, 'id'>): Promise<Result<Company>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, COMPANIES_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newCompany = await this.getDocAndConvert<Company>(docRef);
-      return { success: true, data: newCompany };
-    } catch (error) {
-      console.error('Error creating company:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Company>(COMPANIES_COLLECTION, data);
   }
   async updateCompany(company: Company): Promise<Result<Company>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const { id, ...updateData } = company;
-        const docRef = doc(db, COMPANIES_COLLECTION, id);
-        await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-        return { success: true, data: company };
-    } catch (error) {
-      console.error(`Error updating company ${company.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Company>(COMPANIES_COLLECTION, company);
   }
   async deleteCompany(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, COMPANIES_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting company ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(COMPANIES_COLLECTION, id);
   }
   subscribeToCompanies(callback: (data: Company[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -300,48 +297,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getEquipmentById(id: string): Promise<Result<Equipment | null>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = doc(db, EQUIPMENT_COLLECTION, id);
-      const equipment = await this.getDocAndConvert<Equipment>(docRef);
-      return { success: true, data: equipment };
-    } catch (error) {
-      console.error(`Error getting equipment by id ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Equipment>(EQUIPMENT_COLLECTION, id);
   }
   async createEquipment(data: Omit<Equipment, 'id'>): Promise<Result<Equipment>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, EQUIPMENT_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newEquipment = await this.getDocAndConvert<Equipment>(docRef);
-      return { success: true, data: newEquipment };
-    } catch (error) {
-      console.error('Error creating equipment:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Equipment>(EQUIPMENT_COLLECTION, data);
   }
   async updateEquipment(equipment: Equipment): Promise<Result<Equipment>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = equipment;
-      const docRef = doc(db, EQUIPMENT_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: equipment };
-    } catch (error) {
-      console.error(`Error updating equipment ${equipment.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Equipment>(EQUIPMENT_COLLECTION, equipment);
   }
   async deleteEquipment(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, EQUIPMENT_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting equipment ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(EQUIPMENT_COLLECTION, id);
   }
   subscribeToEquipment(callback: (data: Equipment[]) => void): () => void {
     if (!db) {
@@ -368,15 +333,7 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getReservationById(id: string): Promise<Result<Reservation | null>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, RESERVATIONS_COLLECTION, id);
-        const reservation = await this.getDocAndConvert<Reservation>(docRef);
-        return { success: true, data: reservation };
-    } catch (error) {
-      console.error(`Error getting reservation by id ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Reservation>(RESERVATIONS_COLLECTION, id);
   }
   async createReservation(data: Omit<Reservation, 'id'>): Promise<Result<Reservation>> {
     if (!db) return { success: false, error: new Error("Firebase not configured.") };
@@ -395,36 +352,17 @@ export class FirebaseAdapter implements IDataAdapter {
       if (overlapping) {
           return { success: false, error: new Error('Overlapping reservation exists.') };
       }
-
-      const docRef = await addDoc(collection(db, RESERVATIONS_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newReservation = await this.getDocAndConvert<Reservation>(docRef);
-      return { success: true, data: newReservation };
+      return this.createGenericDoc<Reservation>(RESERVATIONS_COLLECTION, data);
     } catch (error) {
       console.error('Error creating reservation:', error);
       return { success: false, error: error as Error };
     }
   }
   async updateReservation(reservation: Reservation): Promise<Result<Reservation>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = reservation;
-      const docRef = doc(db, RESERVATIONS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: reservation };
-    } catch (error) {
-      console.error(`Error updating reservation ${reservation.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Reservation>(RESERVATIONS_COLLECTION, reservation);
   }
   async deleteReservation(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, RESERVATIONS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting reservation ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(RESERVATIONS_COLLECTION, id);
   }
   subscribeToReservations(callback: (data: Reservation[]) => void): () => void {
     if (!db) {
@@ -456,48 +394,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getUsageById(id: string): Promise<Result<Usage | null>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, USAGE_COLLECTION, id);
-        const usage = await this.getDocAndConvert<Usage>(docRef);
-        return { success: true, data: usage };
-    } catch (error) {
-      console.error(`Error getting usage by id ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Usage>(USAGE_COLLECTION, id);
   }
   async createUsage(data: Omit<Usage, 'id'>): Promise<Result<Usage>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, USAGE_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newUsage = await this.getDocAndConvert<Usage>(docRef);
-      return { success: true, data: newUsage };
-    } catch (error) {
-      console.error('Error creating usage:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Usage>(USAGE_COLLECTION, data);
   }
   async updateUsage(usage: Usage): Promise<Result<Usage>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = usage;
-      const docRef = doc(db, USAGE_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: usage };
-    } catch (error) {
-      console.error(`Error updating usage ${usage.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Usage>(USAGE_COLLECTION, usage);
   }
   async deleteUsage(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, USAGE_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting usage ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(USAGE_COLLECTION, id);
   }
   subscribeToUsages(callback: (data: Usage[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -521,48 +427,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getConsumableById(id: string): Promise<Result<Consumable | null>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = doc(db, CONSUMABLES_COLLECTION, id);
-      const consumable = await this.getDocAndConvert<Consumable>(docRef);
-      return { success: true, data: consumable };
-    } catch (error) {
-      console.error(`Error getting consumable ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Consumable>(CONSUMABLES_COLLECTION, id);
   }
   async createConsumable(data: Omit<Consumable, 'id'>): Promise<Result<Consumable>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, CONSUMABLES_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newConsumable = await this.getDocAndConvert<Consumable>(docRef);
-      return { success: true, data: newConsumable };
-    } catch (error) {
-      console.error('Error creating consumable:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Consumable>(CONSUMABLES_COLLECTION, data);
   }
   async updateConsumable(consumable: Consumable): Promise<Result<Consumable>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = consumable;
-      const docRef = doc(db, CONSUMABLES_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: consumable };
-    } catch (error) {
-      console.error(`Error updating consumable ${consumable.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Consumable>(CONSUMABLES_COLLECTION, consumable);
   }
   async deleteConsumable(id: string): Promise<Result<void>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, CONSUMABLES_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting consumable ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(CONSUMABLES_COLLECTION, id);
   }
   subscribeToConsumables(callback: (data: Consumable[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -585,15 +459,7 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getOrderById(id: string): Promise<Result<Order | null>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, ORDERS_COLLECTION, id);
-        const order = await this.getDocAndConvert<Order>(docRef);
-        return { success: true, data: order };
-    } catch (error) {
-      console.error(`Error getting order ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Order>(ORDERS_COLLECTION, id);
   }
   async createOrder(data: Omit<Order, 'id'>): Promise<Result<Order>> { 
     if (!db) return { success: false, error: new Error("Firebase not configured.") };
@@ -624,26 +490,10 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async updateOrder(order: Order): Promise<Result<Order>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = order;
-      const docRef = doc(db, ORDERS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: order };
-    } catch (error) {
-      console.error(`Error updating order ${order.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Order>(ORDERS_COLLECTION, order);
   }
   async deleteOrder(id: string): Promise<Result<void>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, ORDERS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting order ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(ORDERS_COLLECTION, id);
   }
   subscribeToOrders(callback: (data: Order[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -665,48 +515,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getProjectById(id: string): Promise<Result<Project | null>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, PROJECTS_COLLECTION, id);
-        const project = await this.getDocAndConvert<Project>(docRef);
-        return { success: true, data: project };
-    } catch (error) {
-      console.error(`Error getting project ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Project>(PROJECTS_COLLECTION, id);
   }
   async createProject(data: Omit<Project, 'id'>): Promise<Result<Project>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, PROJECTS_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newProject = await this.getDocAndConvert<Project>(docRef);
-      return { success: true, data: newProject };
-    } catch (error) {
-      console.error('Error creating project:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Project>(PROJECTS_COLLECTION, data);
   }
   async updateProject(project: Project): Promise<Result<Project>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = project;
-      const docRef = doc(db, PROJECTS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: project };
-    } catch (error) {
-      console.error(`Error updating project ${project.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Project>(PROJECTS_COLLECTION, project);
   }
   async deleteProject(id: string): Promise<Result<void>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, PROJECTS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting project ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(PROJECTS_COLLECTION, id);
   }
   subscribeToProjects(callback: (data: Project[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -735,37 +553,13 @@ export class FirebaseAdapter implements IDataAdapter {
     }, (error) => console.error('Error subscribing to tasks:', error));
   }
   async createTask(data: Omit<Task, 'id'>): Promise<Result<Task>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, TASKS_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newTask = await this.getDocAndConvert<Task>(docRef);
-      return { success: true, data: newTask };
-    } catch (error) {
-      console.error('Error creating task:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Task>(TASKS_COLLECTION, data);
   }
   async updateTask(task: Task): Promise<Result<Task>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = task;
-      const docRef = doc(db, TASKS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: task };
-    } catch (error) {
-      console.error(`Error updating task ${task.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Task>(TASKS_COLLECTION, task);
   }
   async deleteTask(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, TASKS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting task ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(TASKS_COLLECTION, id);
   }
   
   // --- Lab Notebook Operations ---
@@ -781,37 +575,13 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, LAB_NOTEBOOK_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newEntry = await this.getDocAndConvert<LabNotebookEntry>(docRef);
-      return { success: true, data: newEntry };
-    } catch (error) {
-      console.error('Error creating lab notebook entry:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<LabNotebookEntry>(LAB_NOTEBOOK_COLLECTION, data);
   }
   async updateLabNotebookEntry(entry: LabNotebookEntry): Promise<Result<LabNotebookEntry>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = entry;
-      const docRef = doc(db, LAB_NOTEBOOK_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: entry };
-    } catch (error) {
-      console.error(`Error updating lab notebook entry ${entry.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<LabNotebookEntry>(LAB_NOTEBOOK_COLLECTION, entry);
   }
   async deleteLabNotebookEntry(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, LAB_NOTEBOOK_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting lab notebook entry ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(LAB_NOTEBOOK_COLLECTION, id);
   }
   subscribeToLabNotebookEntries(callback: (data: LabNotebookEntry[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -834,48 +604,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getMaintenanceLogById(id: string): Promise<Result<MaintenanceLog | null>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, MAINTENANCE_LOGS_COLLECTION, id);
-        const log = await this.getDocAndConvert<MaintenanceLog>(docRef);
-        return { success: true, data: log };
-    } catch (error) {
-      console.error(`Error getting maintenance log ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<MaintenanceLog>(MAINTENANCE_LOGS_COLLECTION, id);
   }
   async createMaintenanceLog(data: Omit<MaintenanceLog, 'id'>): Promise<Result<MaintenanceLog>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, MAINTENANCE_LOGS_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newLog = await this.getDocAndConvert<MaintenanceLog>(docRef);
-      return { success: true, data: newLog };
-    } catch (error) {
-      console.error('Error creating maintenance log:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<MaintenanceLog>(MAINTENANCE_LOGS_COLLECTION, data);
   }
   async updateMaintenanceLog(log: MaintenanceLog): Promise<Result<MaintenanceLog>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = log;
-      const docRef = doc(db, MAINTENANCE_LOGS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: log };
-    } catch (error) {
-      console.error(`Error updating maintenance log ${log.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<MaintenanceLog>(MAINTENANCE_LOGS_COLLECTION, log);
   }
   async deleteMaintenanceLog(id: string): Promise<Result<void>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, MAINTENANCE_LOGS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting maintenance log ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(MAINTENANCE_LOGS_COLLECTION, id);
   }
   subscribeToMaintenanceLogs(callback: (data: MaintenanceLog[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -898,48 +636,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getAnnouncementById(id: string): Promise<Result<Announcement | null>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, ANNOUNCEMENTS_COLLECTION, id);
-        const announcement = await this.getDocAndConvert<Announcement>(docRef);
-        return { success: true, data: announcement };
-    } catch (error) {
-      console.error(`Error getting announcement ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Announcement>(ANNOUNCEMENTS_COLLECTION, id);
   }
   async createAnnouncement(data: Omit<Announcement, 'id'>): Promise<Result<Announcement>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, ANNOUNCEMENTS_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newAnnouncement = await this.getDocAndConvert<Announcement>(docRef);
-      return { success: true, data: newAnnouncement };
-    } catch (error) {
-      console.error('Error creating announcement:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Announcement>(ANNOUNCEMENTS_COLLECTION, data);
   }
   async updateAnnouncement(announcement: Announcement): Promise<Result<Announcement>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = announcement;
-      const docRef = doc(db, ANNOUNCEMENTS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: announcement };
-    } catch (error) {
-      console.error(`Error updating announcement ${announcement.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Announcement>(ANNOUNCEMENTS_COLLECTION, announcement);
   }
   async deleteAnnouncement(id: string): Promise<Result<void>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, ANNOUNCEMENTS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting announcement ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(ANNOUNCEMENTS_COLLECTION, id);
   }
   subscribeToAnnouncements(callback: (data: Announcement[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -961,48 +667,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getCertificateById(id: string): Promise<Result<Certificate | null>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, CERTIFICATES_COLLECTION, id);
-        const certificate = await this.getDocAndConvert<Certificate>(docRef);
-        return { success: true, data: certificate };
-    } catch (error) {
-      console.error(`Error getting certificate ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Certificate>(CERTIFICATES_COLLECTION, id);
   }
   async createCertificate(data: Omit<Certificate, 'id'>): Promise<Result<Certificate>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, CERTIFICATES_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newCertificate = await this.getDocAndConvert<Certificate>(docRef);
-      return { success: true, data: newCertificate };
-    } catch (error) {
-      console.error('Error creating certificate:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Certificate>(CERTIFICATES_COLLECTION, data);
   }
   async updateCertificate(certificate: Certificate): Promise<Result<Certificate>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = certificate;
-      const docRef = doc(db, CERTIFICATES_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: certificate };
-    } catch (error) {
-      console.error(`Error updating certificate ${certificate.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Certificate>(CERTIFICATES_COLLECTION, certificate);
   }
   async deleteCertificate(id: string): Promise<Result<void>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, CERTIFICATES_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting certificate ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(CERTIFICATES_COLLECTION, id);
   }
   subscribeToCertificates(callback: (data: Certificate[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -1024,48 +698,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getSdsById(id: string): Promise<Result<SDS | null>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, SDS_COLLECTION, id);
-        const sds = await this.getDocAndConvert<SDS>(docRef);
-        return { success: true, data: sds };
-    } catch (error) {
-      console.error(`Error getting SDS ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<SDS>(SDS_COLLECTION, id);
   }
   async createSds(data: Omit<SDS, 'id'>): Promise<Result<SDS>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, SDS_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newSds = await this.getDocAndConvert<SDS>(docRef);
-      return { success: true, data: newSds };
-    } catch (error) {
-      console.error('Error creating SDS:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<SDS>(SDS_COLLECTION, data);
   }
   async updateSds(sds: SDS): Promise<Result<SDS>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = sds;
-      const docRef = doc(db, SDS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: sds };
-    } catch (error) {
-      console.error(`Error updating SDS ${sds.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<SDS>(SDS_COLLECTION, sds);
   }
   async deleteSds(id: string): Promise<Result<void>> { 
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, SDS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting SDS ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(SDS_COLLECTION, id);
   }
   subscribeToSds(callback: (data: SDS[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -1088,15 +730,7 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async createMonthlyReport(data: Omit<MonthlyReport, 'id'>): Promise<Result<MonthlyReport>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, MONTHLY_REPORTS_COLLECTION), data);
-      const newReport = await this.getDocAndConvert<MonthlyReport>(docRef);
-      return { success: true, data: newReport };
-    } catch (error) {
-      console.error('Error creating monthly report:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<MonthlyReport>(MONTHLY_REPORTS_COLLECTION, data);
   }
   subscribeToMonthlyReports(callback: (data: MonthlyReport[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -1118,48 +752,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getTicketById(id: string): Promise<Result<Ticket | null>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, TICKETS_COLLECTION, id);
-        const ticket = await this.getDocAndConvert<Ticket>(docRef);
-        return { success: true, data: ticket };
-    } catch (error) {
-      console.error(`Error getting ticket ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<Ticket>(TICKETS_COLLECTION, id);
   }
   async createTicket(data: Omit<Ticket, 'id'>): Promise<Result<Ticket>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, TICKETS_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newTicket = await this.getDocAndConvert<Ticket>(docRef);
-      return { success: true, data: newTicket };
-    } catch (error) {
-      console.error('Error creating ticket:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Ticket>(TICKETS_COLLECTION, data);
   }
   async updateTicket(ticket: Ticket): Promise<Result<Ticket>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = ticket;
-      const docRef = doc(db, TICKETS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: ticket };
-    } catch (error) {
-      console.error(`Error updating ticket ${ticket.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Ticket>(TICKETS_COLLECTION, ticket);
   }
   async deleteTicket(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, TICKETS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting ticket ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(TICKETS_COLLECTION, id);
   }
   subscribeToTickets(callback: (data: Ticket[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -1180,48 +782,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getRegulatoryRequirementById(id: string): Promise<Result<RegulatoryRequirement | null>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, REGULATORY_REQUIREMENTS_COLLECTION, id);
-        const req = await this.getDocAndConvert<RegulatoryRequirement>(docRef);
-        return { success: true, data: req };
-    } catch (error) {
-      console.error(`Error getting regulatory requirement ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<RegulatoryRequirement>(REGULATORY_REQUIREMENTS_COLLECTION, id);
   }
   async createRegulatoryRequirement(data: Omit<RegulatoryRequirement, 'id'>): Promise<Result<RegulatoryRequirement>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, REGULATORY_REQUIREMENTS_COLLECTION), { ...data, lastUpdated: serverTimestamp(), createdAt: serverTimestamp() });
-      const newReq = await this.getDocAndConvert<RegulatoryRequirement>(docRef);
-      return { success: true, data: newReq };
-    } catch (error) {
-      console.error('Error creating regulatory requirement:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<RegulatoryRequirement>(REGULATORY_REQUIREMENTS_COLLECTION, data);
   }
   async updateRegulatoryRequirement(req: RegulatoryRequirement): Promise<Result<RegulatoryRequirement>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = req;
-      const docRef = doc(db, REGULATORY_REQUIREMENTS_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, lastUpdated: serverTimestamp() });
-      return { success: true, data: req };
-    } catch (error) {
-      console.error(`Error updating regulatory requirement ${req.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<RegulatoryRequirement>(REGULATORY_REQUIREMENTS_COLLECTION, req);
   }
   async deleteRegulatoryRequirement(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, REGULATORY_REQUIREMENTS_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting regulatory requirement ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(REGULATORY_REQUIREMENTS_COLLECTION, id);
   }
   subscribeToRegulatoryRequirements(callback: (data: RegulatoryRequirement[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -1242,48 +812,16 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   async getInsuranceCertificateById(id: string): Promise<Result<InsuranceCertificate | null>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-        const docRef = doc(db, INSURANCE_CERTIFICATES_COLLECTION, id);
-        const cert = await this.getDocAndConvert<InsuranceCertificate>(docRef);
-        return { success: true, data: cert };
-    } catch (error) {
-      console.error(`Error getting insurance certificate ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.getGenericDocById<InsuranceCertificate>(INSURANCE_CERTIFICATES_COLLECTION, id);
   }
   async createInsuranceCertificate(data: Omit<InsuranceCertificate, 'id'>): Promise<Result<InsuranceCertificate>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, INSURANCE_CERTIFICATES_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newCert = await this.getDocAndConvert<InsuranceCertificate>(docRef);
-      return { success: true, data: newCert };
-    } catch (error) {
-      console.error('Error creating insurance certificate:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<InsuranceCertificate>(INSURANCE_CERTIFICATES_COLLECTION, data);
   }
   async updateInsuranceCertificate(cert: InsuranceCertificate): Promise<Result<InsuranceCertificate>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = cert;
-      const docRef = doc(db, INSURANCE_CERTIFICATES_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: cert };
-    } catch (error) {
-      console.error(`Error updating insurance certificate ${cert.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<InsuranceCertificate>(INSURANCE_CERTIFICATES_COLLECTION, cert);
   }
   async deleteInsuranceCertificate(id: string): Promise<Result<void>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      await deleteDoc(doc(db, INSURANCE_CERTIFICATES_COLLECTION, id));
-      return { success: true, data: undefined };
-    } catch (error) {
-      console.error(`Error deleting insurance certificate ${id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.deleteGenericDoc(INSURANCE_CERTIFICATES_COLLECTION, id);
   }
   subscribeToInsuranceCertificates(callback: (data: InsuranceCertificate[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
@@ -1294,27 +832,10 @@ export class FirebaseAdapter implements IDataAdapter {
   
   // --- Invoice Operations ---
   async createInvoice(data: Omit<Invoice, 'id'>): Promise<Result<Invoice>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, INVOICES_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      const newInvoice = await this.getDocAndConvert<Invoice>(docRef);
-      return { success: true, data: newInvoice };
-    } catch (error) {
-      console.error('Error creating invoice:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<Invoice>(INVOICES_COLLECTION, data);
   }
   async updateInvoice(invoice: Invoice): Promise<Result<Invoice>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const { id, ...updateData } = invoice;
-      const docRef = doc(db, INVOICES_COLLECTION, id);
-      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
-      return { success: true, data: invoice };
-    } catch (error) {
-      console.error(`Error updating invoice ${invoice.id}:`, error);
-      return { success: false, error: error as Error };
-    }
+    return this.updateGenericDoc<Invoice>(INVOICES_COLLECTION, invoice);
   }
 
   // --- Chat Operations ---
@@ -1339,18 +860,7 @@ export class FirebaseAdapter implements IDataAdapter {
   }
 
   async createChatRoom(data: Omit<ChatRoom, 'id'>): Promise<Result<ChatRoom>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const docRef = await addDoc(collection(db, CHAT_ROOMS_COLLECTION), data);
-      const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) throw new Error('Document not found after creation');
-      const docData = docSnap.data();
-      for (const key in docData) { if (docData[key] instanceof Timestamp) docData[key] = (docData[key] as Timestamp).toDate(); }
-      return { success: true, data: { id: docRef.id, ...docData } as ChatRoom };
-    } catch (error) {
-      console.error('Error creating chat room:', error);
-      return { success: false, error: error as Error };
-    }
+    return this.createGenericDoc<ChatRoom>(CHAT_ROOMS_COLLECTION, data);
   }
   
   async getChatMessages(roomId: string): Promise<Result<ChatMessage[]>> {

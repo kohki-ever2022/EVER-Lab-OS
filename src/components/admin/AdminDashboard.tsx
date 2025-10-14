@@ -14,6 +14,7 @@ import { useEquipmentActions } from '../../hooks/useEquipmentActions';
 import { useUsageContext } from '../../contexts/UsageContext';
 import { useMaintenanceLogContext } from '../../contexts/MaintenanceLogContext';
 import { ClockIcon, CalendarIcon, MailIcon, ExclamationCircleIcon, CogIcon } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface ResultModalProps {
     title: string;
@@ -33,7 +34,9 @@ const InfoCard: React.FC<{ title: string; value: string | number; icon: React.Re
 );
 
 
-const ResultModal: React.FC<ResultModalProps> = ({ title, results, onClose, isJapanese }) => (
+const ResultModal: React.FC<ResultModalProps> = ({ title, results, onClose, isJapanese }) => {
+    const { t } = useTranslation();
+    return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
             <h4 className="text-lg font-bold text-ever-black mb-4">{title}</h4>
@@ -41,21 +44,22 @@ const ResultModal: React.FC<ResultModalProps> = ({ title, results, onClose, isJa
                 {results.length > 0 ? (
                     results.map((res, i) => <p key={i} className="text-gray-700">{res}</p>)
                 ) : (
-                    <p className="text-gray-500">{isJapanese ? '処理対象の項目はありませんでした。' : 'No items were processed.'}</p>
+                    <p className="text-gray-500">{t('noItemsToProcess')}</p>
                 )}
             </div>
             <div className="mt-6 flex justify-end">
                 <button onClick={onClose} className="bg-lab-blue text-white font-bold py-2 px-4 rounded-lg">
-                    {isJapanese ? '閉じる' : 'Close'}
+                    {t('close')}
                 </button>
             </div>
         </div>
     </div>
-);
+)};
 
 
 export const AdminDashboard: React.FC = () => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t, isJapanese } = useTranslation();
     const { memos } = useLabStateContext();
     const { usage } = useUsageContext();
     const { maintenanceLogs } = useMaintenanceLogContext();
@@ -103,7 +107,7 @@ export const AdminDashboard: React.FC = () => {
     };
 
     const handleEmergencyStop = async () => {
-        if (window.confirm(isJapanese ? '本当に全機器を緊急停止しますか？この操作は元に戻せません。' : 'Are you sure you want to perform an emergency stop on all equipment? This action cannot be undone.')) {
+        if (window.confirm(t('emergencyStopConfirm'))) {
             if (emergencyStopAllEquipment) {
                 const result = await emergencyStopAllEquipment();
                 if (result.success === false) {
@@ -144,36 +148,36 @@ export const AdminDashboard: React.FC = () => {
         <div>
             {modalContent && <ResultModal title={modalContent.title} results={modalContent.results} onClose={() => setModalContent(null)} isJapanese={isJapanese} />}
             <h2 className="text-3xl font-bold mb-6 text-ever-black">
-                {isJapanese ? '管理ダッシュボード' : 'Admin Dashboard'}
+                {t('adminDashboard')}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                <InfoCard title={isJapanese ? "進行中の予約" : "Active Reservations"} value={activeReservations.length} icon={<ClockIcon className="h-6 w-6 text-ever-blue" />} />
-                <InfoCard title={isJapanese ? "本日の予約" : "Today's Bookings"} value={todayReservations} icon={<CalendarIcon className="h-6 w-6 text-ever-blue" />} />
-                <InfoCard title={isJapanese ? "未読メモ" : "Unread Memos"} value={unreadMemos} icon={<MailIcon className="h-6 w-6 text-ever-blue" />} />
-                <InfoCard title={isJapanese ? "不具合報告" : "Malfunction Reports"} value={malfunctionReports.length} icon={<ExclamationCircleIcon className="h-6 w-6 text-ever-blue" />} />
-                <InfoCard title={isJapanese ? "メンテナンス中" : "In Maintenance"} value={maintenanceCount} icon={<CogIcon className="h-6 w-6 text-ever-blue" />} />
+                <InfoCard title={t('activeReservations')} value={activeReservations.length} icon={<ClockIcon className="h-6 w-6 text-ever-blue" />} />
+                <InfoCard title={t('todaysBookings')} value={todayReservations} icon={<CalendarIcon className="h-6 w-6 text-ever-blue" />} />
+                <InfoCard title={t('unreadMemos')} value={unreadMemos} icon={<MailIcon className="h-6 w-6 text-ever-blue" />} />
+                <InfoCard title={t('malfunctionReports')} value={malfunctionReports.length} icon={<ExclamationCircleIcon className="h-6 w-6 text-ever-blue" />} />
+                <InfoCard title={t('inMaintenance')} value={maintenanceCount} icon={<CogIcon className="h-6 w-6 text-ever-blue" />} />
             </div>
 
             <div className="bg-white p-4 rounded-lg shadow mb-8">
-                <h3 className="text-xl font-bold text-ever-black mb-4">{isJapanese ? '管理アクション' : 'Admin Actions'}</h3>
+                <h3 className="text-xl font-bold text-ever-black mb-4">{t('adminActions')}</h3>
                 <div className="flex flex-wrap gap-4">
                     {hasPermission('system', 'configureSettings') && (
                         <>
-                            <button onClick={handleProcessNoShows} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg text-sm">{isJapanese ? 'No-Show処理' : 'Process No-Shows'}</button>
-                            <button onClick={handleProcessAutoCheckouts} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm">{isJapanese ? '自動チェックアウト処理' : 'Process Auto-Checkouts'}</button>
-                            <button onClick={handleSendReminders} className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg text-sm">{isJapanese ? 'リマインダー送信' : 'Send Reminders'}</button>
+                            <button onClick={handleProcessNoShows} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg text-sm">{t('processNoShows')}</button>
+                            <button onClick={handleProcessAutoCheckouts} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm">{t('processAutoCheckouts')}</button>
+                            <button onClick={handleSendReminders} className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg text-sm">{t('sendReminders')}</button>
                         </>
                     )}
                     {currentUser?.role === Role.FacilityDirector && (
-                        <button onClick={handleEmergencyStop} className="bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-500 hover:to-red-600 font-bold py-2 px-4 rounded-lg text-sm">{isJapanese ? '全機器 緊急停止' : 'Emergency Stop All'}</button>
+                        <button onClick={handleEmergencyStop} className="bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-500 hover:to-red-600 font-bold py-2 px-4 rounded-lg text-sm">{t('emergencyStopAll')}</button>
                     )}
                 </div>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-xl font-bold mb-4">{isJapanese ? '利用率ランキング (30日)' : 'Usage Ranking (30d)'}</h3>
+                    <h3 className="text-xl font-bold mb-4">{t('usageRanking30d')}</h3>
                     <ul className="space-y-3">
                         {usageRanking.map((item, index) => (
                             <li key={index} className="flex justify-between items-center text-sm">
@@ -184,7 +188,7 @@ export const AdminDashboard: React.FC = () => {
                     </ul>
                 </div>
                 <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-xl font-bold mb-4">{isJapanese ? '対応が必要な不具合報告' : 'Malfunction Reports Requiring Action'}</h3>
+                    <h3 className="text-xl font-bold mb-4">{t('reportsRequiringAction')}</h3>
                      <ul className="space-y-3">
                         {malfunctionReports.map((log: MaintenanceLog) => {
                             const eq = equipment.find(e => e.id === log.equipmentId);
@@ -193,11 +197,11 @@ export const AdminDashboard: React.FC = () => {
                                 <li key={log.id} className="p-3 bg-yellow-50 rounded-md">
                                     <p className="font-semibold text-yellow-800">{isJapanese ? eq?.nameJP : eq?.nameEN}</p>
                                     <p className="text-sm text-yellow-700 mt-1">{log.notes}</p>
-                                    <p className="text-xs text-yellow-600 mt-2">{isJapanese ? '報告者:' : 'By:'} {user?.name} - {new Date(log.reportDate).toLocaleDateString()}</p>
+                                    <p className="text-xs text-yellow-600 mt-2">{t('by')} {user?.name} - {new Date(log.reportDate).toLocaleDateString()}</p>
                                 </li>
                             )
                         })}
-                        {malfunctionReports.length === 0 && <p className="text-sm text-gray-500">{isJapanese ? '報告はありません。' : 'No reports.'}</p>}
+                        {malfunctionReports.length === 0 && <p className="text-sm text-gray-500">{t('noReports')}</p>}
                     </ul>
                 </div>
             </div>

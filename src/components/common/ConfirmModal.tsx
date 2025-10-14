@@ -1,6 +1,6 @@
 // src/components/common/ConfirmModal.tsx
 import React from 'react';
-import { useSessionContext } from '../../contexts/SessionContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface Props {
   title: string;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ConfirmModal: React.FC<Props> = ({ title, message, onConfirm, onClose, confirmText, cancelText }) => {
-  const { isJapanese } = useSessionContext();
+  const { t } = useTranslation();
 
   const handleConfirm = () => {
     onConfirm();
@@ -29,13 +29,13 @@ const ConfirmModal: React.FC<Props> = ({ title, message, onConfirm, onClose, con
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
           >
-            {cancelText || (isJapanese ? 'キャンセル' : 'Cancel')}
+            {cancelText || t('cancel')}
           </button>
           <button
             onClick={handleConfirm}
             className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
           >
-            {confirmText || (isJapanese ? '確認' : 'Confirm')}
+            {confirmText || t('confirm')}
           </button>
         </div>
       </div>

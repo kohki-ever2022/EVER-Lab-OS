@@ -5,7 +5,7 @@ import AdapterFactory from '../config/adapterFactory';
 
 // DataAdapterのインスタンスを保持するためのReact Contextを作成
 // 初期値はnullとし、Providerが提供する値で上書きされる
-const DataAdapterContext = createContext<IDataAdapter | null>(null);
+export const DataAdapterContext = createContext<IDataAdapter | null>(null);
 
 /**
  * DataAdapterProviderコンポーネント

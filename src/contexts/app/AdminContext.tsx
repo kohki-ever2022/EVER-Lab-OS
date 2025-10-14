@@ -4,7 +4,7 @@ import { MonthlyReport, BenchAssignment, InventorySnapshot, AuditLog, SystemSett
 import { useDataAdapter } from '../DataAdapterContext';
 import { getMockData } from '../../data/mockData';
 
-interface AdminContextValue {
+export interface AdminContextValue {
   monthlyReports: MonthlyReport[];
   benchAssignments: BenchAssignment[];
   inventorySnapshots: InventorySnapshot[];
@@ -18,7 +18,7 @@ interface AdminContextValue {
   equipmentManuals: EquipmentManual[];
 }
 
-const AdminContext = createContext<AdminContextValue | null>(null);
+export const AdminContext = createContext<AdminContextValue | null>(null);
 
 export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();

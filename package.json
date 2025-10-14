@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@google/genai": "^1.16.0",
+    "firebase": "^12.3.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^6.25.1"
+  },
   "scripts": {
     "analyze:unused": "npx knip",
     "analyze:circular": "npx madge --circular --extensions ts,tsx src/",
@@ -12,6 +19,9 @@
   },
   "devDependencies": {
     "@testing-library/react": "^16.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "latest",
     "jsdom": "^24.1.1",
     "jscpd": "latest",
@@ -19,6 +29,8 @@
     "madge": "latest",
     "postcss": "latest",
     "tailwindcss": "latest",
+    "vite": "^7.1.7",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^2.0.4"
   }
 }

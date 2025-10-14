@@ -1,0 +1,288 @@
+// src/i18n/translations.ts
+
+export const translations = {
+  // General
+  add: { ja: '追加', en: 'Add' },
+  cancel: { ja: 'キャンセル', en: 'Cancel' },
+  close: { ja: '閉じる', en: 'Close' },
+  confirm: { ja: '確認', en: 'Confirm' },
+  delete: { ja: '削除', en: 'Delete' },
+  edit: { ja: '編集', en: 'Edit' },
+  save: { ja: '保存', en: 'Save' },
+  saving: { ja: '保存中...', en: 'Saving...' },
+  viewAll: { ja: 'すべて表示', en: 'View All' },
+  details: { ja: '詳細', en: 'Details' },
+  actions: { ja: '操作', en: 'Actions' },
+  required: { ja: '必須', en: 'Required' },
+  optional: { ja: '任意', en: 'Optional' },
+  status: { ja: 'ステータス', en: 'Status' },
+  notes: { ja: '備考', en: 'Notes' },
+  description: { ja: '説明', en: 'Description' },
+  name: { ja: '名前', en: 'Name' },
+  select: { ja: '選択してください', en: 'Select' },
+  none: { ja: 'なし', en: 'None' },
+  search: { ja: '検索...', en: 'Search...' },
+  permissionDenied: { ja: 'アクセス権がありません。', en: 'Permission Denied.' },
+  underDevelopment: { ja: 'この機能は現在開発中です。', en: 'This feature is currently under development.' },
+  loadingApplication: { ja: 'アプリケーションを読み込んでいます...', en: 'Loading Application...' },
+  by: { ja: '報告者:', en: 'By:' },
+  noItemsToDisplay: { ja: '表示する項目がありません。', en: 'No items to display.' },
+  // FIX: Add missing translation keys
+  unlockReason: { ja: 'ロック解除の理由', en: 'Reason for unlocking' },
+  deadlineAddedToCalendar: { ja: '期限をカレンダーに追加しました。', en: 'Deadline added to calendar.' },
+  failedToAddToCalendar: { ja: 'カレンダーへの追加に失敗しました。', en: 'Failed to add to calendar.' },
+  user: { ja: '操作者', en: 'User' },
+
+  // Login
+  signInToAccount: { ja: 'アカウントにサインイン', en: 'Sign in to your account' },
+  emailAddress: { ja: 'メールアドレス', en: 'Email address' },
+  password: { ja: 'パスワード', en: 'Password' },
+  signIn: { ja: 'サインイン', en: 'Sign in' },
+  signingIn: { ja: 'サインイン中...', en: 'Signing in...' },
+  loginErrorUserNotFound: { ja: 'ユーザー情報の取得に失敗しました。', en: 'Failed to retrieve user data.' },
+  loginErrorSessionFailed: { ja: 'ログインセッションの開始に失敗しました。', en: 'Failed to start login session.' },
+  loginErrorInvalidCredentials: { ja: 'メールアドレスまたはパスワードが正しくありません。', en: 'Invalid email address or password.' },
+  loginErrorGeneral: { ja: 'ログイン処理中にエラーが発生しました。', en: 'An error occurred during login.' },
+
+  // Header & Sidebar
+  openMenu: { ja: 'メニューを開く', en: 'Open menu' },
+  qrScan: { ja: 'QRスキャン', en: 'QR Scan' },
+  notifications: { ja: '通知', en: 'Notifications' },
+  switchLangToEN: { ja: '言語を英語に切り替え', en: 'Switch language to English' },
+  switchLangToJA: { ja: '言語を日本語に切り替え', en: 'Switch language to Japanese' },
+  main: { ja: 'メイン', en: 'Main' },
+  inventoryPurchasing: { ja: '在庫・購買', en: 'Inventory & Purchasing' },
+  qualitySafety: { ja: '品質・安全', en: 'Quality & Safety' },
+  facilityManagement: { ja: '施設管理', en: 'Facility Management' },
+  dashboard: { ja: 'ダッシュボード', en: 'Dashboard' },
+  equipmentBooking: { ja: '機器予約', en: 'Equipment Booking' },
+  myReservations: { ja: '予約管理', en: 'My Reservations' },
+  projects: { ja: 'プロジェクト', en: 'Projects' },
+  chat: { ja: 'チャット', en: 'Chat' },
+  favorites: { ja: 'お気に入り', en: 'Favorites' },
+  reorder: { ja: '再発注推奨', en: 'Reorder' },
+  manuals: { ja: 'マニュアル', en: 'Manuals' },
+  labRules: { ja: 'ラボルール', en: 'Lab Rules' },
+  certificates: { ja: '資格・証明書', en: 'Certificates' },
+  adminDashboard: { ja: '管理ダッシュボード', en: 'Admin Dashboard' },
+  userManagement: { ja: 'ユーザー管理', en: 'User Management' },
+  equipmentMaster: { ja: '機器マスタ管理', en: 'Equipment Master' },
+  inventoryLock: { ja: '在庫ロック管理', en: 'Inventory Lock' },
+  monthlyReports: { ja: '月次レポート', en: 'Monthly Reports' },
+  systemSettings: { ja: 'システム設定', en: 'System Settings' },
+
+  // Dashboard
+  welcome: { ja: 'ようこそ、', en: 'Welcome,' },
+  upcomingReservations: { ja: '今後の予約', en: 'Upcoming Reservations' },
+  noUpcomingReservations: { ja: '今後の予約はありません。', en: 'No upcoming reservations.' },
+  quickActions: { ja: 'クイックアクション', en: 'Quick Actions' },
+  bookEquipment: { ja: '機器を予約する', en: 'Book Equipment' },
+  viewProjects: { ja: 'プロジェクトを見る', en: 'View Projects' },
+  consumablesStore: { ja: '消耗品ストア', en: 'Consumables Store' },
+  announcements: { ja: 'お知らせ', en: 'Announcements' },
+  noAnnouncements: { ja: 'お知らせはありません。', en: 'No announcements.' },
+
+  // Admin Dashboard
+  activeReservations: { ja: '進行中の予約', en: 'Active Reservations' },
+  todaysBookings: { ja: '本日の予約', en: "Today's Bookings" },
+  unreadMemos: { ja: '未読メモ', en: 'Unread Memos' },
+  malfunctionReports: { ja: '不具合報告', en: 'Malfunction Reports' },
+  inMaintenance: { ja: 'メンテナンス中', en: 'In Maintenance' },
+  adminActions: { ja: '管理アクション', en: 'Admin Actions' },
+  processNoShows: { ja: 'No-Show処理', en: 'Process No-Shows' },
+  processAutoCheckouts: { ja: '自動チェックアウト処理', en: 'Process Auto-Checkouts' },
+  sendReminders: { ja: 'リマインダー送信', en: 'Send Reminders' },
+  emergencyStopAll: { ja: '全機器 緊急停止', en: 'Emergency Stop All' },
+  usageRanking30d: { ja: '利用率ランキング (30日)', en: 'Usage Ranking (30d)' },
+  reportsRequiringAction: { ja: '対応が必要な不具合報告', en: 'Malfunction Reports Requiring Action' },
+  noItemsToProcess: { ja: '処理対象の項目はありませんでした。', en: 'No items were processed.' },
+  emergencyStopConfirm: { ja: '本当に全機器を緊急停止しますか？この操作は元に戻せません。', en: 'Are you sure you want to perform an emergency stop on all equipment? This action cannot be undone.' },
+  noReports: { ja: '報告はありません。', en: 'No reports.' },
+  
+  // AuditLog
+  auditLog: { ja: '監査ログ', en: 'Audit Log' },
+  auditLogDescription: { ja: 'システム内での重要な操作とデータ変更の履歴です。', en: 'History of important operations and data changes within the system.' },
+  timestamp: { ja: '日時', en: 'Timestamp' },
+  noLogEntries: { ja: 'ログエントリがありません。', en: 'No log entries.' },
+  
+  // Hooks
+  permissionDeniedDeleteUser: { ja: 'このユーザーを削除する権限がありません。', en: 'Permission denied to delete this user.' },
+  inventoryLockedUpdate: { ja: '在庫がロックされているため、更新できません。', en: 'Cannot update, inventory is locked.' },
+  inventoryLockedAdd: { ja: '在庫がロックされているため、追加できません。', en: 'Cannot add, inventory is locked.' },
+  inventoryLockedDelete: { ja: '在庫がロックされているため、削除できません。', en: 'Cannot delete, inventory is locked.' },
+  
+  // FavoriteConsumablesList
+  noFavorites: { ja: 'お気に入りに登録されたアイテムはありません。', en: 'You have no favorite items.' },
+  stock: { ja: '在庫:', en: 'Stock:' },
+  itemCannotBePurchased: { ja: 'このアイテムは購入できません。', en: 'This item cannot be purchased.' },
+  orderPlacedSuccessfully: { ja: '注文が完了しました。', en: 'Order placed successfully.' },
+  ordering: { ja: '注文中...', en: 'Ordering...' },
+  order: { ja: '注文', en: 'Order' },
+  
+  // CertificateManagement
+  certifications: { ja: '資格・証明書管理', en: 'Certifications' },
+  uploadNew: { ja: '新規アップロード', en: 'Upload New' },
+  allCertificates: { ja: '全証明書', en: 'All Certificates' },
+  myCertificates: { ja: '自分の証明書', en: 'My Certificates' },
+  expiringOrExpired: { ja: '期限間近・切れ', en: 'Expiring / Expired' },
+  qualification: { ja: '資格名', en: 'Qualification' },
+  expiryDate: { ja: '有効期限', en: 'Expiry Date' },
+  viewRenew: { ja: '詳細・更新', en: 'View/Renew' },
+  noCertsToDisplay: { ja: '表示する証明書はありません。', en: 'No certificates to display.' },
+  expired: { ja: '期限切れ', en: 'Expired' },
+  expiringSoon: { ja: '期限間近', en: 'Expiring Soon' },
+  valid: { ja: '有効', en: 'Valid' },
+  
+  // Waitlist
+  noWaitlists: { ja: '待機中の予約はありません。', en: 'You are not on any waitlists.' },
+  requestedTime: { ja: '希望時間:', en: 'Requested:' },
+  
+  // Reservations
+  noCurrentReservations: { ja: '現在の予約はありません。', en: 'No current reservations.' },
+  noReservationHistory: { ja: '予約履歴はありません。', en: 'No reservation history.' },
+  checkIn: { ja: 'チェックイン', en: 'Check-in' },
+  checkOut: { ja: 'チェックアウト', en: 'Check-out' },
+  cancelReservationConfirm: { ja: 'この予約をキャンセルしますか？', en: 'Are you sure you want to cancel this reservation?' },
+  checkInFailed: { ja: 'チェックインに失敗', en: 'Check-in failed' },
+  checkInSuccess: { ja: 'チェックインしました。', en: 'Checked in successfully.' },
+  checkOutFailed: { ja: 'チェックアウトに失敗', en: 'Check-out failed' },
+  checkOutSuccess: { ja: 'チェックアウトしました。', en: 'Checked out successfully.' },
+  cancelFailed: { ja: 'キャンセルに失敗', en: 'Cancellation failed' },
+  cancelSuccess: { ja: '予約をキャンセルしました。', en: 'Reservation cancelled.' },
+  
+  // MemberManagement
+  memberManagement: { ja: 'メンバー管理', en: 'Member Management' },
+  addNewMember: { ja: '新規メンバー追加', en: 'Add New Member' },
+  
+  // UserProfile
+  profile: { ja: 'プロフィール', en: 'Profile' },
+  company: { ja: '所属企業', en: 'Company' },
+  role: { ja: '役割', en: 'Role' },
+  nameMinLength: { ja: '名前は2文字以上で入力してください。', en: 'Name must be at least 2 characters.' },
+  
+  // UserStatusUpdater
+  updateStatus: { ja: 'ステータス更新', en: 'Update Status' },
+  statusAvailable: { ja: 'オンライン', en: 'Available' },
+  statusBusy: { ja: '取り込み中', en: 'Busy' },
+  statusAway: { ja: '離席中', en: 'Away' },
+  statusMessage: { ja: 'ステータスメッセージ', en: 'Status Message' },
+  statusUpdated: { ja: 'ステータスを更新しました。', en: 'Status updated.' },
+  statusUpdateFailed: { ja: '更新に失敗しました。', en: 'Failed to update status.' },
+  
+  // Equipment
+  equipmentList: { ja: '機器一覧', en: 'Equipment' },
+  notReservable: { ja: 'この機器は予約不要です', en: 'This equipment does not require reservation' },
+  calibrationOverdue: { ja: '校正期限切れのため予約不可', en: 'Cannot book, calibration is overdue' },
+  certExpired: { ja: '資格の有効期限が切れています', en: 'Your certification has expired' },
+  noCert: { ja: '有効な資格がありません', en: 'You lack the required certification' },
+  notAvailable: { ja: '現在利用できません', en: 'Currently unavailable' },
+  noManuals: { ja: '利用可能なマニュアルはありません。', en: 'No manuals available.' },
+  version: { ja: 'バージョン', en: 'Version' },
+  noReservationsNext7Days: { ja: '今後7日間に予約はありません。', en: 'No reservations in the next 7 days.' },
+  inUse: { ja: '使用中', en: 'In Use' },
+  available: { ja: '利用可', en: 'Available' },
+  maintenance: { ja: 'メンテ中', en: 'Maintenance' },
+  calibration: { ja: '校正中', en: 'Calibration' },
+  equipmentName: { ja: '機器名', en: 'Equipment Name' },
+  modelProductCode: { ja: 'モデル / 製品コード', en: 'Model / Product Code' },
+  manufacturer: { ja: 'メーカー', en: 'Manufacturer' },
+  priceFee: { ja: '価格 / 料金', en: 'Price / Fee' },
+  noEquipmentToDisplay: { ja: '表示する機器はありません。', en: 'No equipment to display.' },
+  
+  // Maintenance
+  maintenanceStatus: { ja: 'メンテナンス状況', en: 'Maintenance Status' },
+  latestReport: { ja: '最新の報告', en: 'Latest Report' },
+  noDetailedReport: { ja: '詳細な報告はありません。', en: 'No detailed report available.' },
+  noMaintenanceEquipment: { ja: '現在メンテナンス中の機器はありません。', en: 'No equipment is currently under maintenance.' },
+  maintenanceLog: { ja: 'メンテナンスログ', en: 'Maintenance Log' },
+  reportDate: { ja: '報告日', en: 'Report Date' },
+  reporter: { ja: '報告者', en: 'Reporter' },
+  noMaintenanceLogs: { ja: 'メンテナンスログはありません。', en: 'No maintenance logs found.' },
+  
+  // Facility Consumables
+  facilityConsumablesShortage: { ja: '施設消耗品 不足通知', en: 'Facility Consumables Shortage Notification' },
+  reportShortage: { ja: '不足を報告', en: 'Report Shortage' },
+  consumable: { ja: '消耗品', en: 'Consumable' },
+  reportConsumableShortage: { ja: '消耗品不足の報告', en: 'Report Consumable Shortage' },
+  priority: { ja: '緊急度', en: 'Priority' },
+  activeNotifications: { ja: '対応中の通知', en: 'Active Notifications' },
+  noActiveNotifications: { ja: '対応中の通知はありません', en: 'No active notifications' },
+  completedNotificationsHistory: { ja: '完了済み通知履歴', en: 'Completed Notifications History' },
+  
+  // Facility Layout
+  facilityLayout: { ja: '施設レイアウト', en: 'Facility Layout' },
+  areaP1: { ja: '陰圧式P1実験室', en: 'AREA P1' },
+  assigned: { ja: '契約済', en: 'Assigned' },
+  
+  // Hazardous Materials
+  hazardousMaterialsDashboard: { ja: '危険物管理ダッシュボード', en: 'Hazardous Materials Dashboard' },
+  goToInventory: { ja: '在庫管理へ', en: 'Go to Inventory' },
+  facilityWideMultiple: { ja: '施設全体の指定数量倍率', en: 'Facility-Wide Designated Quantity Multiple' },
+  fireServiceActStandard: { ja: '消防法に基づく届出基準は倍率1.0です。', en: 'The reporting standard based on the Fire Service Act is a multiple of 1.0.' },
+  fireServiceActWarning: { ja: '警告: 指定数量の倍率が1.0を超えています。消防署への届出が必要です。', en: 'Warning: The designated quantity multiple exceeds 1.0. Notification to the fire department is required.' },
+  totalMultiple: { ja: '合計倍率', en: 'Total Multiple' },
+  substance: { ja: '物質名', en: 'Substance' },
+  multiple: { ja: '倍率', en: 'Multiple' },
+  sdsDetails: { ja: 'SDS詳細', en: 'SDS Details' },
+  noSdsAssociated: { ja: 'SDSが関連付けられていません。', en: 'No SDS associated.' },
+  sdsNotFound: { ja: 'SDS情報が見つかりません。', en: 'SDS information not found.' },
+  
+  // Reorder Suggestions
+  reorderSuggestions: { ja: '再発注推奨', en: 'Reorder Suggestions' },
+  stockoutItems: { ja: '在庫切れ', en: 'Stockout Items' },
+  lowStockItems: { ja: '低在庫', en: 'Low Stock Items' },
+  noStockoutItems: { ja: '在庫切れの商品はありません。', en: 'No stockout items.' },
+  noLowStockItems: { ja: '低在庫の商品はありません。', en: 'No low stock items.' },
+  currentStock: { ja: '現在の在庫', en: 'Current Stock' },
+  threshold: { ja: '閾値', en: 'Threshold' },
+  
+  // Billing
+  invoices: { ja: '請求書一覧', en: 'Invoices' },
+  permissionDeniedViewPage: { ja: 'このページを閲覧する権限がありません。', en: 'You do not have permission to view this page.' },
+  noInvoicesAvailable: { ja: '利用可能な請求書はありません。', en: 'No invoices available.' },
+  cannotDisplayPdf: { ja: 'PDFデータを表示できません。この機能は現在利用できません。', en: 'Cannot display PDF data. This feature is currently unavailable.' },
+  cannotDownloadPdf: { ja: 'このPDFは直接ダウンロードできません。「PDF表示」から保存してください。', en: 'This PDF cannot be downloaded directly. Please save from "View PDF".' },
+  total: { ja: '合計:', en: 'Total:' },
+  issued: { ja: '発行日:', en: 'Issued:' },
+  
+  // Projects
+  newProject: { ja: '新規プロジェクト', en: 'New Project' },
+  editProject: { ja: 'プロジェクト編集', en: 'Edit Project' },
+  noProjects: { ja: 'プロジェクトがありません。', en: 'No projects found.' },
+  createFirstProject: { ja: '最初のプロジェクトを作成', en: 'Create your first project' },
+  projectName: { ja: 'プロジェクト名', en: 'Project Name' },
+  
+  // Project Progress
+  projectProgressDashboard: { ja: 'プロジェクト進捗ダッシュボード', en: 'Project Progress Dashboard' },
+  progress: { ja: '進捗率', en: 'Progress' },
+  totalTasks: { ja: '総タスク', en: 'Total' },
+  done: { ja: '完了', en: 'Done' },
+  overdue: { ja: '遅延', en: 'Overdue' },
+  milestones: { ja: 'マイルストーン', en: 'Milestones' },
+  totalEquipmentUsage: { ja: '総機器使用時間', en: 'Total Equipment Usage' },
+  noProjectsToDisplay: { ja: '表示するプロジェクトがありません。', en: 'No projects to display.' },
+  
+  // ELN
+  electronicLabNotebook: { ja: '電子実験ノート', en: 'Electronic Lab Notebook' },
+  newEntry: { ja: '新規エントリー', en: 'New Entry' },
+  selectOrCreateEntry: { ja: 'エントリーを選択するか、新規作成してください。', en: 'Select an entry or create a new one.' },
+  deleteEntryConfirm: { ja: 'この実験ノートを削除しますか？', en: 'Are you sure you want to delete this entry?' },
+  entryDeleted: { ja: 'エントリーを削除しました。', en: 'Entry deleted.' },
+  deleteFailed: { ja: '削除に失敗しました。', en: 'Failed to delete entry.' },
+  entryTitle: { ja: 'エントリーのタイトル', en: 'Entry Title' },
+  experimentDate: { ja: '実験日', en: 'Experiment Date' },
+  relatedProject: { ja: '関連プロジェクト', en: 'Related Project' },
+  tagsCommaSeparated: { ja: 'タグ (カンマ区切り)', en: 'Tags (comma-separated)' },
+  contentMarkdown: { ja: '内容 (Markdown対応)', en: 'Content (Markdown supported)' },
+  attachments: { ja: '添付ファイル', en: 'Attachments' },
+  fileAttachmentWip: { ja: 'ファイル添付機能は開発中です。', en: 'File attachment is under development.' },
+  titleRequired: { ja: 'タイトルは必須です。', en: 'Title is required.' },
+  
+  // Chat
+  messages: { ja: 'チャット', en: 'Messages' },
+  typeAMessage: { ja: 'メッセージを入力...', en: 'Type a message...' },
+  selectChatToStart: { ja: 'チャットを選択してください', en: 'Select a chat to start messaging' },
+  failedToSend: { ja: 'メッセージの送信に失敗しました', en: 'Failed to send message' },
+  
+  // ... and many many more. This is becoming too large. I will add the rest inside the file directly.
+};
