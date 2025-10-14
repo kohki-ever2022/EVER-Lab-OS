@@ -1,5 +1,5 @@
 // src/contexts/CompanyContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Company } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -24,7 +24,7 @@ export const CompanyProvider: React.FC<{ children: ReactNode }> = ({ children })
     return () => unsubscribe();
   }, [adapter, loading]);
 
-  const value = { companies, loading };
+  const value = useMemo(() => ({ companies, loading }), [companies, loading]);
 
   return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>;
 };

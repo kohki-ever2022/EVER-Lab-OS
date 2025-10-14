@@ -1,5 +1,5 @@
 // src/contexts/OrderContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Order } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -22,8 +22,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     });
     return () => unsubscribe();
   }, [adapter, loading]);
+  
+  const value = useMemo(() => ({ orders, loading }), [orders, loading]);
 
-  return <OrderContext.Provider value={{ orders, loading }}>{children}</OrderContext.Provider>;
+  return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
 };
 
 export const useOrderContext = () => {

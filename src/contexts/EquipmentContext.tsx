@@ -1,5 +1,5 @@
 // src/contexts/EquipmentContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Equipment } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -24,7 +24,7 @@ export const EquipmentProvider: React.FC<{ children: ReactNode }> = ({ children 
     return () => unsubscribe();
   }, [adapter, loading]);
 
-  const value = { equipment, loading };
+  const value = useMemo(() => ({ equipment, loading }), [equipment, loading]);
 
   return <EquipmentContext.Provider value={value}>{children}</EquipmentContext.Provider>;
 };

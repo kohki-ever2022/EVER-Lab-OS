@@ -1,5 +1,5 @@
 // src/contexts/UserContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { User } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -24,7 +24,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => unsubscribe();
   }, [adapter, loading]);
 
-  const value = { users, loading };
+  const value = useMemo(() => ({ users, loading }), [users, loading]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

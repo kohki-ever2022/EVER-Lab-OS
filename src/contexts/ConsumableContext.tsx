@@ -1,5 +1,5 @@
 // src/contexts/ConsumableContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Consumable } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -24,7 +24,7 @@ export const ConsumableProvider: React.FC<{ children: ReactNode }> = ({ children
     return () => unsubscribe();
   }, [adapter, loading]);
 
-  const value = { consumables, loading };
+  const value = useMemo(() => ({ consumables, loading }), [consumables, loading]);
 
   return <ConsumableContext.Provider value={value}>{children}</ConsumableContext.Provider>;
 };

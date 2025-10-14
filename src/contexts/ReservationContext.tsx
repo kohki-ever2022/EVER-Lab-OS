@@ -1,5 +1,5 @@
 // src/contexts/ReservationContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Reservation } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -24,7 +24,7 @@ export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ childre
     return () => unsubscribe();
   }, [adapter, loading]);
 
-  const value = { reservations, loading };
+  const value = useMemo(() => ({ reservations, loading }), [reservations, loading]);
 
   return <ReservationContext.Provider value={value}>{children}</ReservationContext.Provider>;
 };

@@ -1,5 +1,5 @@
 // src/contexts/MaintenanceLogContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { MaintenanceLog } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -22,8 +22,10 @@ export const MaintenanceLogProvider: React.FC<{ children: ReactNode }> = ({ chil
     });
     return () => unsubscribe();
   }, [adapter, loading]);
+  
+  const value = useMemo(() => ({ maintenanceLogs, loading }), [maintenanceLogs, loading]);
 
-  return <MaintenanceLogContext.Provider value={{ maintenanceLogs, loading }}>{children}</MaintenanceLogContext.Provider>;
+  return <MaintenanceLogContext.Provider value={value}>{children}</MaintenanceLogContext.Provider>;
 };
 
 export const useMaintenanceLogContext = () => {

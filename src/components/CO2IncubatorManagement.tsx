@@ -193,4 +193,93 @@ export const CO2IncubatorManagement: React.FC = () => {
       showToast(
         isJapanese 
           ? '交換スケジュールを設定しました（カレンダー同期はオフライン）' 
-          : 'Replacement scheduled (Calendar sync
+          : 'Replacement scheduled (Calendar sync is offline)',
+        'info'
+      );
+    }
+  };
+
+  // FIX: Added missing return statement with JSX
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6">{isJapanese ? 'CO2インキュベーターガス管理' : 'CO2 Incubator Gas Management'}</h2>
+
+      <div className="space-y-4">
+        {co2IncubatorTrackingData.map(item => {
+          const warningLevel = getWarningLevel(item.currentLevel, item.minimumLevel, item.cylinderSize);
+          const gasType = gasTypeLabels[item.gasType] || { jp: item.gasType, en: item.gasType };
+          
+          return (
+            <div key={item.id} className={`p-4 rounded-lg shadow mb-4 border-l-4 ${warningLevel.color.replace('bg-', 'border-').replace('-100', '-400')}`}>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold text-lg">{item.equipmentName}</h3>
+                  <p className="text-sm text-gray-600">{isJapanese ? gasType.jp : gasType.en}</p>
+                </div>
+                <div className={`px-3 py-1 text-sm font-medium rounded-full flex items-center gap-2 ${warningLevel.color}`}>
+                  <span>{warningLevel.icon}</span>
+                  <span>{isJapanese ? warningLevel.labelJP : warningLevel.labelEN}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
+                <div>
+                  <p className="text-gray-500">{isJapanese ? '現在残量' : 'Current Level'}</p>
+                  <p className="font-semibold text-xl">{item.currentLevel.toFixed(1)} / {item.cylinderSize} kg</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">{isJapanese ? '最低レベル' : 'Min. Level'}</p>
+                  <p className="font-semibold">{item.minimumLevel} kg</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">{isJapanese ? '最終測定日' : 'Last Measured'}</p>
+                  <p className="font-semibold">{new Date(item.lastMeasuredDate).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">{isJapanese ? '推定空日' : 'Est. Empty Date'}</p>
+                  <p className="font-semibold">{item.estimatedEmptyDate ? new Date(item.estimatedEmptyDate).toLocaleDateString() : 'N/A'}</p>
+                </div>
+              </div>
+              {item.replacementScheduled && item.replacementDate && (
+                <p className="text-sm mt-2 text-green-700 font-medium">{isJapanese ? `交換予定日: ${new Date(item.replacementDate).toLocaleDateString()}` : `Replacement scheduled for ${new Date(item.replacementDate).toLocaleDateString()}`}</p>
+              )}
+
+              <div className="flex gap-2 mt-4">
+                <button onClick={() => { setSelectedIncubator(item.equipmentId); setShowRecordForm(true); setFormData({ currentLevel: item.currentLevel, notes: '' }) }} className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                  {isJapanese ? '残量記録' : 'Record Level'}
+                </button>
+                {warningLevel.level !== 'normal' && !item.replacementScheduled && (
+                  <button onClick={() => scheduleReplacement(item.id, new Date(Date.now() + 3 * 24 * 60 * 60 * 1000))} className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+                    {isJapanese ? '交換をスケジュール' : 'Schedule Replacement'}
+                  </button>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {showRecordForm && selectedIncubator && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold mb-4">{isJapanese ? 'ガス残量記録: ' : 'Record Gas Level for '}{co2IncubatorTrackingData.find(d => d.equipmentId === selectedIncubator)?.equipmentName}</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium">{isJapanese ? '現在残量 (kg)' : 'Current Level (kg)'}</label>
+                <input type="number" value={formData.currentLevel} onChange={e => setFormData(p => ({...p, currentLevel: parseFloat(e.target.value)}))} className="w-full border rounded p-2 mt-1" step="0.1" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">{isJapanese ? '備考' : 'Notes'}</label>
+                <textarea value={formData.notes} onChange={e => setFormData(p => ({...p, notes: e.target.value}))} className="w-full border rounded p-2 mt-1" rows={3}></textarea>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <button onClick={() => setShowRecordForm(false)} className="px-4 py-2 border rounded hover:bg-gray-50">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
+              <button onClick={handleSubmitRecord} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{isJapanese ? '保存' : 'Save'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

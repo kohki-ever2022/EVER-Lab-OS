@@ -1,5 +1,5 @@
 // src/contexts/UsageContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Usage } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -22,8 +22,10 @@ export const UsageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     });
     return () => unsubscribe();
   }, [adapter, loading]);
+  
+  const value = useMemo(() => ({ usage, loading }), [usage, loading]);
 
-  return <UsageContext.Provider value={{ usage, loading }}>{children}</UsageContext.Provider>;
+  return <UsageContext.Provider value={value}>{children}</UsageContext.Provider>;
 };
 
 export const useUsageContext = () => {

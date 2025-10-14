@@ -1,5 +1,5 @@
 // src/contexts/ProjectContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Project, Task, LabNotebookEntry, Protocol } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -49,8 +49,7 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
   }, [projects, tasks, loading]);
 
-  // @ts-ignore
-  const value = { projects, tasks, loading, labNotebookEntries, setLabNotebookEntries, protocols };
+  const value = useMemo(() => ({ projects, tasks, loading, labNotebookEntries, setLabNotebookEntries, protocols }), [projects, tasks, loading, labNotebookEntries, protocols]);
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
 };

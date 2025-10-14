@@ -1,5 +1,5 @@
 // src/contexts/AnnouncementContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Announcement } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -22,8 +22,10 @@ export const AnnouncementProvider: React.FC<{ children: ReactNode }> = ({ childr
     });
     return () => unsubscribe();
   }, [adapter, loading]);
+  
+  const value = useMemo(() => ({ announcements, loading }), [announcements, loading]);
 
-  return <AnnouncementContext.Provider value={{ announcements, loading }}>{children}</AnnouncementContext.Provider>;
+  return <AnnouncementContext.Provider value={value}>{children}</AnnouncementContext.Provider>;
 };
 
 export const useAnnouncementContext = () => {

@@ -27,7 +27,8 @@ const Equipment = lazy(() => import('./components/Equipment'));
 const Announcements = lazy(() => import('./components/Announcements'));
 const ManualManagement = lazy(() => import('./components/ManualManagement'));
 const UserManagement = lazy(() => import('./components/UserManagement'));
-const CO2IncubatorManagement = lazy(() => import('./components/CO2IncubatorManagement'));
+// FIX: Changed lazy import to handle named export
+const CO2IncubatorManagement = lazy(() => import('./components/CO2IncubatorManagement').then(m => ({ default: m.CO2IncubatorManagement })));
 const FacilityConsumableNotification = lazy(() => import('./components/FacilityConsumableNotification'));
 const ElectronicLabNotebook = lazy(() => import('./components/ElectronicLabNotebook'));
 const ProjectProgressDashboard = lazy(() => import('./components/ProjectProgressDashboard'));
