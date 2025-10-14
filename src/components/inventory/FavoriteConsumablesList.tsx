@@ -5,6 +5,7 @@ import { useConsumableContext } from '../../contexts/ConsumableContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useInventoryActions } from '../../hooks/useInventoryActions';
 import { useFavorites } from '../../hooks/useFavorites';
+import { HeartIconFill } from '../common/Icons';
 
 const FavoriteConsumablesList: React.FC = () => {
     const { currentUser, isJapanese } = useSessionContext();
@@ -121,9 +122,7 @@ const FavoriteConsumablesList: React.FC = () => {
                                     </>
                                 )}
                                 <button onClick={() => handleToggleFavorite(item.id)} className="p-2 rounded-full hover:bg-red-100 transition-colors" title={isJapanese ? 'お気に入りから削除' : 'Remove from favorites'}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
-                                    </svg>
+                                    <HeartIconFill />
                                 </button>
                             </div>
                         </div>

@@ -29,9 +29,7 @@ import {
 import { IDataAdapter } from './IDataAdapter';
 import { getMockData } from '../data/mockData';
 import { ValidationError, validatePassword, validateDateRange } from '../utils/validation';
-
-// ID生成用のヘルパー関数
-const simpleUUID = () => `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+import { simpleUUID } from '../utils/uuid';
 
 /**
  * モックデータを操作するためのIDataAdapterの実装。

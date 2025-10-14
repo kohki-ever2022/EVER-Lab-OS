@@ -6,6 +6,7 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { useQmsContext } from '../contexts/AppProviders';
 import { useToast } from '../contexts/ToastContext';
 import { useComplianceActions } from '../hooks/useComplianceActions';
+import { CaretDownIcon } from './common/Icons';
 
 export const LabRuleManagement: React.FC = () => {
   const { currentUser, isFacilityStaff, isJapanese } = useSessionContext();
@@ -125,7 +126,7 @@ export const LabRuleManagement: React.FC = () => {
                         </div>
                         <div className="ml-4 flex items-center gap-4">
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${importance.color}`}>{isJapanese ? importance.jp : importance.en}</span>
-                            <svg className={`w-5 h-5 transition-transform ${expandedRuleId === rule.id ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+                            <CaretDownIcon className={`${expandedRuleId === rule.id ? 'rotate-180' : ''}`} />
                         </div>
                     </button>
                     {expandedRuleId === rule.id && (

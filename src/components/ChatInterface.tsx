@@ -5,6 +5,7 @@ import { useUserContext } from '../contexts/UserContext';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useToast } from '../contexts/ToastContext';
 import { ChatRoom, ChatMessage } from '../types/chat';
+import { SendIcon } from './common/Icons';
 
 export const ChatInterface: React.FC = () => {
   const { currentUser, isJapanese } = useSessionContext();
@@ -162,7 +163,7 @@ export const ChatInterface: React.FC = () => {
                   onClick={handleSendMessage}
                   className="bg-ever-blue text-white rounded-full p-2 w-10 h-10 flex items-center justify-center"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
+                  <SendIcon />
                 </button>
               </div>
             </div>

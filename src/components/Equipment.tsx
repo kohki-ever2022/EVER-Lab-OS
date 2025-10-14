@@ -16,11 +16,7 @@ import { useEquipmentContext } from '../contexts/EquipmentContext';
 import { useModalContext } from '../contexts/ModalContext';
 import { useQmsContext } from '../contexts/AppProviders';
 import { useAdminContext } from '../contexts/AppProviders';
-
-
-const YoutubeIcon: React.FC<{className?: string}> = ({className}) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2ZM17.2,9.47,14.8,11.2,12,9.36,9.2,11.2,6.8,9.47l-2,5.85,5.4,3.21,5.4,3.21Z" opacity=".3"/><path d="M12,22A10,10,0,1,1,22,12,10,10,0,0,1,12,22ZM12,4a8,8,0,1,0,8,8A8,8,0,0,0,12,4Z"/><path d="M12,15.64,6.6,18.85l2-5.85L4,9.47,10,9,2-6,2,6,6,0-4.59,3.53,2,5.85Z"/></svg>);
-const PdfIcon: React.FC<{className?: string}> = ({className}) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M20,2H8A2,2,0,0,0,6,4V16a2,2,0,0,0,2,2H20a2,2,0,0,0,2-2V4A2,2,0,0,0,20,2ZM12,16a2,2,0,1,1,2-2A2,2,0,0,1,12,16Zm6-7H16V7h2Z"/><path d="M4,6H2V20a2,2,0,0,0,2,2H16V20H4Z"/></svg>);
-const LinkIcon: React.FC<{className?: string}> = ({className}) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M17,12a1,1,0,0,0-1,1v5a1,1,0,0,1-1,1H7a1,1,0,0,1-1-1V10a1,1,0,0,1,1-1h5a1,1,0,0,0,0-2H7A3,3,0,0,0,4,10V18a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V13A1,1,0,0,0,17,12Z"/><path d="M20,2.93a1,1,0,0,0,0,1.41L15.41,9H18a1,1,0,0,0,0-2H12a1,1,0,0,0-1,1v6a1,1,0,0,0,2,0V8.41l4.29-4.3a1,1,0,0,0-1.41-1.41Z"/></svg>);
+import { YoutubeIcon, PdfIcon, LinkIcon, ArrowRightIcon, WarningIcon } from './common/Icons';
 
 const getManualIcon = (type: ManualType) => {
     switch (type) {
@@ -290,9 +286,7 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
                             className="flex-shrink-0 bg-yellow-500 hover:bg-yellow-600 text-white font-bold p-2 rounded-lg"
                             title={isJapanese ? "不具合を報告" : "Report Issue"}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.21 3.001-1.742 3.001H4.42c-1.532 0-2.492-1.667-1.742-3.001l5.58-9.92zM10 13a1 1 0 110-2 1 1 0 010 2zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
+                            <WarningIcon />
                         </button>
                     </div>
                 </div>

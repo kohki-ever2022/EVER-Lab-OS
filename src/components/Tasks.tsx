@@ -5,20 +5,16 @@ import { useUserContext } from '../contexts/UserContext';
 import { useModalContext } from '../contexts/ModalContext';
 import { Task, TaskStatus, TaskPriority } from '../types/research';
 import { User } from '../types/user';
+import { PriorityUrgentIcon, PriorityHighIcon, PriorityMediumIcon, PriorityLowIcon } from './common/Icons';
 
 const PriorityIcon: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
-    const config = {
-        [TaskPriority.Urgent]: { color: 'text-red-500', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
-        [TaskPriority.High]: { color: 'text-orange-500', icon: 'M5 15l7-7 7 7' },
-        [TaskPriority.Medium]: { color: 'text-yellow-500', icon: 'M5 12h14' },
-        [TaskPriority.Low]: { color: 'text-blue-500', icon: 'M5 9l7 7 7-7' },
+    const iconMap = {
+        [TaskPriority.Urgent]: <PriorityUrgentIcon className="w-4 h-4 text-red-500" />,
+        [TaskPriority.High]: <PriorityHighIcon className="w-4 h-4 text-orange-500" />,
+        [TaskPriority.Medium]: <PriorityMediumIcon className="w-4 h-4 text-yellow-500" />,
+        [TaskPriority.Low]: <PriorityLowIcon className="w-4 h-4 text-blue-500" />,
     };
-    const { color, icon } = config[priority];
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={`w-4 h-4 ${color}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
-        </svg>
-    );
+    return iconMap[priority];
 };
 
 const TaskCard: React.FC<{ task: Task, users: User[] }> = ({ task, users }) => {

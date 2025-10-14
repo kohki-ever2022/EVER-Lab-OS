@@ -4,13 +4,7 @@ import { useAnnouncementContext } from '../contexts/AnnouncementContext';
 import { useReservationContext } from '../contexts/ReservationContext';
 import { useEquipmentContext } from '../contexts/EquipmentContext';
 import { Reservation, ReservationStatus, View, Announcement } from '../types';
-
-// --- Icon Components ---
-const CalendarIcon: React.FC<{className?: string}> = ({className}) => (<svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>);
-const MegaphoneIcon: React.FC<{className?: string}> = ({className}) => (<svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L14.732 3.732z" /></svg>);
-const BeakerIcon: React.FC<{className?: string}> = ({className}) => (<svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>);
-const ArrowRightIcon: React.FC<{className?: string}> = ({className}) => (<svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>);
-
+import { CalendarIcon, PencilIcon, BeakerIcon, ArrowRightIcon } from './common/Icons';
 
 const DashboardCard: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode, onViewAll?: () => void, viewAllText?: string}> = ({ title, icon, children, onViewAll, viewAllText }) => (
     <div className="bg-white p-6 rounded-lg shadow flex flex-col">
@@ -74,7 +68,7 @@ const Dashboard: React.FC = () => {
                                                 <p className="font-semibold text-gray-800">{isJapanese ? eq?.nameJP : eq?.nameEN}</p>
                                                 <p className="text-sm text-gray-600">{new Date(r.startTime).toLocaleString(isJapanese ? 'ja-JP' : 'en-US', { dateStyle: 'short', timeStyle: 'short' })}</p>
                                             </div>
-                                            <ArrowRightIcon className="h-5 w-5 text-gray-400" />
+                                            <ArrowRightIcon />
                                         </li>
                                     );
                                 })}
@@ -111,7 +105,7 @@ const Dashboard: React.FC = () => {
                 <div className="lg:col-span-3">
                     <DashboardCard 
                         title={isJapanese ? "お知らせ" : "Announcements"}
-                        icon={<MegaphoneIcon className="h-6 w-6 text-ever-blue" />}
+                        icon={<PencilIcon className="h-6 w-6 text-ever-blue" />}
                         onViewAll={() => handleNavigate('announcements')}
                         viewAllText={isJapanese ? 'すべて表示' : 'View All'}
                     >
