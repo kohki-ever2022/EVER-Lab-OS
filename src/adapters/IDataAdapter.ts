@@ -13,6 +13,7 @@ import {
   Order,
   Project,
   Task,
+  LabNotebookEntry,
   Certificate,
   SDS,
   Ticket,
@@ -101,6 +102,15 @@ export interface IDataAdapter {
   // --- Task Operations ---
   getTasks(): Promise<Result<Task[]>>;
   subscribeToTasks(callback: (data: Task[]) => void): () => void;
+  createTask(data: Omit<Task, 'id'>): Promise<Result<Task>>;
+  updateTask(task: Task): Promise<Result<Task>>;
+  deleteTask(id: string): Promise<Result<void>>;
+  
+  // --- Lab Notebook Operations ---
+  createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>>;
+  updateLabNotebookEntry(entry: LabNotebookEntry): Promise<Result<LabNotebookEntry>>;
+  deleteLabNotebookEntry(id: string): Promise<Result<void>>;
+  subscribeToLabNotebookEntries(callback: (data: LabNotebookEntry[]) => void): () => void;
 
   // --- MaintenanceLog Operations ---
   getMaintenanceLogs(): Promise<Result<MaintenanceLog[]>>;

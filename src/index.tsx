@@ -31,7 +31,7 @@ import './firebase';
 // Dynamically import the App component to code-split the main app bundle from the login page.
 const App = lazy(() => import('./App').then(module => ({ default: module.App })));
 
-const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const AuthenticatedApp: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <AdminProvider>
     <BillingProvider>
       <PurchasingProvider>
@@ -83,11 +83,11 @@ const AppShell: React.FC = () => {
         path="/*"
         element={
           currentUser ? (
-            <AppProviders>
+            <AuthenticatedApp>
               <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading Application...</div>}>
                 <App />
               </Suspense>
-            </AppProviders>
+            </AuthenticatedApp>
           ) : (
             <Navigate to="/login" replace />
           )

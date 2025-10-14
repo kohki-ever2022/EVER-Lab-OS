@@ -12,22 +12,22 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Removed 'public' keyword. It's the default and might be confusing the linter.
-  state: State = {
+  // FIX: Explicitly declare state as public. While this is the default, some toolchains might misinterpret the class structure without it.
+  public state: State = {
     hasError: false,
     error: null,
     errorInfo: null,
   };
 
-  // FIX: Removed 'public' keyword.
-  static getDerivedStateFromError(error: Error): Partial<State> {
+  // FIX: Explicitly declare static method as public for consistency.
+  public static getDerivedStateFromError(error: Error): Partial<State> {
     // This static method runs first when an error is thrown.
     // It should return a state update object.
     return { hasError: true, error };
   }
 
-  // FIX: Removed 'public' keyword to resolve potential 'this' context issues with the linter.
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  // FIX: Reverted to a standard class method. Lifecycle methods are automatically bound by React, so `this` is correctly typed.
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
     // This lifecycle method is for side effects like logging.
@@ -42,8 +42,8 @@ class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  // FIX: Removed 'public' keyword to resolve potential 'this' context issues with the linter.
-  render() {
+  // FIX: Reverted to a standard class method to ensure `this.props` and `this.state` are correctly typed from the base `Component` class.
+  public render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;

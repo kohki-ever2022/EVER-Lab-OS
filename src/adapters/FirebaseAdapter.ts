@@ -41,6 +41,7 @@ import {
   Order,
   Project,
   Task,
+  LabNotebookEntry,
   Certificate,
   SDS,
   Ticket,
@@ -65,6 +66,7 @@ const CONSUMABLES_COLLECTION = 'consumables';
 const ORDERS_COLLECTION = 'orders';
 const PROJECTS_COLLECTION = 'projects';
 const TASKS_COLLECTION = 'tasks';
+const LAB_NOTEBOOK_COLLECTION = 'labNotebookEntries';
 const MAINTENANCE_LOGS_COLLECTION = 'maintenanceLogs';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const CERTIFICATES_COLLECTION = 'certificates';
@@ -732,7 +734,82 @@ export class FirebaseAdapter implements IDataAdapter {
       callback(this.fromSnapshot<Task>(snapshot));
     }, (error) => console.error('Error subscribing to tasks:', error));
   }
+  async createTask(data: Omit<Task, 'id'>): Promise<Result<Task>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const docRef = await addDoc(collection(db, TASKS_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      const newTask = await this.getDocAndConvert<Task>(docRef);
+      return { success: true, data: newTask };
+    } catch (error) {
+      console.error('Error creating task:', error);
+      return { success: false, error: error as Error };
+    }
+  }
+  async updateTask(task: Task): Promise<Result<Task>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const { id, ...updateData } = task;
+      const docRef = doc(db, TASKS_COLLECTION, id);
+      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
+      return { success: true, data: task };
+    } catch (error) {
+      console.error(`Error updating task ${task.id}:`, error);
+      return { success: false, error: error as Error };
+    }
+  }
+  async deleteTask(id: string): Promise<Result<void>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      await deleteDoc(doc(db, TASKS_COLLECTION, id));
+      return { success: true, data: undefined };
+    } catch (error) {
+      console.error(`Error deleting task ${id}:`, error);
+      return { success: false, error: error as Error };
+    }
+  }
   
+  // --- Lab Notebook Operations ---
+  async createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const docRef = await addDoc(collection(db, LAB_NOTEBOOK_COLLECTION), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      const newEntry = await this.getDocAndConvert<LabNotebookEntry>(docRef);
+      return { success: true, data: newEntry };
+    } catch (error) {
+      console.error('Error creating lab notebook entry:', error);
+      return { success: false, error: error as Error };
+    }
+  }
+  async updateLabNotebookEntry(entry: LabNotebookEntry): Promise<Result<LabNotebookEntry>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const { id, ...updateData } = entry;
+      const docRef = doc(db, LAB_NOTEBOOK_COLLECTION, id);
+      await updateDoc(docRef, { ...updateData, updatedAt: serverTimestamp() });
+      return { success: true, data: entry };
+    } catch (error) {
+      console.error(`Error updating lab notebook entry ${entry.id}:`, error);
+      return { success: false, error: error as Error };
+    }
+  }
+  async deleteLabNotebookEntry(id: string): Promise<Result<void>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      await deleteDoc(doc(db, LAB_NOTEBOOK_COLLECTION, id));
+      return { success: true, data: undefined };
+    } catch (error) {
+      console.error(`Error deleting lab notebook entry ${id}:`, error);
+      return { success: false, error: error as Error };
+    }
+  }
+  subscribeToLabNotebookEntries(callback: (data: LabNotebookEntry[]) => void): () => void {
+    if (!db) { console.error("Firebase not configured."); return () => {}; }
+    const q = query(collection(db, LAB_NOTEBOOK_COLLECTION), orderBy('experimentDate', 'desc'));
+    return onSnapshot(q, (snapshot) => {
+      callback(this.fromSnapshot<LabNotebookEntry>(snapshot));
+    }, (error) => console.error('Error subscribing to lab notebook entries:', error));
+  }
+
   // --- MaintenanceLog Operations ---
   async getMaintenanceLogs(): Promise<Result<MaintenanceLog[]>> { 
     if (!db) return { success: false, error: new Error("Firebase not configured.") };

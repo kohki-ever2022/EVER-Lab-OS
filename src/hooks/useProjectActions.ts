@@ -5,13 +5,11 @@ import { useProjectContext } from '../contexts/ProjectContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
 import { Result } from '../types/core';
-import { Project, LabNotebookEntry } from '../types/research';
-
-const simpleUUID = () => `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+import { Project, LabNotebookEntry, Task } from '../types/research';
 
 export const useProjectActions = () => {
     const adapter = useDataAdapter();
-    const { setLabNotebookEntries } = useProjectContext();
+    const { labNotebookEntries, tasks } = useProjectContext();
     const { currentUser } = useSessionContext();
     const { addAuditLog } = useAudit();
 
@@ -33,33 +31,79 @@ export const useProjectActions = () => {
 
     const addLabNotebookEntry = useCallback(async (entry: Omit<LabNotebookEntry, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<Result<LabNotebookEntry, Error>> => {
         if (!currentUser) return { success: false, error: new Error('User not logged in.') };
-        const newEntry: LabNotebookEntry = {
+        const newEntryData: Omit<LabNotebookEntry, 'id'> = {
             ...entry,
-            id: `eln-${simpleUUID()}`,
             userId: currentUser.id,
+            createdAt: new Date(), // This will be replaced by serverTimestamp in FirebaseAdapter
+            updatedAt: new Date(),
+        };
+        const result = await adapter.createLabNotebookEntry(newEntryData);
+        if (result.success) {
+            addAuditLog('ELN_ENTRY_CREATE', `Created ELN entry '${result.data.title}'`);
+        }
+        return result;
+    }, [currentUser, adapter, addAuditLog]);
+
+    const updateLabNotebookEntry = useCallback(async (entry: LabNotebookEntry): Promise<Result<LabNotebookEntry, Error>> => {
+        const updatedEntry = { ...entry, updatedAt: new Date() }; // client-side update
+        const result = await adapter.updateLabNotebookEntry(updatedEntry);
+        if (result.success) {
+            addAuditLog('ELN_ENTRY_UPDATE', `Updated ELN entry '${entry.title}'`);
+        }
+        return result;
+    }, [adapter, addAuditLog]);
+
+    const deleteLabNotebookEntry = useCallback(async (entryId: string): Promise<Result<void, Error>> => {
+        const entryToDelete = labNotebookEntries.find(e => e.id === entryId);
+        const result = await adapter.deleteLabNotebookEntry(entryId);
+        if (result.success && entryToDelete) {
+            addAuditLog('ELN_ENTRY_DELETE', `Deleted ELN entry '${entryToDelete.title}'`);
+        }
+        return result;
+    }, [adapter, labNotebookEntries, addAuditLog]);
+
+    const addTask = useCallback(async (task: Omit<Task, 'id' | 'createdByUserId' | 'createdAt' | 'updatedAt'>): Promise<Result<Task, Error>> => {
+        if (!currentUser) return { success: false, error: new Error('User not logged in.') };
+        const newTaskData: Omit<Task, 'id'> = {
+            ...task,
+            createdByUserId: currentUser.id,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
-        setLabNotebookEntries(prev => [...prev, newEntry]); // Mock behavior
-        return { success: true, data: newEntry };
-    }, [currentUser, setLabNotebookEntries]);
+        const result = await adapter.createTask(newTaskData);
+        if (result.success) {
+            addAuditLog('TASK_CREATE', `Created task '${result.data.title}'`);
+        }
+        return result;
+    }, [currentUser, adapter, addAuditLog]);
 
-    const updateLabNotebookEntry = useCallback(async (entry: LabNotebookEntry): Promise<Result<LabNotebookEntry, Error>> => {
-        const updatedEntry = { ...entry, updatedAt: new Date() };
-        setLabNotebookEntries(prev => prev.map(e => e.id === entry.id ? updatedEntry : e)); // Mock behavior
-        return { success: true, data: updatedEntry };
-    }, [setLabNotebookEntries]);
-    
-    const deleteLabNotebookEntry = useCallback(async (entryId: string): Promise<Result<void, Error>> => {
-        setLabNotebookEntries(prev => prev.filter(e => e.id !== entryId)); // Mock behavior
-        return { success: true, data: undefined };
-    }, [setLabNotebookEntries]);
+    const updateTask = useCallback(async (task: Task): Promise<Result<Task, Error>> => {
+        const updatedTask = { ...task, updatedAt: new Date() };
+        const result = await adapter.updateTask(updatedTask);
+        if (result.success) {
+            addAuditLog('TASK_UPDATE', `Updated task '${task.title}'`);
+        }
+        return result;
+    }, [adapter, addAuditLog]);
+
+    const deleteTask = useCallback(async (taskId: string): Promise<Result<void, Error>> => {
+        const taskToDelete = tasks.find(t => t.id === taskId);
+        const result = await adapter.deleteTask(taskId);
+        if (result.success && taskToDelete) {
+            addAuditLog('TASK_DELETE', `Deleted task '${taskToDelete.title}'`);
+        }
+        return result;
+    }, [adapter, tasks, addAuditLog]);
+
 
     return useMemo(() => ({
         addProject,
         updateProject,
         addLabNotebookEntry,
         updateLabNotebookEntry,
-        deleteLabNotebookEntry
-    }), [addProject, updateProject, addLabNotebookEntry, updateLabNotebookEntry, deleteLabNotebookEntry]);
+        deleteLabNotebookEntry,
+        addTask,
+        updateTask,
+        deleteTask,
+    }), [addProject, updateProject, addLabNotebookEntry, updateLabNotebookEntry, deleteLabNotebookEntry, addTask, updateTask, deleteTask]);
 };

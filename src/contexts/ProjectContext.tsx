@@ -7,7 +7,6 @@ interface ProjectContextValue {
   projects: Project[];
   tasks: Task[];
   labNotebookEntries: LabNotebookEntry[];
-  setLabNotebookEntries: React.Dispatch<React.SetStateAction<LabNotebookEntry[]>>;
   protocols: Protocol[];
   loading: boolean;
 }
@@ -18,7 +17,6 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
   const adapter = useDataAdapter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  // @ts-ignore
   const [labNotebookEntries, setLabNotebookEntries] = useState<LabNotebookEntry[]>([]);
   // @ts-ignore
   const [protocols, setProtocols] = useState<Protocol[]>([]);
@@ -28,7 +26,8 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     const unsubProjects = adapter.subscribeToProjects(setProjects);
     const unsubTasks = adapter.subscribeToTasks(setTasks);
-    // TODO: The adapter should be updated to provide subscriptions for labNotebookEntries and protocols.
+    const unsubEntries = adapter.subscribeToLabNotebookEntries(setLabNotebookEntries);
+    // TODO: The adapter should be updated to provide subscriptions for protocols.
     // For now, this will allow the app to run without crashing.
     
     // A simple loading indicator; assumes data arrives reasonably quickly.
@@ -39,17 +38,18 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
     return () => {
       unsubProjects();
       unsubTasks();
+      unsubEntries();
       clearTimeout(timer);
     };
   }, [adapter, loading]);
 
   useEffect(() => {
-      if(projects.length > 0 && tasks.length > 0 && loading) {
+      if(projects.length > 0 && tasks.length > 0 && labNotebookEntries.length > 0 && loading) {
           setLoading(false);
       }
-  }, [projects, tasks, loading]);
+  }, [projects, tasks, labNotebookEntries, loading]);
 
-  const value = useMemo(() => ({ projects, tasks, loading, labNotebookEntries, setLabNotebookEntries, protocols }), [projects, tasks, loading, labNotebookEntries, protocols]);
+  const value = useMemo(() => ({ projects, tasks, loading, labNotebookEntries, protocols }), [projects, tasks, loading, labNotebookEntries, protocols]);
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
 };

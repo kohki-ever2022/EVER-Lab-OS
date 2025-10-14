@@ -6,12 +6,11 @@ import { useProjectActions } from '../hooks/useProjectActions';
 import { Project } from '../types/research';
 
 interface ModalProps {
-    isOpen: boolean;
     onClose: () => void;
     project: Project | null;
 }
 
-const ProjectDetailsModal: React.FC<ModalProps> = ({ isOpen, onClose, project }) => {
+const ProjectDetailsModal: React.FC<ModalProps> = ({ onClose, project }) => {
     const { isJapanese, currentUser } = useSessionContext();
     const { users } = useUserContext();
     const { addProject, updateProject } = useProjectActions();
@@ -45,8 +44,6 @@ const ProjectDetailsModal: React.FC<ModalProps> = ({ isOpen, onClose, project })
     const toggleMember = (userId: string) => {
         setMemberIds(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
     };
-
-    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

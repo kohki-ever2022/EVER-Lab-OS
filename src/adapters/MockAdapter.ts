@@ -14,6 +14,7 @@ import {
   Order,
   Project,
   Task,
+  LabNotebookEntry,
   Certificate,
   SDS,
   Ticket,
@@ -48,6 +49,7 @@ export class MockAdapter implements IDataAdapter {
   private orders: Order[];
   private projects: Project[];
   private tasks: Task[];
+  private labNotebookEntries: LabNotebookEntry[];
   private maintenanceLogs: MaintenanceLog[];
   private announcements: Announcement[];
   private certificates: Certificate[];
@@ -74,6 +76,7 @@ export class MockAdapter implements IDataAdapter {
     this.orders = initialData.orders;
     this.projects = initialData.projects;
     this.tasks = initialData.tasks;
+    this.labNotebookEntries = initialData.labNotebookEntries;
     this.maintenanceLogs = initialData.maintenanceLogs;
     this.announcements = initialData.announcements;
     this.certificates = initialData.certificates;
@@ -321,6 +324,47 @@ export class MockAdapter implements IDataAdapter {
 
   async getTasks(): Promise<Result<Task[]>> { return { success: true, data: [...this.tasks] }; }
   subscribeToTasks(callback: (data: Task[]) => void): () => void { return this.createSubscription('tasks', this.tasks, callback); }
+  async createTask(data: Omit<Task, 'id'>): Promise<Result<Task>> {
+    const newTask: Task = { ...data, id: simpleUUID() };
+    this.tasks.push(newTask);
+    this.notifySubscribers('tasks', this.tasks);
+    return { success: true, data: newTask };
+  }
+  async updateTask(task: Task): Promise<Result<Task>> {
+    const index = this.tasks.findIndex(t => t.id === task.id);
+    if (index === -1) return { success: false, error: new Error('Task not found') };
+    this.tasks[index] = task;
+    this.notifySubscribers('tasks', this.tasks);
+    return { success: true, data: task };
+  }
+  async deleteTask(id: string): Promise<Result<void>> {
+    this.tasks = this.tasks.filter(t => t.id !== id);
+    this.notifySubscribers('tasks', this.tasks);
+    return { success: true, data: undefined };
+  }
+  
+  // --- Lab Notebook Operations ---
+  async createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>> {
+    const newEntry: LabNotebookEntry = { ...data, id: simpleUUID() };
+    this.labNotebookEntries.push(newEntry);
+    this.notifySubscribers('labNotebookEntries', this.labNotebookEntries);
+    return { success: true, data: newEntry };
+  }
+  async updateLabNotebookEntry(entry: LabNotebookEntry): Promise<Result<LabNotebookEntry>> {
+    const index = this.labNotebookEntries.findIndex(e => e.id === entry.id);
+    if (index === -1) return { success: false, error: new Error('Entry not found') };
+    this.labNotebookEntries[index] = entry;
+    this.notifySubscribers('labNotebookEntries', this.labNotebookEntries);
+    return { success: true, data: entry };
+  }
+  async deleteLabNotebookEntry(id: string): Promise<Result<void>> {
+    this.labNotebookEntries = this.labNotebookEntries.filter(e => e.id !== id);
+    this.notifySubscribers('labNotebookEntries', this.labNotebookEntries);
+    return { success: true, data: undefined };
+  }
+  subscribeToLabNotebookEntries(callback: (data: LabNotebookEntry[]) => void): () => void {
+    return this.createSubscription('labNotebookEntries', this.labNotebookEntries, callback);
+  }
 
   async getMaintenanceLogs(): Promise<Result<MaintenanceLog[]>> { return { success: true, data: [...this.maintenanceLogs] }; }
   async getMaintenanceLogById(id: string): Promise<Result<MaintenanceLog | null>> { return { success: true, data: this.maintenanceLogs.find(i => i.id === id) || null }; }
