@@ -2,8 +2,10 @@
 import { useCallback, useMemo } from 'react';
 import { usePurchasingContext } from '../contexts/AppProviders';
 import { useSessionContext } from '../contexts/SessionContext';
-import { Result } from '../types/core';
-import { QuotationStatus, QuotationResponse } from '../types/inventory';
+// FIX: import from barrel file
+import { Result } from '../types';
+// FIX: import from barrel file
+import { QuotationStatus, QuotationResponse } from '../types';
 
 export const usePurchasingActions = () => {
     const { setQuotations } = usePurchasingContext();

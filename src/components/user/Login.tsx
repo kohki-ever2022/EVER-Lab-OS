@@ -1,7 +1,8 @@
 import React, { useState, FormEvent } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useDataAdapter } from '../../contexts/DataAdapterContext';
-import { User } from '../../types/user';
+// FIX: import from barrel file
+import { User } from '../../types';
 
 const Login: React.FC = () => {
     const { login, isJapanese } = useSessionContext();

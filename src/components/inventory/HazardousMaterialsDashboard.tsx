@@ -3,8 +3,10 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useConsumableContext } from '../../contexts/ConsumableContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 
-import { View } from '../../types/core';
-import { Consumable } from '../../types/inventory';
+// FIX: import from barrel file
+import { View } from '../../types';
+// FIX: import from barrel file
+import { Consumable } from '../../types';
 
 export const HazardousMaterialsDashboard: React.FC = () => {
   const { isJapanese } = useSessionContext();

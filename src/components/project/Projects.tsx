@@ -1,9 +1,9 @@
 import React from 'react';
-import { useSessionContext } from '../contexts/SessionContext';
-import { useProjectContext } from '../contexts/ProjectContext';
-import { useUserContext } from '../contexts/UserContext';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useProjectContext } from '../../contexts/ProjectContext';
+import { useUserContext } from '../../contexts/UserContext';
 
-import { useModalContext } from '../contexts/ModalContext';
+import { useModalContext } from '../../contexts/ModalContext';
 
 const Projects: React.FC = () => {
     const { isJapanese, currentUser } = useSessionContext();

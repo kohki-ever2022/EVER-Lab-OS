@@ -11,8 +11,10 @@ import {
   MaintenanceLog,
   Result,
 } from '../types';
-import { NotificationType } from '../types/common';
-import { RoleCategory } from '../types/core';
+// FIX: import from barrel file
+import { NotificationType } from '../types';
+// FIX: import from barrel file
+import { RoleCategory } from '../types';
 import { useEquipmentContext } from '../contexts/EquipmentContext';
 import { useUserContext } from '../contexts/UserContext';
 

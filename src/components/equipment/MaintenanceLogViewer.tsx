@@ -5,7 +5,8 @@ import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useUserContext } from '../../contexts/UserContext';
 import { usePermissions } from '../../hooks/usePermissions';
 
-import { MaintenanceLog, MaintenanceLogStatus } from '../../types/equipment';
+// FIX: import from barrel file
+import { MaintenanceLog, MaintenanceLogStatus } from '../../types';
 
 export const MaintenanceLogViewer: React.FC = () => {
     const { maintenanceLogs } = useMaintenanceLogContext();

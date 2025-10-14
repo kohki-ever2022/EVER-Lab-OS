@@ -2,7 +2,8 @@ import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useConsumableContext } from '../../contexts/ConsumableContext';
 import { usePermissions } from '../../hooks/usePermissions';
-import { View } from '../../types/core';
+// FIX: import from barrel file
+import { View } from '../../types';
 
 const ReorderSuggestions: React.FC = () => {
   const { consumables } = useConsumableContext();

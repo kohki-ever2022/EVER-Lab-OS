@@ -3,7 +3,8 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useUserContext } from '../../contexts/UserContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { usePermissions } from '../../hooks/usePermissions';
-import { Role } from '../../types/core';
+// FIX: import from barrel file
+import { Role } from '../../types';
 
 export const MemberManagement: React.FC = () => {
     const { currentUser, isJapanese } = useSessionContext();

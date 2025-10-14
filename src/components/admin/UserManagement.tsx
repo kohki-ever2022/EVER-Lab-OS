@@ -6,8 +6,10 @@ import { useToast } from '../../contexts/ToastContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useUserActions } from '../../hooks/useUserActions';
 
-import { User } from '../../types/user';
-import { Role, RoleCategory, Result } from '../../types/core';
+// FIX: import from barrel file
+import { User } from '../../types';
+// FIX: import from barrel file
+import { Role, RoleCategory, Result } from '../../types';
 
 export const UserManagement: React.FC = () => {
     const { users } = useUserContext();

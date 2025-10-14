@@ -4,7 +4,8 @@ import { useMaintenanceLogContext } from '../../contexts/MaintenanceLogContext';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useUserContext } from '../../contexts/UserContext';
 
-import { EquipmentStatus, MaintenanceLogStatus } from '../../types/equipment';
+// FIX: import from barrel file
+import { EquipmentStatus, MaintenanceLogStatus } from '../../types';
 
 const MaintenanceStatus: React.FC = () => {
     const { isJapanese } = useSessionContext();

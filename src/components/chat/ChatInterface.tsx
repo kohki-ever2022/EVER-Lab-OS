@@ -4,7 +4,8 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useUserContext } from '../../contexts/UserContext';
 import { useDataAdapter } from '../../contexts/DataAdapterContext';
 import { useToast } from '../../contexts/ToastContext';
-import { ChatRoom, ChatMessage } from '../../types/chat';
+// FIX: import from barrel file
+import { ChatRoom, ChatMessage } from '../../types';
 import { SendIcon } from '../common/Icons';
 
 export const ChatInterface: React.FC = () => {

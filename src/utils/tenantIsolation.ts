@@ -1,10 +1,9 @@
 // src/utils/tenantIsolation.ts
-import type { CurrentUser } from '../types/user';
-import { Role, RoleCategory } from '../types/core';
-import type { Equipment } from '../types/equipment';
-import type { Consumable, Order, PurchaseOrder } from '../types/inventory';
-import type { Project } from '../types/research';
-import type { Reservation } from '../types/equipment';
+// FIX: import from barrel file
+import type { CurrentUser, Equipment, Consumable, Order, PurchaseOrder, Project, Reservation } from '../types';
+// FIX: import from barrel file
+import { Role, RoleCategory } from '../types';
+
 
 /**
 * テナント分離ユーティリティ

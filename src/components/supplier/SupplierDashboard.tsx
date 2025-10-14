@@ -1,10 +1,11 @@
-// src/components/SupplierDashboard.tsx
+// src/components/supplier/SupplierDashboard.tsx
 import React, { useState, useMemo } from 'react';
-import { useSessionContext } from '../contexts/SessionContext';
-import { usePurchasingContext } from '../contexts/AppProviders';
-import { useToast } from '../contexts/ToastContext';
-import { usePurchasingActions } from '../hooks/usePurchasingActions';
-import { Quotation } from '../types/inventory';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { usePurchasingContext } from '../../contexts/AppProviders';
+import { useToast } from '../../contexts/ToastContext';
+import { usePurchasingActions } from '../../hooks/usePurchasingActions';
+// FIX: import from barrel file
+import { Quotation } from '../../types';
 
 const SupplierDashboard: React.FC = () => {
     const { isJapanese, currentUser } = useSessionContext();

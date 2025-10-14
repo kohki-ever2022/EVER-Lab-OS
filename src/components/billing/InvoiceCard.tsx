@@ -1,5 +1,6 @@
 import React from 'react';
-import { Invoice } from '../../types/billing';
+// FIX: import from barrel file
+import { Invoice } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 
 interface InvoiceCardProps {

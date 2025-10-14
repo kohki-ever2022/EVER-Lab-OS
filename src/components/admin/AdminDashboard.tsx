@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Language, Role } from '../../types/core';
-import { ReservationStatus, Reservation, MaintenanceLogStatus, EquipmentStatus, MaintenanceLog } from '../../types/equipment';
+// FIX: import from barrel file
+import { Language, Role } from '../../types';
+// FIX: import from barrel file
+import { ReservationStatus, Reservation, MaintenanceLogStatus, EquipmentStatus, MaintenanceLog } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useLabStateContext } from '../../contexts/AppProviders';
 import { useReservationContext } from '../../contexts/ReservationContext';

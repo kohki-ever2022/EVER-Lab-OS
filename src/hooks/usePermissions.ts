@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 import { ROLE_PERMISSIONS } from '../data/rolePermissions';
 import { canAccessData as checkDataScope, canAccessAllTenants as checkAllTenantsAccess, filterByTenantAccess as filterData } from '../utils/tenantIsolation';
-import { Role, RoleCategory } from '../types/core';
-import { User } from '../types/user';
-import { Resource, Action } from '../types/common';
+// FIX: Corrected imports to use the barrel file
+import { Role, RoleCategory, User, Resource, Action } from '../types';
 import { useSessionContext } from '../contexts/SessionContext';
 
 /**

@@ -3,7 +3,8 @@ import React, { useMemo } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useReservationContext } from '../../contexts/ReservationContext';
 import { useUserContext } from '../../contexts/UserContext';
-import { Equipment, ReservationStatus } from '../../types/equipment';
+// FIX: import from barrel file
+import { Equipment, ReservationStatus } from '../../types';
 
 interface ScheduleEquipmentModalProps {
     equipment: Equipment;

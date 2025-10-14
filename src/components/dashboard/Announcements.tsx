@@ -2,7 +2,8 @@ import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useAnnouncementContext } from '../../contexts/AnnouncementContext';
 
-import { Announcement } from '../../types/common';
+// FIX: import from barrel file
+import { Announcement } from '../../types';
 
 const Announcements: React.FC = () => {
     const { announcements } = useAnnouncementContext();

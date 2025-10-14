@@ -12,26 +12,27 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // State is explicitly declared as public for clarity across different TypeScript toolchains.
-  public state: State = {
+  // FIX: Removed `public` keyword which can cause issues with some toolchains.
+  state: State = {
     hasError: false,
     error: null,
     errorInfo: null,
   };
 
-  // Static method is explicitly declared public for class structure consistency.
-  public static getDerivedStateFromError(error: Error): Partial<State> {
+  // FIX: Removed `public` keyword.
+  static getDerivedStateFromError(error: Error): Partial<State> {
     // This static method runs first when an error is thrown.
     // It should return a state update object.
     return { hasError: true, error };
   }
 
-  // Standard class method for lifecycle events to ensure correct `this` context.
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  // FIX: Removed `public` keyword.
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
     // This lifecycle method is for side effects like logging.
     // We can also set state here.
+    // FIX: Correctly call `this.setState` which exists on the component instance.
     this.setState({
       errorInfo
     });
@@ -42,9 +43,10 @@ class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  // Standard class method to ensure `this.props` and `this.state` are correctly typed from the base `Component` class.
-  public render() {
+  // FIX: Removed `public` keyword.
+  render() {
     if (this.state.hasError) {
+      // FIX: Correctly access `this.props` which exists on the component instance.
       if (this.props.fallback) {
         return this.props.fallback;
       }
@@ -81,6 +83,7 @@ class ErrorBoundary extends Component<Props, State> {
       );
     }
 
+    // FIX: Correctly access `this.props` which exists on the component instance.
     return this.props.children;
   }
 }

@@ -4,7 +4,8 @@ import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useEquipmentActions } from '../../hooks/useEquipmentActions';
 
-import { Equipment, EquipmentStatus } from '../../types/equipment';
+// FIX: import from barrel file
+import { Equipment, EquipmentStatus } from '../../types';
 
 export const EquipmentManagement: React.FC = () => {
     const { equipment } = useEquipmentContext();

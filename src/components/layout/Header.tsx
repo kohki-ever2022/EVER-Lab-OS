@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Language, Role } from '../../types/core';
-import { UserAvailabilityStatus } from '../../types/common';
+// FIX: import from barrel file
+import { Language, Role, UserAvailabilityStatus } from '../../types';
 import UserStatusUpdater from '../user/UserStatusUpdater';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useNotificationsContext } from '../../contexts/NotificationContext';

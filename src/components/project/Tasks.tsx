@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { useSessionContext } from '../contexts/SessionContext';
-import { useProjectContext } from '../contexts/ProjectContext';
-import { useUserContext } from '../contexts/UserContext';
-import { useModalContext } from '../contexts/ModalContext';
-import { Task, TaskStatus, TaskPriority } from '../types/research';
-import { User } from '../types/user';
-import { PriorityUrgentIcon, PriorityHighIcon, PriorityMediumIcon, PriorityLowIcon } from './common/Icons';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useProjectContext } from '../../contexts/ProjectContext';
+import { useUserContext } from '../../contexts/UserContext';
+import { useModalContext } from '../../contexts/ModalContext';
+// FIX: import from barrel file
+import { Task, TaskStatus, TaskPriority, User } from '../../types';
+import { PriorityUrgentIcon, PriorityHighIcon, PriorityMediumIcon, PriorityLowIcon } from '../common/Icons';
 
 const PriorityIcon: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
     const iconMap = {

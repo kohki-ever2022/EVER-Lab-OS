@@ -1,10 +1,12 @@
-// src/components/ProjectProgressDashboard.tsx
+// src/components/dashboard/ProjectProgressDashboard.tsx
 import React, { useMemo } from 'react';
-import { useUsageContext } from '../contexts/UsageContext';
-import { useProjectContext } from '../contexts/ProjectContext';
-import { useSessionContext } from '../contexts/SessionContext';
-import { Project, Task, TaskStatus, Milestone, MilestoneStatus } from '../types/research';
-import { Usage } from '../types/equipment';
+import { useUsageContext } from '../../contexts/UsageContext';
+import { useProjectContext } from '../../contexts/ProjectContext';
+import { useSessionContext } from '../../contexts/SessionContext';
+// FIX: import from barrel file
+import { Project, Task, TaskStatus, Milestone, MilestoneStatus } from '../../types';
+// FIX: import from barrel file
+import { Usage } from '../../types';
 
 const ProjectProgressDashboard: React.FC = () => {
   const { usage } = useUsageContext();

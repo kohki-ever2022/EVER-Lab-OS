@@ -4,9 +4,8 @@ import { useToast } from '../../contexts/ToastContext';
 import { useReservationActions } from '../../hooks/useReservationActions';
 import { useReservationContext } from '../../contexts/ReservationContext';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
-
-import { Language, Result } from '../../types/core';
-import { Reservation, ReservationStatus, Usage } from '../../types/equipment';
+// FIX: import from barrel file
+import { Language, Result, Reservation, ReservationStatus, Usage } from '../../types';
 import Waitlist from './Waitlist';
 
 type TabType = 'current' | 'history' | 'waitlist';

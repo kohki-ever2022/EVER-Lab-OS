@@ -4,7 +4,8 @@ import { useQmsContext } from '../../contexts/AppProviders';
 import { useUserContext } from '../../contexts/UserContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useCertificates } from '../../contexts/CertificateContext';
-import { CertificateStatus } from '../../types/qms';
+// FIX: import from barrel file
+import { CertificateStatus } from '../../types';
 
 const CertificateManagement: React.FC = () => {
     const { 

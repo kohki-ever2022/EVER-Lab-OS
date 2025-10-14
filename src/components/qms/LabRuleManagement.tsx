@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { LabRule, LabRuleCategory, RuleImportance, ManualTargetAudience } from '../../types/qms';
-import { Role } from '../../types/core';
+// FIX: import from barrel file
+import { LabRule, LabRuleCategory, RuleImportance, ManualTargetAudience } from '../../types';
+// FIX: import from barrel file
+import { Role } from '../../types';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useQmsContext } from '../../contexts/AppProviders';
@@ -123,30 +125,3 @@ export const LabRuleManagement: React.FC = () => {
                                 <span className="font-bold">{rule.ruleNumber}: {isJapanese ? rule.titleJP : rule.titleEN}</span>
                             </div>
                             <p className="text-sm text-gray-600">{isJapanese ? rule.descriptionJP : rule.descriptionEN}</p>
-                        </div>
-                        <div className="ml-4 flex items-center gap-4">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${importance.color}`}>{isJapanese ? importance.jp : importance.en}</span>
-                            <CaretDownIcon className={`${expandedRuleId === rule.id ? 'rotate-180' : ''}`} />
-                        </div>
-                    </button>
-                    {expandedRuleId === rule.id && (
-                        <div className="p-4 bg-white border-t">
-                            <div className="prose max-w-none">
-                                <MarkdownRenderer markdown={isJapanese ? rule.detailsJP || '' : rule.detailsEN || ''} />
-                            </div>
-                            {isMandatoryUnacked && (
-                                <div className="mt-4 pt-4 border-t flex justify-end">
-                                    <button onClick={() => handleAcknowledge(rule.id)} className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
-                                        {isJapanese ? 'ルールを読み、遵守することに同意します' : 'I have read and agree to comply'}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            );
-        })}
-      </div>
-    </div>
-  );
-};

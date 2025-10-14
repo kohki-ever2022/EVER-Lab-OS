@@ -1,7 +1,7 @@
 // src/hooks/useUserActions.ts
 import { useCallback, useMemo } from 'react';
-import { User } from '../types/user';
-import { Result, Role } from '../types/core';
+// FIX: import from barrel file
+import { User, Result, Role } from '../types';
 import { ValidationError, validateEmail as validateEmailFormat, validatePassword } from '../utils/validation';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useSessionContext } from '../contexts/SessionContext';
@@ -56,7 +56,8 @@ export const useUserActions = () => {
             }
             validatePassword(user.password);
 
-            const userPayload = { ...user, name: escapeHtml(user.name) };
+            // FIX: Explicitly type userPayload to avoid type inference issue.
+            const userPayload: Omit<User, 'id'> = { ...user, name: escapeHtml(user.name) };
             const result = await adapter.createUser(userPayload);
 
             if (result.success) {

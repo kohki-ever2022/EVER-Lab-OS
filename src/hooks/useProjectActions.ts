@@ -4,8 +4,10 @@ import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useProjectContext } from '../contexts/ProjectContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
-import { Result } from '../types/core';
-import { Project, LabNotebookEntry, Task } from '../types/research';
+// FIX: import from barrel file
+import { Result } from '../types';
+// FIX: import from barrel file
+import { Project, LabNotebookEntry, Task } from '../types';
 
 export const useProjectActions = () => {
     const adapter = useDataAdapter();

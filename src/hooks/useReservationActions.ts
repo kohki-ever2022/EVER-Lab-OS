@@ -3,8 +3,10 @@ import { useCallback, useMemo } from 'react';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useLabStateContext } from '../contexts/AppProviders';
 import { useSessionContext } from '../contexts/SessionContext';
-import { Reservation, ReservationStatus, Usage, WaitlistEntry, WaitlistStatus } from '../types/equipment';
-import { Result } from '../types/core';
+// FIX: import from barrel file
+import { Reservation, ReservationStatus, Usage, WaitlistEntry, WaitlistStatus } from '../types';
+// FIX: import from barrel file
+import { Result } from '../types';
 import { useReservationContext } from '../contexts/ReservationContext';
 
 export const useReservationActions = () => {

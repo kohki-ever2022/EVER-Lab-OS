@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { aggregateMonthlyData } from '../../services/reportAggregator';
 import { generateMonthlyReport } from '../../services/geminiReportService';
 import MarkdownRenderer from '../common/MarkdownRenderer';
-import { MonthlyReport } from '../../types/reports';
+// FIX: import from barrel file
+import { MonthlyReport } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useReservationContext } from '../../contexts/ReservationContext';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';

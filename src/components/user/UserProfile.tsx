@@ -3,8 +3,8 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useUserActions } from '../../hooks/useUserActions';
-
-import { User } from '../../types/user';
+// FIX: import from barrel file
+import { User } from '../../types';
 
 const UserProfile: React.FC = () => {
     const { currentUser, isJapanese } = useSessionContext();

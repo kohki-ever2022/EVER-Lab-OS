@@ -1,8 +1,11 @@
+
+
 import React, { useState } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useUserContext } from '../../contexts/UserContext';
 import { useProjectActions } from '../../hooks/useProjectActions';
-import { Project } from '../../types/research';
+// FIX: import from barrel file
+import { Project } from '../../types';
 
 interface ModalProps {
     onClose: () => void;

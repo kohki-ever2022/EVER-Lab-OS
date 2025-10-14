@@ -2,7 +2,8 @@ import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useAdminContext } from '../../contexts/AppProviders';
 import { usePermissions } from '../../hooks/usePermissions';
-import { Language } from '../../types/core';
+// FIX: import from barrel file
+import { Language } from '../../types';
 
 const AuditLog: React.FC = () => {
     const { auditLogs } = useAdminContext();

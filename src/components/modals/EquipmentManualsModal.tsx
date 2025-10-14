@@ -1,7 +1,8 @@
 import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useAdminContext } from '../../contexts/AppProviders';
-import { Equipment, ManualType } from '../../types/equipment';
+// FIX: import from barrel file
+import { Equipment, ManualType } from '../../types';
 import { YoutubeIcon, PdfIcon, LinkIcon, ArrowRightIcon } from '../common/Icons';
 
 const getManualIcon = (type: ManualType) => {

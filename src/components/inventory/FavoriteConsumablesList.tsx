@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+// FIX: import from barrel file
 import { Consumable } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useConsumableContext } from '../../contexts/ConsumableContext';

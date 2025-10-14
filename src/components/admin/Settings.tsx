@@ -5,7 +5,8 @@ import { useToast } from '../../contexts/ToastContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useAdminActions } from '../../hooks/useAdminActions';
 
-import { SystemSettings } from '../../types/common';
+// FIX: import from barrel file
+import { SystemSettings } from '../../types';
 
 type SettingsTab = 'general' | 'billing' | 'notifications';
 

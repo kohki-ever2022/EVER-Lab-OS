@@ -1,9 +1,12 @@
 import React, { useState, FormEvent, useEffect, useMemo } from 'react';
-import { Role, Language } from '../../types/core';
-import { Equipment as EquipmentType, EquipmentStatus, ReservationStatus, MaintenanceLogStatus, Usage, EquipmentManual, ManualType } from '../../types/equipment';
-import { Protocol } from '../../types/research';
-import { UserCertification } from '../../types/user';
-import { NotificationType } from '../../types/common';
+// FIX: import from barrel file
+import { Role, Language, View, NotificationType } from '../../types';
+// FIX: import from barrel file
+import { Equipment as EquipmentType, EquipmentStatus, ReservationStatus, MaintenanceLogStatus, Usage, EquipmentManual, ManualType } from '../../types';
+// FIX: import from barrel file
+import { Protocol } from '../../types';
+// FIX: import from barrel file
+import { UserCertification } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useNotifications } from '../../hooks/useNotifications';

@@ -1,9 +1,11 @@
 
+
 import React, { useState, lazy, Suspense } from 'react';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
-import { RoleCategory } from './types/core';
+// FIX: import from barrel file
+import { RoleCategory } from './types';
 import { useSessionContext } from './contexts/SessionContext';
 import Toast from './components/common/Toast';
 import ModalRenderer from './components/common/ModalRenderer';
@@ -20,30 +22,25 @@ const Projects = lazy(() => import('./components/project/Projects'));
 const Tasks = lazy(() => import('./components/project/Tasks'));
 const Reservations = lazy(() => import('./components/reservations/Reservations'));
 const FavoriteConsumablesList = lazy(() => import('./components/inventory/FavoriteConsumablesList'));
-// FIX: Corrected import path for ElectronicLabNotebook. The component is in `./components` not `./components/project`.
-const ElectronicLabNotebook = lazy(() => import('./components/ElectronicLabNotebook'));
+const ElectronicLabNotebook = lazy(() => import('./components/project/ElectronicLabNotebook'));
 const ProjectProgressDashboard = lazy(() => import('./components/dashboard/ProjectProgressDashboard'));
 const SupplierDashboard = lazy(() => import('./components/supplier/SupplierDashboard'));
 const ReorderSuggestions = lazy(() => import('./components/inventory/ReorderSuggestions'));
 const CertificateManagement = lazy(() => import('./components/certificates/CertificateManagement'));
+const Settings = lazy(() => import('./components/admin/Settings'));
 
 // Named Exports
 const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 const EquipmentManagement = lazy(() => import('./components/admin/EquipmentManagement').then(m => ({ default: m.EquipmentManagement })));
 const UserManagement = lazy(() => import('./components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
-// FIX: Corrected import for Settings. It's a default export and the path was incorrect.
-const Settings = lazy(() => import('./components/Settings'));
-// FIX: Corrected import for AuditLog. It's a default export, not a named export.
 const AuditLog = lazy(() => import('./components/admin/AuditLog'));
 const MaintenanceLogViewer = lazy(() => import('./components/equipment/MaintenanceLogViewer').then(m => ({ default: m.MaintenanceLogViewer })));
-// FIX: Corrected import for MaintenanceStatus. It's a default export, not a named export.
 const MaintenanceStatus = lazy(() => import('./components/equipment/MaintenanceStatus'));
 const MemberManagement = lazy(() => import('./components/user/MemberManagement').then(m => ({ default: m.MemberManagement })));
 const ManualManagement = lazy(() => import('./components/qms/ManualManagement').then(m => ({ default: m.ManualManagement })));
 const LabRuleManagement = lazy(() => import('./components/qms/LabRuleManagement').then(m => ({ default: m.LabRuleManagement })));
 const FacilityConsumableNotification = lazy(() => import('./components/facility/FacilityConsumableNotification').then(m => ({ default: m.FacilityConsumableNotification })));
 const ChatInterface = lazy(() => import('./components/chat/ChatInterface').then(m => ({ default: m.ChatInterface })));
-// FIX: Corrected import for InventoryLockManager. It's a default export, not a named export.
 const InventoryLockManager = lazy(() => import('./components/admin/InventoryLockManager'));
 const MonthlyReportGenerator = lazy(() => import('./components/admin/MonthlyReportGenerator'));
 const HazardousMaterialsDashboard = lazy(() => import('./components/inventory/HazardousMaterialsDashboard').then(m => ({ default: m.HazardousMaterialsDashboard })));

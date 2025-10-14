@@ -4,9 +4,12 @@ import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
 import { useNotifications } from '../hooks/useNotifications';
-import { Consumable, Order, OrderStatus } from '../types/inventory';
-import { Result, Role } from '../types/core';
-import { NotificationType } from '../types/common';
+// FIX: import from barrel file
+import { Consumable, Order, OrderStatus } from '../types';
+// FIX: import from barrel file
+import { Result, Role } from '../types';
+// FIX: import from barrel file
+import { NotificationType } from '../types';
 import { useConsumableContext } from '../contexts/ConsumableContext';
 import { useUserContext } from '../contexts/UserContext';
 
