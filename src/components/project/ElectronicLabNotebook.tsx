@@ -4,7 +4,6 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useProjectContext } from '../../contexts/ProjectContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useProjectActions } from '../../hooks/useProjectActions';
-// FIX: import from barrel file
 import { LabNotebookEntry } from '../../types';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -102,12 +101,10 @@ const ElectronicLabNotebook: React.FC = () => {
                 : await addLabNotebookEntry(entryData);
 
             if (result.success) {
-                // FIX: Use 'saveSuccess' translation key which has been added to translations.ts.
                 showToast(t('saveSuccess'), 'success');
                 setSelectedEntryId(result.data.id);
                 setIsEditing(false);
             } else {
-                // FIX: Use 'saveFailed' translation key which has been added to translations.ts.
                 showToast(t('saveFailed'), 'error');
             }
         };
@@ -158,8 +155,7 @@ const ElectronicLabNotebook: React.FC = () => {
                     <div>
                         <h2 className="text-2xl font-bold">{entry.title}</h2>
                         <p className="text-sm text-gray-500">{t('experimentDate')}: {new Date(entry.experimentDate).toLocaleDateString()}</p>
-                        {/* FIX: Use 'project' translation key which has been added to translations.ts. */}
-                        {project && <p className="text-sm text-gray-500">{t('project')}: {project.name}</p>}
+                        {project && <p className="text-sm text-gray-500">{t('projectLabel')}: {project.name}</p>}
                     </div>
                     <div className="flex gap-2">
                         <button onClick={() => setIsEditing(true)} className="px-3 py-1 border rounded-md text-sm">{t('edit')}</button>

@@ -5,9 +5,7 @@ import { useQmsContext } from '../../contexts/AppProviders';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useTranslation } from '../../hooks/useTranslation';
 
-// FIX: import from barrel file
 import { View } from '../../types';
-// FIX: import from barrel file
 import { Consumable } from '../../types';
 
 export const HazardousMaterialsDashboard: React.FC = () => {
@@ -48,7 +46,6 @@ export const HazardousMaterialsDashboard: React.FC = () => {
   }, {} as CompanyItemsMap);
 
   const getCompanyName = (id: string) => {
-    // FIX: Use a translation key for 'facility'.
     if (id === 'facility') return t('facility');
     const company = companies.find(c => c.id === id);
     return company ? (isJapanese ? company.nameJP : company.nameEN) : 'Unknown';

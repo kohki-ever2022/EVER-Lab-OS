@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, ReactNode, useMemo } from '
 import { ConsumableNotification, CO2IncubatorTracking, Memo, WaitlistEntry } from '../../types';
 import { getMockData } from '../../data/mockData';
 
-interface LabStateContextValue {
+export interface LabStateContextValue {
   consumableNotifications: ConsumableNotification[];
   setConsumableNotifications: React.Dispatch<React.SetStateAction<ConsumableNotification[]>>;
   co2IncubatorTrackingData: CO2IncubatorTracking[];
@@ -13,7 +13,7 @@ interface LabStateContextValue {
   setWaitlist: React.Dispatch<React.SetStateAction<WaitlistEntry[]>>;
 }
 
-const LabStateContext = createContext<LabStateContextValue | null>(null);
+export const LabStateContext = createContext<LabStateContextValue | null>(null);
 
 export const LabStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const initialData = getMockData();

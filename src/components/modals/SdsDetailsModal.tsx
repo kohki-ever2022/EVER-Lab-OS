@@ -82,7 +82,6 @@ const SdsDetailsModal: React.FC<Props> = ({ sds, onClose }) => {
             <h4 className="font-bold text-lg text-blue-800">{t('aiEmergencySummary')}</h4>
             {summary ? (
               <div className="mt-2 space-y-3">
-                {/* FIX: Use SDS-related translation keys which have been added to translations.ts. */}
                 <SummarySection title={t('sdsHazards')} content={summary.hazards} />
                 <SummarySection title={t('sdsHandling')} content={summary.handling} />
                 <SummarySection title={t('sdsStorage')} content={summary.storage} />

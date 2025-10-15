@@ -1,7 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useDataAdapter } from '../../contexts/DataAdapterContext';
-// FIX: import from barrel file
 import { User } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 

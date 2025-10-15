@@ -3,7 +3,6 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useProjectContext } from '../../contexts/ProjectContext';
 import { useUsers } from '../../contexts/UserContext';
 import { useModalContext } from '../../contexts/ModalContext';
-// FIX: import from barrel file
 import { Task, TaskStatus, TaskPriority, User } from '../../types';
 import { PriorityUrgentIcon, PriorityHighIcon, PriorityMediumIcon, PriorityLowIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -65,12 +64,10 @@ const Tasks: React.FC = () => {
         return tasks.filter(t => t.assigneeIds.includes(currentUser.id) || t.createdByUserId === currentUser.id);
     }, [tasks, currentUser]);
 
-    // FIX: Use translation keys for task statuses.
     const columns: { status: TaskStatus, title: string }[] = [
         { status: TaskStatus.ToDo, title: t('taskStatusToDo') },
         { status: TaskStatus.InProgress, title: t('taskStatusInProgress') },
         { status: TaskStatus.InReview, title: t('taskStatusInReview') },
-        // FIX: Use 'taskStatusDone' for consistency and to resolve key conflicts.
         { status: TaskStatus.Done, title: t('taskStatusDone') },
     ];
 
@@ -91,7 +88,6 @@ const Tasks: React.FC = () => {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-ever-black">
-                    {/* FIX: Use 'taskManagement' translation key. */}
                     {t('taskManagement')}
                 </h2>
                 <button

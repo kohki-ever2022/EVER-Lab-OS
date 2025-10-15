@@ -4,7 +4,6 @@ import { useQmsContext } from '../../contexts/AppProviders';
 import { useUsers } from '../../contexts/UserContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useCertificates } from '../../contexts/CertificateContext';
-// FIX: import from barrel file
 import { CertificateStatus } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 

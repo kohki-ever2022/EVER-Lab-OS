@@ -3,7 +3,6 @@ import React, { useMemo } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useReservations } from '../../contexts/ReservationContext';
 import { useUsers } from '../../contexts/UserContext';
-// FIX: import from barrel file
 import { Equipment, ReservationStatus } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -13,7 +12,6 @@ interface ScheduleEquipmentModalProps {
 }
 
 const ScheduleEquipmentModal: React.FC<ScheduleEquipmentModalProps> = ({ equipment, onClose }) => {
-    // FIX: Destructured isJapanese from useTranslation hook, where it is provided.
     const { t, isJapanese } = useTranslation();
     const reservations = useReservations();
     const users = useUsers();

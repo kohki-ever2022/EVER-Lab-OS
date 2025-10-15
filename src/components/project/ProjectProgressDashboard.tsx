@@ -3,9 +3,7 @@ import React, { useMemo } from 'react';
 import { useUsageContext } from '../../contexts/UsageContext';
 import { useProjectContext } from '../../contexts/ProjectContext';
 import { useSessionContext } from '../../contexts/SessionContext';
-// FIX: import from barrel file
 import { Project, Task, TaskStatus, Milestone, MilestoneStatus } from '../../types';
-// FIX: import from barrel file
 import { Usage } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -75,12 +73,10 @@ const ProjectProgressDashboard: React.FC = () => {
                 <div className="text-lg font-bold">{project.totalTasks}</div>
               </div>
               <div className="bg-green-50 p-2 rounded">
-                {/* FIX: Use 'taskStatusDone' for consistency. */}
                 <div className="text-xs text-green-600">{t('taskStatusDone')}</div>
                 <div className="text-lg font-bold text-green-700">{project.completedTasks}</div>
               </div>
               <div className="bg-red-50 p-2 rounded">
-                {/* FIX: Use 'projectTaskOverdue' translation key to avoid conflicts. */}
                 <div className="text-xs text-red-600">{t('projectTaskOverdue')}</div>
                 <div className="text-lg font-bold text-red-700">{project.overdueTasks}</div>
               </div>

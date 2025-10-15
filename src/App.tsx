@@ -2,7 +2,6 @@ import React, { useState, lazy, Suspense } from 'react';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
-// FIX: import from barrel file
 import { RoleCategory } from './types';
 import { useSessionContext } from './contexts/SessionContext';
 import Toast from './components/common/Toast';

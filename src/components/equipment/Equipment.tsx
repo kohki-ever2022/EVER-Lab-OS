@@ -1,7 +1,5 @@
 import React, { useState, useMemo } from 'react';
-// FIX: import from barrel file
 import { Role, Language, View, NotificationType } from '../../types';
-// FIX: import from barrel file
 import { Equipment as EquipmentType, EquipmentStatus, ManualType } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useUsers } from '../../contexts/UserContext';
@@ -9,7 +7,6 @@ import { useEquipment } from '../../contexts/EquipmentContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useAdminContext } from '../../contexts/AppProviders';
-// FIX: Import getManualIcon to resolve error
 import { YoutubeIcon, PdfIcon, LinkIcon, ArrowRightIcon, WarningIcon, getManualIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -105,7 +102,6 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
                          <p className="text-xs text-yellow-600 font-semibold">{t('required')}: {requiredQualName}</p>
                     )}
                     {personInCharge && (
-                        // FIX: Add 'expert' key to translations
                         <p className="text-xs text-gray-600">{t('expert')}: {personInCharge.name}</p>
                     )}
                 </div>

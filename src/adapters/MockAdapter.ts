@@ -127,8 +127,6 @@ export class MockAdapter implements IDataAdapter {
     this.regulatoryRequirementCrud = createGenericCrud(this.regulatoryRequirements, 'regulatoryRequirements', this);
     this.insuranceCertificateCrud = createGenericCrud(this.insuranceCertificates, 'insuranceCertificates', this);
 
-    // FIX: Moved generic implementations from class property initializers to the constructor
-    // to ensure CRUD helpers are initialized before being used.
     this.getCompanies = this.companyCrud.getAll; this.getCompanyById = this.companyCrud.getById; this.createCompany = this.companyCrud.create; this.updateCompany = this.companyCrud.update; this.deleteCompany = this.companyCrud.delete; this.subscribeToCompanies = this.companyCrud.subscribe;
     this.getEquipmentList = this.equipmentCrud.getAll; this.getEquipmentById = this.equipmentCrud.getById; this.createEquipment = this.equipmentCrud.create; this.updateEquipment = this.equipmentCrud.update; this.deleteEquipment = this.equipmentCrud.delete; this.subscribeToEquipment = this.equipmentCrud.subscribe;
     this.getUsages = this.usageCrud.getAll; this.getUsageById = this.usageCrud.getById; this.createUsage = this.usageCrud.create; this.updateUsage = this.usageCrud.update; this.deleteUsage = this.usageCrud.delete; this.subscribeToUsages = this.usageCrud.subscribe;

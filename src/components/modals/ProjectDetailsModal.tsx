@@ -1,10 +1,7 @@
-
-
 import React, { useState } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useProjectActions } from '../../hooks/useProjectActions';
-// FIX: import from barrel file
 import { Project } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -16,7 +13,7 @@ interface ModalProps {
 const ProjectDetailsModal: React.FC<ModalProps> = ({ onClose, project }) => {
     const { currentUser } = useSessionContext();
     const { t } = useTranslation();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { addProject, updateProject } = useProjectActions();
     const [name, setName] = useState(project?.name || '');
     const [description, setDescription] = useState(project?.description || '');

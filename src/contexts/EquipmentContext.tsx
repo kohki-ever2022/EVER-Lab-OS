@@ -50,10 +50,3 @@ export const useEquipmentLoading = () => {
     }
     return context;
 };
-
-/** @deprecated Use `useEquipment` or `useEquipmentLoading` instead. */
-export const useEquipmentContext = (): EquipmentContextValue => {
-  const equipment = useEquipment();
-  const loading = useEquipmentLoading();
-  return { equipment, loading };
-};

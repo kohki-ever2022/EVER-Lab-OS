@@ -70,7 +70,6 @@ const createWrapper = () => {
     setLanguage: vi.fn(), login: vi.fn(), logout: vi.fn(), isFacilityStaff: true, isTenantStaff: false,
   };
   
-  // FIX: Converted the broken JSX-like syntax to React.createElement calls to resolve parsing errors in a .ts file.
   return ({ children }: { children: ReactNode }) => React.createElement(
     DataAdapterContext.Provider,
     { value: mockAdapter },

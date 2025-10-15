@@ -111,7 +111,7 @@ const BookEquipmentModal: React.FC<Props> = ({ equipment, onClose }) => {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">{t('project')}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('projectLabel')}</label>
                         <select value={projectId} onChange={e => setProjectId(e.target.value)} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                             <option value="">{t('none')}</option>
                             {userProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}

@@ -1,24 +1,14 @@
 // src/hooks/useUserActions.ts
 import { useCallback, useMemo } from 'react';
-// FIX: import from barrel file
 import { User, Result, Role } from '../types';
 import { ValidationError, validateEmail as validateEmailFormat } from '../utils/validation';
+import { sanitizeObject } from '../utils/sanitization';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { usePermissions } from './usePermissions';
 import { useAudit } from './useAudit';
 import { useUsers } from '../contexts/UserContext';
 import { useTranslation } from './useTranslation';
-
-const escapeHtml = (unsafe: string): string => {
-    if (!unsafe) return '';
-    return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-}
 
 /**
  * Custom hook for managing user-related actions such as creating, updating, and deleting users.
@@ -53,9 +43,8 @@ export const useUserActions = () => {
             if (user.name.length < 2) throw new ValidationError('name', 'TOO_SHORT', 'Name must be at least 2 characters.');
             validateEmailFormat(user.email);
             
-            // FIX: Explicitly type userPayload to avoid type inference issue.
-            const userPayload: Omit<User, 'id'> = { ...user, name: escapeHtml(user.name) };
-            const result = await adapter.createUser(userPayload);
+            const sanitizedUser = sanitizeObject(user);
+            const result = await adapter.createUser(sanitizedUser);
 
             if (result.success) {
                 addAuditLog('USER_CREATE', `Created user '${result.data.name}' (${result.data.id})`);
@@ -94,11 +83,11 @@ export const useUserActions = () => {
                 throw new ValidationError('email', 'EXISTS', 'Email already exists.');
             }
 
-            const updatedUser = { ...user, name: escapeHtml(user.name) };
-            const result = await adapter.updateUser(updatedUser);
+            const sanitizedUser = sanitizeObject(user);
+            const result = await adapter.updateUser(sanitizedUser);
 
             if (result.success) {
-                addAuditLog('USER_UPDATE', `Updated user '${updatedUser.name}' (${updatedUser.id})`);
+                addAuditLog('USER_UPDATE', `Updated user '${sanitizedUser.name}' (${sanitizedUser.id})`);
             }
             return result;
         } catch(e) {
@@ -114,7 +103,6 @@ export const useUserActions = () => {
     const deleteUser = useCallback(async (userId: string): Promise<Result<void, Error>> => {
         try {
             if (!hasPermission('users', 'delete')) {
-                // FIX: Use a valid translation key. 'permissionDeniedDeleteUser' has been added to translations.ts.
                 throw new Error(t('permissionDeniedDeleteUser'));
             }
 

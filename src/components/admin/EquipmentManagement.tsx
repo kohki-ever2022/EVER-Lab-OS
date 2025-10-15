@@ -4,7 +4,6 @@ import { useToast } from '../../contexts/ToastContext';
 import { useEquipmentActions } from '../../hooks/useEquipmentActions';
 import { useTranslation } from '../../hooks/useTranslation';
 
-// FIX: import from barrel file
 import { Equipment, EquipmentStatus } from '../../types';
 
 export const EquipmentManagement: React.FC = () => {
@@ -38,7 +37,6 @@ export const EquipmentManagement: React.FC = () => {
         }
         
         if (result.success === false) {
-            // FIX: Use a valid translation key.
             showToast(`${t('saveFailed')}: ${result.error.message}`, 'error');
         } else {
             showToast(t('equipmentSaved'), 'success');
@@ -50,7 +48,7 @@ export const EquipmentManagement: React.FC = () => {
         if (window.confirm(t('deleteEquipmentConfirm'))) {
             const result = await deleteEquipment(id);
             if (result.success === false) {
-                showToast(`${t('deleteFailedMsg')}: ${result.error.message}`, 'error');
+                showToast(`${t('deleteFailed')}: ${result.error.message}`, 'error');
             } else {
                 showToast(t('equipmentDeleted'), 'success');
             }

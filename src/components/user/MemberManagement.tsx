@@ -1,16 +1,15 @@
 import React, { useMemo } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { usePermissions } from '../../hooks/usePermissions';
-// FIX: import from barrel file
 import { Role } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export const MemberManagement: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t, isJapanese } = useTranslation();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { companies } = useCompanyContext();
     const { hasPermission } = usePermissions();
 

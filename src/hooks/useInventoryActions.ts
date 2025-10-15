@@ -4,11 +4,8 @@ import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
 import { useNotifications } from '../hooks/useNotifications';
-// FIX: import from barrel file
 import { Consumable, Order, OrderStatus } from '../types';
-// FIX: import from barrel file
 import { Result, Role } from '../types';
-// FIX: import from barrel file
 import { NotificationType } from '../types';
 import { useConsumables } from '../contexts/ConsumableContext';
 import { useUsers } from '../contexts/UserContext';
@@ -27,7 +24,6 @@ export const useInventoryActions = () => {
   const updateConsumable = useCallback(async (consumable: Consumable): Promise<Result<Consumable, Error>> => {
     try {
         if (consumable.isLocked) {
-            // FIX: Use a valid translation key. 'inventoryLockedUpdate' has been added to translations.ts.
             throw new Error(t('inventoryLockedUpdate'));
         }
 
@@ -61,7 +57,6 @@ export const useInventoryActions = () => {
   const addConsumable = useCallback(async (consumable: Omit<Consumable, 'id'>): Promise<Result<Consumable, Error>> => {
     try {
         if (consumables.some(c => c.isLocked)) {
-            // FIX: Use a valid translation key. 'inventoryLockedAdd' has been added to translations.ts.
             throw new Error(t('inventoryLockedAdd'));
         }
         return await adapter.createConsumable(consumable);
@@ -74,7 +69,6 @@ export const useInventoryActions = () => {
     try {
          const item = consumables.find(c => c.id === consumableId);
         if (item?.isLocked) {
-             // FIX: Use a valid translation key. 'inventoryLockedDelete' has been added to translations.ts.
              throw new Error(t('inventoryLockedDelete'));
         }
         return await adapter.deleteConsumable(consumableId);

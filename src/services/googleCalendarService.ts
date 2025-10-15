@@ -101,10 +101,54 @@ class MockGoogleCalendarService implements IGoogleCalendarService {
     }
 }
 
+/**
+ * GoogleカレンダーAPIの本番実装（プレースホルダー）
+ */
+class ProductionGoogleCalendarService implements IGoogleCalendarService {
+    private getErrorMessage(language: Language) {
+        return language === Language.JA ? 'この機能は現在実装されていません。' : 'This feature is not yet implemented.';
+    }
+
+    async createEvent(event: CalendarEvent, language: Language): Promise<CalendarSyncResult> {
+        console.warn('[ProductionGoogleCalendarService] createEvent is not implemented.');
+        return { success: false, errorMessage: this.getErrorMessage(language), syncedAt: new Date() };
+    }
+
+    async updateEvent(event: CalendarEvent, language: Language): Promise<CalendarSyncResult> {
+        console.warn('[ProductionGoogleCalendarService] updateEvent is not implemented.');
+        return { success: false, errorMessage: this.getErrorMessage(language), syncedAt: new Date() };
+    }
+
+    async deleteEvent(googleCalendarEventId: string): Promise<CalendarSyncResult> {
+        console.warn('[ProductionGoogleCalendarService] deleteEvent is not implemented.');
+        return { success: false, errorMessage: 'Not implemented', syncedAt: new Date() };
+    }
+}
+
+
+/**
+ * 環境変数に基づいて適切なGoogleカレンダーサービスインスタンスを提供するファクトリー。
+ */
+class GoogleCalendarServiceFactory {
+  private static instance: IGoogleCalendarService | null = null;
+  
+  static getService(): IGoogleCalendarService {
+    if (!this.instance) {
+      const useMock = import.meta.env.VITE_USE_MOCK_GOOGLE_CALENDAR === 'true';
+      
+      if (useMock) {
+        console.log('🔧 Using Mock Google Calendar Service');
+        this.instance = new MockGoogleCalendarService();
+      } else {
+        console.log('📅 Using Production Google Calendar Service (Placeholder)');
+        this.instance = new ProductionGoogleCalendarService();
+      }
+    }
+    return this.instance;
+  }
+}
 
 /**
  * アプリケーション全体で使用するGoogleカレンダーサービスのシングルトンインスタンス。
- * NOTE: 現在はモック実装のみが提供されています。本番実装は保留中です。
  */
-console.log('🔧 Using Mock Google Calendar Service (Production implementation is pending)');
-export const googleCalendarService: IGoogleCalendarService = new MockGoogleCalendarService();
+export const googleCalendarService: IGoogleCalendarService = GoogleCalendarServiceFactory.getService();

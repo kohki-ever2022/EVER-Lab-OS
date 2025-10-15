@@ -52,10 +52,3 @@ export const useUsersLoading = () => {
   }
   return context;
 };
-
-/** @deprecated Use `useUsers` or `useUsersLoading` instead. */
-export const useUserContext = (): UserContextValue => {
-  const users = useUsers();
-  const loading = useUsersLoading();
-  return { users, loading };
-};

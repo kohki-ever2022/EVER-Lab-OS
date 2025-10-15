@@ -122,8 +122,7 @@ const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
                         </div>
                         {/* Project */}
                         <div>
-                            {/* FIX: Use 'project' translation key which has been added to translations.ts. */}
-                            <label className="block text-sm font-medium text-gray-700">{t('project')}</label>
+                            <label className="block text-sm font-medium text-gray-700">{t('projectLabel')}</label>
                             <select name="projectId" value={formData.projectId} onChange={handleChange} className="w-full border rounded p-2 mt-1 text-sm">
                                 <option value="">{t('none')}</option>
                                 {myProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}

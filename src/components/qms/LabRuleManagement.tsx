@@ -1,7 +1,5 @@
 import React, { useState, useMemo } from 'react';
-// FIX: import from barrel file
 import { LabRule, LabRuleCategory, RuleImportance, ManualTargetAudience } from '../../types';
-// FIX: import from barrel file
 import { Role } from '../../types';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 import { useSessionContext } from '../../contexts/SessionContext';
@@ -141,10 +139,8 @@ export const LabRuleManagement: React.FC = () => {
                             {rule.importance === RuleImportance.Mandatory && (
                                 <div className="mt-4 pt-4 border-t">
                                     {isAcknowledged ? (
-                                        // FIX: Use a valid translation key.
                                         <div className="text-green-600 font-medium text-sm">{t('acknowledged')}</div>
                                     ) : (
-                                        // FIX: Use a valid translation key.
                                         <button onClick={() => handleAcknowledge(rule.id)} className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">{t('acknowledgeRule')}</button>
                                     )}
                                 </div>

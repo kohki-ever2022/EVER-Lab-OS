@@ -5,7 +5,6 @@ import { useUsers } from '../../contexts/UserContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useTranslation } from '../../hooks/useTranslation';
 
-// FIX: import from barrel file
 import { MaintenanceLog, MaintenanceLogStatus } from '../../types';
 
 export const MaintenanceLogViewer: React.FC = () => {
@@ -47,7 +46,6 @@ export const MaintenanceLogViewer: React.FC = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {/* FIX: Use a valid translation key. 'equipment' has been added to translations.ts. */}
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('equipment')}</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reportDate')}</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporter')}</th>

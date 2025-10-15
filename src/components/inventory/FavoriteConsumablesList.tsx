@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-// FIX: import from barrel file
 import { Consumable } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useConsumables } from '../../contexts/ConsumableContext';
@@ -10,7 +9,6 @@ import { HeartIconFill } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const FavoriteConsumablesList: React.FC = () => {
-    // FIX: Destructure 'isJapanese' from 'useTranslation' hook
     const { currentUser } = useSessionContext();
     const consumables = useConsumables();
     const { showToast } = useToast();

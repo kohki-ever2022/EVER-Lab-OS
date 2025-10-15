@@ -206,7 +206,8 @@ export const InsuranceManagement: React.FC = () => {
       'PENDING': { key: 'pending', color: 'bg-yellow-100 text-yellow-700' },
       'VERIFIED': { key: 'statusVerified', color: 'bg-blue-100 text-blue-700' },
       'EXPIRED': { key: 'expired', color: 'bg-gray-200 text-gray-600' },
-      'REJECTED': { key: 'statusRejected', color: 'bg-red-100 text-red-700' },
+      // FIX: Use a more specific translation key 'insuranceStatusRejected' to avoid conflicts.
+      'REJECTED': { key: 'insuranceStatusRejected', color: 'bg-red-100 text-red-700' },
   };
 
 

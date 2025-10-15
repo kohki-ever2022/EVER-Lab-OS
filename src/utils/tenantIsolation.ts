@@ -1,7 +1,5 @@
 // src/utils/tenantIsolation.ts
-// FIX: import from barrel file
 import type { CurrentUser, Equipment, Consumable, Order, PurchaseOrder, Project, Reservation } from '../types';
-// FIX: import from barrel file
 import { Role, RoleCategory } from '../types';
 
 

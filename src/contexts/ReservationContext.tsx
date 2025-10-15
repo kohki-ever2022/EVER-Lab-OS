@@ -50,10 +50,3 @@ export const useReservationsLoading = () => {
     }
     return context;
 }
-
-/** @deprecated Use `useReservations` or `useReservationsLoading` instead. */
-export const useReservationContext = (): ReservationContextValue => {
-  const reservations = useReservations();
-  const loading = useReservationsLoading();
-  return { reservations, loading };
-};

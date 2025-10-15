@@ -42,7 +42,6 @@ const ErrorFallback: React.FC<{ error: Error | null; errorInfo: ErrorInfo | null
 
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Moved state initialization to the constructor to resolve potential tooling issues with class properties.
   constructor(props: Props) {
     super(props);
     this.state = {

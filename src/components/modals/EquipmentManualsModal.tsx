@@ -1,8 +1,6 @@
 import React from 'react';
 import { useAdminContext } from '../../contexts/AppProviders';
-// FIX: import from barrel file
 import { Equipment, ManualType } from '../../types';
-// FIX: Remove local getManualIcon and import from shared Icons file
 import { YoutubeIcon, PdfIcon, LinkIcon, ArrowRightIcon, getManualIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
 

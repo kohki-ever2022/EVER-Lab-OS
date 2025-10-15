@@ -53,10 +53,3 @@ export const useConsumablesLoading = () => {
   }
   return context;
 };
-
-/** @deprecated Use `useConsumables` or `useConsumablesLoading` instead. */
-export const useConsumableContext = (): ConsumableContextValue => {
-  const consumables = useConsumables();
-  const loading = useConsumablesLoading();
-  return { consumables, loading };
-};

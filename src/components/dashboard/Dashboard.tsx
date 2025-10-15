@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useAnnouncementContext } from '../../contexts/AnnouncementContext';
-import { useReservationContext } from '../../contexts/ReservationContext';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
+import { useReservations } from '../../contexts/ReservationContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
 import { Reservation, ReservationStatus, View, Announcement } from '../../types';
 import { CalendarIcon, PencilIcon, BeakerIcon, ArrowRightIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -24,8 +24,8 @@ const Dashboard: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t, isJapanese } = useTranslation();
     const { announcements } = useAnnouncementContext();
-    const { reservations } = useReservationContext();
-    const { equipment } = useEquipmentContext();
+    const reservations = useReservations();
+    const equipment = useEquipment();
 
     const upcomingReservations = React.useMemo(() => {
         const now = new Date();

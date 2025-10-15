@@ -18,6 +18,14 @@ EVER-Lab OSは、共同利用型研究施設向けの統合管理アプリケー
 *   **データ永続化**: Firebase (Firestore) または モックデータ
 *   **AI機能**: Google Gemini API
 
+## 🏛️ アーキテクチャ概要
+
+本プロジェクトは、保守性と拡張性を重視した疎結合なアーキテクチャを採用しています。
+
+*   **Adapter Pattern**: データ永続化層は `IDataAdapter` インターフェースによって抽象化されています。`AdapterFactory` が環境変数に応じて `FirebaseAdapter` (本番用) または `MockAdapter` (開発用) のインスタンスを切り替えるため、アプリケーションのコアロジックはデータソースに依存しません。
+*   **Context API**: アプリケーションの状態は、ReactのContext APIを用いて管理されています。データドメイン（例: `UserContext`, `EquipmentContext`）ごとにプロバイダーを分割し、関心の分離を図っています。
+*   **カスタムフック**: ビジネスロジック（例: `useUserActions`, `useReservationActions`）はカスタムフックにカプセル化されており、UIコンポーネントからロジックを分離しています。これにより、コンポーネントの再利用性とテストの容易性が向上します。
+
 ## 🚀 セットアップ方法
 
 1.  **依存関係のインストール**:
@@ -33,9 +41,13 @@ EVER-Lab OSは、共同利用型研究施設向けの統合管理アプリケー
     # When using mock data, set to 'true'; for Firebase, set to 'false'.
     VITE_USE_MOCK_DATA=true
 
+    # Google Calendar連携のモックを使用する場合は 'true'
+    # Set to 'true' to use the mock for Google Calendar integration.
+    VITE_USE_MOCK_GOOGLE_CALENDAR=true
+
     # AI機能を使用する場合は 'true' を設定 (VITE_GEMINI_API_KEYが必須)
     # Set to 'true' to use AI features (requires VITE_GEMINI_API_KEY).
-    VITE_USE_MOCK_GEMINI=false
+    VITE_USE_MOCK_GEMINI=true
 
     # Firebaseを使用する場合の接続情報
     # Required if VITE_USE_MOCK_DATA is 'false'.
@@ -57,14 +69,30 @@ EVER-Lab OSは、共同利用型研究施設向けの統合管理アプリケー
     ```
     サーバーが起動し、 `http://localhost:3000` でアプリケーションにアクセスできます。
 
-## 🧪 利用可能なスクリプト
+## 🧪 コード品質とテスト
+
+品質を維持するため、以下のスクリプトが利用可能です。
 
 *   `npm run test`: Vitestを使用してユニットテストを実行します。
-*   `npm run analyze:all`: `knip`, `madge`, `jscpd`を使用して、未使用のファイルや循環参照、コードの重複を検出します。
+*   `npm run analyze:all`: `knip`, `madge`, `jscpd`を使用して、コードベースの健全性（未使用ファイル、循環参照、コード重複）を総合的にチェックします。
+    *   `npm run analyze:unused`: 未使用のファイル、依存関係、エクスポートを検出します。
+    *   `npm run analyze:circular`: モジュール間の循環参照を検出します。
+    *   `npm run analyze:duplication`: コードの重複を検出します。
+
+## 🚢 デプロイ
+
+1.  **本番用ビルド**:
+    以下のコマンドを実行して、`dist` ディレクトリに最適化された静的ファイルを生成します。
+    ```bash
+    npm run build
+    ```
+
+2.  **ホスティング**:
+    `dist` ディレクトリの内容を、Netlify, Vercel, Firebase Hostingなどの静的ホスティングサービスにデプロイします。
 
 ## 👤 デモ用ログイン情報
 
-`VITE_USE_MOCK_DATA=true` を設定している場合、以下のメールアドレスで各役割のユーザーとしてログインできます。パスワードは `password` です。
+`VITE_USE_MOCK_DATA=true` を設定している場合、以下のメールアドレスで各役割のユーザーとしてログインできます。パスワードはすべて `password` です。
 
 *   **施設責任者 (Facility Director)**: `taro.suzuki@ever.com`
 *   **ラボマネージャー (Lab Manager)**: `jiro.tanaka@ever.com`

@@ -28,7 +28,6 @@ const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
 
         const updateResult = await updateEquipment({ ...equipment, status: EquipmentStatus.Maintenance });
         if (updateResult.success === false) {
-            // FIX: Use 'updateFailed' translation key which has been added to translations.ts.
             showToast(`${t('updateFailed')}: ${updateResult.error.message}`, 'error');
             return;
         }
@@ -39,7 +38,6 @@ const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
         });
 
         if (logResult.success === false) {
-            // FIX: Use 'addFailed' translation key which has been added to translations.ts.
             showToast(`${t('addFailed')}: ${logResult.error.message}`, 'error');
             return;
         }
@@ -69,7 +67,8 @@ const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
                     </div>
                     <div className="mt-8 flex justify-end space-x-3">
                         <button type="button" onClick={onClose} className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg">{t('cancel')}</button>
-                        <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">{t('report')}</button>
+                        {/* FIX: Use a more specific translation key 'submitReport' to avoid conflicts. */}
+                        <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">{t('submitReport')}</button>
                     </div>
                 </form>
             </div>

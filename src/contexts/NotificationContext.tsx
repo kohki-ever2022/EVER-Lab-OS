@@ -8,7 +8,6 @@ interface NotificationContextType {
   clearNotifications: () => void;
 }
 
-// FIX: Export context for use in tests
 export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
