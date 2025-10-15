@@ -48,7 +48,7 @@ export type TenantView =
     | 'sampleManagement' | 'billingSummary' | 'tasks' | 'training'
     | 'myTickets' | 'sdsManagement' | 'quotationList' | 'purchaseOrders'
     | 'inventoryList' | 'consumablesStore' | 'supplierInquiry'
-    | 'reorderSuggestions' | 'supplierManagement' | 'favoriteConsumables'
+    | 'reorderSuggestions' | 'favoriteConsumables'
     | 'facilityConsumableNotification' | 'manuals' | 'rules' | 'electronicLabNotebook'
     | 'projectProgress' | 'projectGanttChart' | 'chat';
 
@@ -1001,6 +1001,7 @@ export interface User {
   availabilityStatus?: UserAvailabilityStatus;
   statusMessage?: string;
   qualificationIds?: string[];
+  favoriteConsumableIds?: string[];
 }
 
 export type CurrentUser = Omit<User, 'password'>;

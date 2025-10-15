@@ -2,8 +2,8 @@ import React, { useState, FormEvent, useMemo } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useReservationActions } from '../../hooks/useReservationActions';
-import { useReservationContext } from '../../contexts/ReservationContext';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
+import { useReservations } from '../../contexts/ReservationContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
 // FIX: import from barrel file
 import { Language, Result, Reservation, ReservationStatus, Usage } from '../../types';
 import Waitlist from './Waitlist';
@@ -12,7 +12,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 type TabType = 'current' | 'history' | 'waitlist';
 
 const ReservationCard: React.FC<{ reservation: Reservation }> = ({ reservation }) => {
-    const { equipment } = useEquipmentContext();
+    const equipment = useEquipment();
     const { showToast } = useToast();
     const { checkOutReservation, updateReservation } = useReservationActions();
     const { t, isJapanese } = useTranslation();
@@ -86,7 +86,7 @@ const ReservationCard: React.FC<{ reservation: Reservation }> = ({ reservation }
 const Reservations: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t } = useTranslation();
-    const { reservations } = useReservationContext();
+    const reservations = useReservations();
     const [activeTab, setActiveTab] = useState<TabType>('current');
 
     const myReservations = reservations.filter(r => r.userId === currentUser?.id);

@@ -75,7 +75,8 @@ const ProjectProgressDashboard: React.FC = () => {
                 <div className="text-lg font-bold">{project.totalTasks}</div>
               </div>
               <div className="bg-green-50 p-2 rounded">
-                <div className="text-xs text-green-600">{t('done')}</div>
+                {/* FIX: Use 'taskStatusDone' for consistency. */}
+                <div className="text-xs text-green-600">{t('taskStatusDone')}</div>
                 <div className="text-lg font-bold text-green-700">{project.completedTasks}</div>
               </div>
               <div className="bg-red-50 p-2 rounded">

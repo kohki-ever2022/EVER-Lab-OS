@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { useToast } from '../../contexts/ToastContext';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -12,7 +12,7 @@ import { User } from '../../types';
 import { Role, RoleCategory, Result } from '../../types';
 
 export const UserManagement: React.FC = () => {
-    const { users } = useUserContext();
+    const users = useUsers();
     const { companies } = useCompanyContext();
     const { t, isJapanese } = useTranslation();
     const { showToast } = useToast();

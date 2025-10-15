@@ -7,7 +7,7 @@ import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { usePermissions } from './usePermissions';
 import { useAudit } from './useAudit';
-import { useUserContext } from '../contexts/UserContext';
+import { useUsers } from '../contexts/UserContext';
 import { useTranslation } from './useTranslation';
 
 const escapeHtml = (unsafe: string): string => {
@@ -27,7 +27,7 @@ const escapeHtml = (unsafe: string): string => {
  */
 export const useUserActions = () => {
     const adapter = useDataAdapter();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { currentUser } = useSessionContext();
     const { t } = useTranslation();
     const { hasPermission, canAccessData } = usePermissions();

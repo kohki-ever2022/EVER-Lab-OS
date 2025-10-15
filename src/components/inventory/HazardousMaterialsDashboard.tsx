@@ -1,5 +1,5 @@
 import React from 'react';
-import { useConsumableContext } from '../../contexts/ConsumableContext';
+import { useConsumables } from '../../contexts/ConsumableContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useModalContext } from '../../contexts/ModalContext';
@@ -12,7 +12,7 @@ import { Consumable } from '../../types';
 
 export const HazardousMaterialsDashboard: React.FC = () => {
   const { t, isJapanese } = useTranslation();
-  const { consumables } = useConsumableContext();
+  const consumables = useConsumables();
   const { companies } = useCompanyContext();
   const { sds } = useQmsContext();
   const { openModal } = useModalContext();

@@ -1,12 +1,12 @@
 import React from 'react';
-import { useConsumableContext } from '../../contexts/ConsumableContext';
+import { useConsumables } from '../../contexts/ConsumableContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useTranslation } from '../../hooks/useTranslation';
 // FIX: import from barrel file
 import { View } from '../../types';
 
 const ReorderSuggestions: React.FC = () => {
-  const { consumables } = useConsumableContext();
+  const consumables = useConsumables();
   const { t, isJapanese } = useTranslation();
   const { hasPermission } = usePermissions();
 

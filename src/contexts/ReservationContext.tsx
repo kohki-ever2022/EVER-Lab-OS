@@ -8,7 +8,8 @@ interface ReservationContextValue {
   loading: boolean;
 }
 
-const ReservationContext = createContext<ReservationContextValue | null>(null);
+const ReservationsDataContext = createContext<Reservation[]>([]);
+const ReservationsLoadingContext = createContext<boolean>(true);
 
 export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -21,16 +22,38 @@ export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ childre
       setReservations(data);
       if (loading) setLoading(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
 
-  const value = useMemo(() => ({ reservations, loading }), [reservations, loading]);
-
-  return <ReservationContext.Provider value={value}>{children}</ReservationContext.Provider>;
+  return (
+    <ReservationsDataContext.Provider value={reservations}>
+        <ReservationsLoadingContext.Provider value={loading}>
+            {children}
+        </ReservationsLoadingContext.Provider>
+    </ReservationsDataContext.Provider>
+  );
 };
 
-export const useReservationContext = () => {
-  const context = useContext(ReservationContext);
-  if (!context) throw new Error('useReservationContext must be used within ReservationProvider');
-  return context;
+export const useReservations = () => {
+    const context = useContext(ReservationsDataContext);
+    if (context === undefined) {
+        throw new Error('useReservations must be used within a ReservationProvider');
+    }
+    return context;
+}
+
+export const useReservationsLoading = () => {
+    const context = useContext(ReservationsLoadingContext);
+    if (context === undefined) {
+        throw new Error('useReservationsLoading must be used within a ReservationProvider');
+    }
+    return context;
+}
+
+/** @deprecated Use `useReservations` or `useReservationsLoading` instead. */
+export const useReservationContext = (): ReservationContextValue => {
+  const reservations = useReservations();
+  const loading = useReservationsLoading();
+  return { reservations, loading };
 };

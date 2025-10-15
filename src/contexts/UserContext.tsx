@@ -8,6 +8,9 @@ export interface UserContextValue {
   loading: boolean;
 }
 
+const UsersDataContext = createContext<User[]>([]);
+const UsersLoadingContext = createContext<boolean>(true);
+
 export const UserContext = createContext<UserContextValue | null>(null);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -21,16 +24,38 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUsers(data);
       if (loading) setLoading(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
 
-  const value = useMemo(() => ({ users, loading }), [users, loading]);
-
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return (
+    <UsersDataContext.Provider value={users}>
+      <UsersLoadingContext.Provider value={loading}>
+        {children}
+      </UsersLoadingContext.Provider>
+    </UsersDataContext.Provider>
+  );
 };
 
-export const useUserContext = () => {
-  const context = useContext(UserContext);
-  if (!context) throw new Error('useUserContext must be used within UserProvider');
+export const useUsers = () => {
+  const context = useContext(UsersDataContext);
+  if (context === undefined) {
+    throw new Error('useUsers must be used within a UserProvider');
+  }
   return context;
+};
+
+export const useUsersLoading = () => {
+  const context = useContext(UsersLoadingContext);
+  if (context === undefined) {
+    throw new Error('useUsersLoading must be used within a UserProvider');
+  }
+  return context;
+};
+
+/** @deprecated Use `useUsers` or `useUsersLoading` instead. */
+export const useUserContext = (): UserContextValue => {
+  const users = useUsers();
+  const loading = useUsersLoading();
+  return { users, loading };
 };

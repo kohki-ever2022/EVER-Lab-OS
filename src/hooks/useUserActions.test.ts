@@ -7,7 +7,6 @@ import { useUserActions } from './useUserActions';
 import { IDataAdapter } from '../adapters/IDataAdapter';
 import { SessionContext, SessionContextType } from '../contexts/SessionContext';
 import { DataAdapterContext } from '../contexts/DataAdapterContext';
-import { UserContext, UserContextValue } from '../contexts/UserContext';
 import { AdminContext, AdminContextValue } from '../contexts/app/AdminContext';
 import { Role, RoleCategory, User, Language, SystemSettings, Plan, EquipmentManual, MonthlyReport, BenchAssignment, InventorySnapshot, AuditLog } from '../types';
 
@@ -23,6 +22,18 @@ const mockUsers: User[] = [
     { id: 'user-1', name: 'Existing User', email: 'exist@test.com', companyId: 'company-a', role: Role.Researcher, roleCategory: RoleCategory.Tenant, password: 'password' },
 ];
 const mockFacilityDirector: User = { id: 'admin-user', name: 'Admin', email: 'admin@test.com', companyId: 'company-lab', role: Role.FacilityDirector, roleCategory: RoleCategory.Facility, password: 'password' };
+
+// This is a dynamic import because the context file itself is being modified.
+let UsersDataContext: React.Context<User[]>;
+let UsersLoadingContext: React.Context<boolean>;
+
+beforeEach(async () => {
+  const userContextModule = await import('../contexts/UserContext');
+  // @ts-ignore - we are accessing a non-exported context for testing
+  UsersDataContext = userContextModule.UsersDataContext;
+  // @ts-ignore
+  UsersLoadingContext = userContextModule.UsersLoadingContext;
+});
 
 
 const createWrapper = (
@@ -55,8 +66,6 @@ const createWrapper = (
     equipmentManuals: [] as EquipmentManual[],
   };
 
-  const userContextValue: UserContextValue = { users, loading: false };
-
   return ({ children }: { children: ReactNode }) => {
     return React.createElement(
       DataAdapterContext.Provider,
@@ -68,9 +77,13 @@ const createWrapper = (
           AdminContext.Provider,
           { value: adminContextValue },
           React.createElement(
-            UserContext.Provider,
-            { value: userContextValue },
-            children
+            UsersDataContext.Provider,
+            { value: users },
+            React.createElement(
+                UsersLoadingContext.Provider,
+                { value: false },
+                children
+            )
           )
         )
       )

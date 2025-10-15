@@ -1,88 +1,98 @@
 // src/components/common/MarkdownRenderer.tsx
-
-import React, { useMemo } from 'react';
+import React, { useMemo, Fragment } from 'react';
 
 interface Props {
   markdown: string;
 }
 
+// This function will parse inline styles like **bold** and *italic*.
+// It returns an array of strings and React elements.
+const renderInlines = (text: string) => {
+  if (!text) return [''];
+  // Split text by markdown tokens for bold and italic, keeping the delimiters
+  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+  
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*')) {
+      return <em key={index}>{part.slice(1, -1)}</em>;
+    }
+    return part; // Return plain text parts as is
+  });
+};
+
 const MarkdownRenderer: React.FC<Props> = ({ markdown }) => {
-  const renderedHtml = useMemo(() => {
-    if (!markdown) return '';
-    
-    const escapeHtml = (unsafe: string) => 
-        unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+  const renderedContent = useMemo(() => {
+    if (!markdown) return null;
 
-    // A secure function to process only **bold** and *italic* markdown.
-    const processInlines = (text: string) => {
-        // Split text by markdown tokens, escape the plain text parts,
-        // and reconstruct. This is safer against injection.
-        const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+    // Process blocks (paragraphs, headings, lists) separated by double newlines
+    const blocks = markdown.split(/\n{2,}/);
+
+    return blocks.map((block, blockIndex) => {
+      const trimmedBlock = block.trim();
+      if (!trimmedBlock) return null;
+
+      // Headings
+      if (trimmedBlock.startsWith('# ')) {
+        return <h1 key={blockIndex} className="text-2xl font-bold mt-8 mb-4 border-b pb-2">{trimmedBlock.substring(2)}</h1>;
+      }
+      if (trimmedBlock.startsWith('## ')) {
+        return <h2 key={blockIndex} className="text-xl font-bold mt-6 mb-3 border-b pb-1">{trimmedBlock.substring(3)}</h2>;
+      }
+      if (trimmedBlock.startsWith('### ')) {
+        return <h3 key={blockIndex} className="text-lg font-semibold mt-4 mb-2">{trimmedBlock.substring(4)}</h3>;
+      }
+
+      // Horizontal Rule
+      if (trimmedBlock === '---') {
+        return <hr key={blockIndex} className="my-6" />;
+      }
+
+      // Unordered List
+      if (trimmedBlock.startsWith('* ')) {
+        const items = trimmedBlock.split('\n').map((line, itemIndex) => {
+          const trimmedLine = line.trim();
+          let content = '';
+          let className = '';
+
+          if (trimmedLine.startsWith('  * ')) { // Simple sub-list support
+            content = trimmedLine.substring(3);
+            className = 'ml-10';
+          } else if (trimmedLine.startsWith('* ')) {
+            content = trimmedLine.substring(2);
+            className = 'ml-5';
+          } else {
+            return null;
+          }
+          
+          return <li key={itemIndex} className={className}>{renderInlines(content)}</li>;
+        }).filter(Boolean); // Filter out any nulls
         
-        return parts.map(part => {
-            if (part.startsWith('**') && part.endsWith('**')) {
-                return `<strong>${escapeHtml(part.slice(2, -2))}</strong>`;
-            }
-            if (part.startsWith('*') && part.endsWith('*')) {
-                return `<em>${escapeHtml(part.slice(1, -1))}</em>`;
-            }
-            // Escape everything else.
-            return escapeHtml(part);
-        }).join('');
-    };
+        return <ul key={blockIndex}>{items}</ul>;
+      }
 
-    // Process blocks (paragraphs)
-    const paragraphs = markdown.split(/\n{2,}/);
-
-    const processedBlocks = paragraphs.map(p => {
-        let block = p.trim();
-        if (!block) return '';
-
-        // Block elements (headings do not support inlines for security)
-        if (block.startsWith('# ')) return `<h1 class="text-2xl font-bold mt-8 mb-4 border-b pb-2">${escapeHtml(block.substring(2))}</h1>`;
-        if (block.startsWith('## ')) return `<h2 class="text-xl font-bold mt-6 mb-3 border-b pb-1">${escapeHtml(block.substring(3))}</h2>`;
-        if (block.startsWith('### ')) return `<h3 class="text-lg font-semibold mt-4 mb-2">${escapeHtml(block.substring(4))}</h3>`;
-        if (block === '---') return '<hr class="my-6"/>';
-
-        // List processing
-        if (block.startsWith('* ')) {
-             const items = block.split('\n').map(line => {
-                const trimmedLine = line.trim();
-                let content = '';
-                let className = '';
-
-                if (trimmedLine.startsWith('  * ')) {
-                    content = trimmedLine.substring(3);
-                    className = 'ml-10';
-                } else if (trimmedLine.startsWith('* ')) {
-                    content = trimmedLine.substring(2);
-                    className = 'ml-5';
-                } else {
-                    return null; // Not a list item
-                }
-                
-                // Process inlines securely for list item content
-                return `<li class="${className}">${processInlines(content)}</li>`;
-            }).filter(Boolean).join('');
-            return `<ul>${items}</ul>`;
-        }
-        
-        // Default to paragraph. Process inlines and convert single newlines to <br>.
-        const processedLines = block.split('\n').map(processInlines);
-        return `<p>${processedLines.join('<br />')}</p>`;
+      // Default to paragraph
+      const lines = trimmedBlock.split('\n');
+      return (
+        <p key={blockIndex}>
+          {lines.map((line, lineIndex) => (
+            <Fragment key={lineIndex}>
+              {renderInlines(line)}
+              {lineIndex < lines.length - 1 && <br />}
+            </Fragment>
+          ))}
+        </p>
+      );
     });
-
-    return processedBlocks.join('');
 
   }, [markdown]);
 
   return (
-    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
+    <div className="prose max-w-none">
+      {renderedContent}
+    </div>
   );
 };
 

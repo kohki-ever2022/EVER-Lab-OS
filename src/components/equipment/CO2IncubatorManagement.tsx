@@ -4,7 +4,7 @@ import { Language } from '../../types';
 import { googleCalendarService, createCalendarEventFromSchedule } from '../../services/googleCalendarService';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useLabStateContext } from '../../contexts/AppProviders';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useEquipmentActions } from '../../hooks/useEquipmentActions';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -12,7 +12,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 export const CO2IncubatorManagement: React.FC = () => {
   const { language, currentUser } = useSessionContext();
   const { co2IncubatorTrackingData, setCo2IncubatorTrackingData } = useLabStateContext();
-  const { equipment } = useEquipmentContext();
+  const equipment = useEquipment();
   const { showToast } = useToast();
   const { updateCO2IncubatorTracking } = useEquipmentActions();
   const { t, isJapanese } = useTranslation();

@@ -2,6 +2,7 @@
 import { Language } from '../types';
 import { MonthlyReportData } from './reportAggregator';
 import { geminiService } from './geminiService';
+// FIX: Import standalone translate function
 import { translate } from '../i18n/translations';
 
 /**

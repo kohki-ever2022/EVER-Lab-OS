@@ -13,15 +13,15 @@ import {
 } from '../types';
 import { NotificationType } from '../types';
 import { RoleCategory } from '../types';
-import { useEquipmentContext } from '../contexts/EquipmentContext';
-import { useUserContext } from '../contexts/UserContext';
+import { useEquipment } from '../contexts/EquipmentContext';
+import { useUsers } from '../contexts/UserContext';
 import { useTranslation } from './useTranslation';
 
 export const useEquipmentActions = () => {
     const adapter = useDataAdapter();
     const { setCo2IncubatorTrackingData } = useLabStateContext();
-    const { equipment } = useEquipmentContext();
-    const { users } = useUserContext();
+    const equipment = useEquipment();
+    const users = useUsers();
     const { addAuditLog } = useAudit();
     const { addNotification } = useNotifications();
     const { t, isJapanese } = useTranslation();

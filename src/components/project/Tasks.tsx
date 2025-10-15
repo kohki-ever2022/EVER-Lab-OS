@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useProjectContext } from '../../contexts/ProjectContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useModalContext } from '../../contexts/ModalContext';
 // FIX: import from barrel file
 import { Task, TaskStatus, TaskPriority, User } from '../../types';
@@ -57,7 +57,7 @@ const Tasks: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t } = useTranslation();
     const { tasks } = useProjectContext();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { openModal } = useModalContext();
 
     const myTasks = useMemo(() => {
@@ -70,7 +70,8 @@ const Tasks: React.FC = () => {
         { status: TaskStatus.ToDo, title: t('taskStatusToDo') },
         { status: TaskStatus.InProgress, title: t('taskStatusInProgress') },
         { status: TaskStatus.InReview, title: t('taskStatusInReview') },
-        { status: TaskStatus.Done, title: t('done') },
+        // FIX: Use 'taskStatusDone' for consistency and to resolve key conflicts.
+        { status: TaskStatus.Done, title: t('taskStatusDone') },
     ];
 
     const tasksByStatus = useMemo(() => {

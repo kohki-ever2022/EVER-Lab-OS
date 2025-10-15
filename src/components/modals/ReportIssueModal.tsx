@@ -1,7 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import { Equipment, EquipmentStatus, MaintenanceLogStatus, Role, NotificationType } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useEquipmentActions } from '../../hooks/useEquipmentActions';
 import { useNotifications } from '../../hooks/useNotifications';
@@ -15,7 +15,7 @@ interface Props {
 const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
     const { currentUser } = useSessionContext();
     const { t } = useTranslation();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { showToast } = useToast();
     const { addNotification } = useNotifications();
     const { updateEquipment, addMaintenanceLog } = useEquipmentActions();

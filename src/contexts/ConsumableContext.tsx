@@ -8,7 +8,11 @@ interface ConsumableContextValue {
   loading: boolean;
 }
 
-const ConsumableContext = createContext<ConsumableContextValue | null>(null);
+const ConsumablesDataContext = createContext<Consumable[]>([]);
+const ConsumablesLoadingContext = createContext<boolean>(true);
+
+// Keep original context export for test setup compatibility if needed, though ideally tests should be updated.
+export const ConsumableContext = createContext<ConsumableContextValue | null>(null);
 
 export const ConsumableProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -21,16 +25,38 @@ export const ConsumableProvider: React.FC<{ children: ReactNode }> = ({ children
       setConsumables(data);
       if (loading) setLoading(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
 
-  const value = useMemo(() => ({ consumables, loading }), [consumables, loading]);
-
-  return <ConsumableContext.Provider value={value}>{children}</ConsumableContext.Provider>;
+  return (
+    <ConsumablesDataContext.Provider value={consumables}>
+      <ConsumablesLoadingContext.Provider value={loading}>
+        {children}
+      </ConsumablesLoadingContext.Provider>
+    </ConsumablesDataContext.Provider>
+  );
 };
 
-export const useConsumableContext = () => {
-  const context = useContext(ConsumableContext);
-  if (!context) throw new Error('useConsumableContext must be used within ConsumableProvider');
+export const useConsumables = () => {
+  const context = useContext(ConsumablesDataContext);
+  if (context === undefined) {
+    throw new Error('useConsumables must be used within a ConsumableProvider');
+  }
   return context;
+};
+
+export const useConsumablesLoading = () => {
+  const context = useContext(ConsumablesLoadingContext);
+  if (context === undefined) {
+    throw new Error('useConsumablesLoading must be used within a ConsumableProvider');
+  }
+  return context;
+};
+
+/** @deprecated Use `useConsumables` or `useConsumablesLoading` instead. */
+export const useConsumableContext = (): ConsumableContextValue => {
+  const consumables = useConsumables();
+  const loading = useConsumablesLoading();
+  return { consumables, loading };
 };

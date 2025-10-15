@@ -1,7 +1,7 @@
 // src/components/chat/ChatInterface.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useDataAdapter } from '../../contexts/DataAdapterContext';
 import { useToast } from '../../contexts/ToastContext';
 // FIX: import from barrel file
@@ -12,7 +12,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 export const ChatInterface: React.FC = () => {
   const { currentUser } = useSessionContext();
   const { t, isJapanese } = useTranslation();
-  const { users } = useUserContext();
+  const users = useUsers();
   const adapter = useDataAdapter();
   const { showToast } = useToast();
   

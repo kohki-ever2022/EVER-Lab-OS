@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Task, TaskStatus, TaskPriority, TaskScope } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useProjectContext } from '../../contexts/ProjectContext';
 import { useProjectActions } from '../../hooks/useProjectActions';
 import { useToast } from '../../contexts/ToastContext';
@@ -16,7 +16,7 @@ interface Props {
 const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
     const { currentUser } = useSessionContext();
     const { t } = useTranslation();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { projects } = useProjectContext();
     const { addTask, updateTask, deleteTask } = useProjectActions();
     const { showToast } = useToast();

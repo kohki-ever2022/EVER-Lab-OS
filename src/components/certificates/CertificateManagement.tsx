@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useQmsContext } from '../../contexts/AppProviders';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useCertificates } from '../../contexts/CertificateContext';
 // FIX: import from barrel file
@@ -12,7 +12,7 @@ const CertificateManagement: React.FC = () => {
     const { currentUser, isFacilityStaff } = useSessionContext();
     const { qualifications, userCertifications } = useQmsContext();
     const { certificates } = useCertificates();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { openModal } = useModalContext();
     const { t, isJapanese } = useTranslation();
 

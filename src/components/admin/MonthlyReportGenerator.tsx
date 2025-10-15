@@ -5,10 +5,10 @@ import { generateMonthlyReport } from '../../services/geminiReportService';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 // FIX: import from barrel file
 import { MonthlyReport } from '../../types';
-import { useReservationContext } from '../../contexts/ReservationContext';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
-import { useConsumableContext } from '../../contexts/ConsumableContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useReservations } from '../../contexts/ReservationContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
+import { useConsumables } from '../../contexts/ConsumableContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useAdminActions } from '../../hooks/useAdminActions';
 import { useAdminContext } from '../../contexts/AppProviders';
@@ -26,10 +26,10 @@ const MonthlyReportGenerator: React.FC = () => {
   const { sds, ehsIncidents } = useQmsContext();
   const { invoices } = useBillingContext();
   const { certificates } = useCertificates();
-  const { reservations } = useReservationContext();
-  const { equipment } = useEquipmentContext();
-  const { consumables } = useConsumableContext();
-  const { users } = useUserContext();
+  const reservations = useReservations();
+  const equipment = useEquipment();
+  const consumables = useConsumables();
+  const users = useUsers();
   const { showToast } = useToast();
   const { addMonthlyReport } = useAdminActions();
   

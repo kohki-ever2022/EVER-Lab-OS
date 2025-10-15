@@ -1,6 +1,7 @@
 // src/hooks/useTranslation.ts
 import { useCallback, useMemo } from 'react';
 import { useSessionContext } from '../contexts/SessionContext';
+// FIX: Import TranslationKey type
 import { translations, TranslationKey } from '../i18n/translations';
 import { Language } from '../types';
 

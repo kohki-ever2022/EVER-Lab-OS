@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useMaintenanceLogContext } from '../../contexts/MaintenanceLogContext';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
+import { useUsers } from '../../contexts/UserContext';
 import { useTranslation } from '../../hooks/useTranslation';
 
 // FIX: import from barrel file
@@ -10,8 +10,8 @@ import { EquipmentStatus, MaintenanceLogStatus } from '../../types';
 const MaintenanceStatus: React.FC = () => {
     const { t, isJapanese } = useTranslation();
     const { maintenanceLogs } = useMaintenanceLogContext();
-    const { equipment } = useEquipmentContext();
-    const { users } = useUserContext();
+    const equipment = useEquipment();
+    const users = useUsers();
     
     const maintenanceEquipment = useMemo(() => {
         return equipment

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useEquipmentActions } from '../../hooks/useEquipmentActions';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -8,7 +8,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { Equipment, EquipmentStatus } from '../../types';
 
 export const EquipmentManagement: React.FC = () => {
-    const { equipment } = useEquipmentContext();
+    const equipment = useEquipment();
     const { t, isJapanese } = useTranslation();
     const { showToast } = useToast();
     const { addEquipment, updateEquipment, deleteEquipment } = useEquipmentActions();

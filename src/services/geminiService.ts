@@ -5,6 +5,7 @@ import { Usage, Equipment } from "../types";
 import { Language } from "../types";
 import { SDSSummary } from "../types";
 import { logger } from './logger';
+// FIX: Import standalone translate function and TranslationKey type
 import { translate, TranslationKey } from '../i18n/translations';
 
 // --- Interface Definition ---

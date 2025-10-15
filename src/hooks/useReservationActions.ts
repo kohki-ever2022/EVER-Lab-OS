@@ -7,11 +7,11 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { Reservation, ReservationStatus, Usage, WaitlistEntry, WaitlistStatus } from '../types';
 // FIX: import from barrel file
 import { Result } from '../types';
-import { useReservationContext } from '../contexts/ReservationContext';
+import { useReservations } from '../contexts/ReservationContext';
 
 export const useReservationActions = () => {
     const adapter = useDataAdapter();
-    const { reservations } = useReservationContext();
+    const reservations = useReservations();
     const { setWaitlist } = useLabStateContext();
     const { currentUser } = useSessionContext();
 

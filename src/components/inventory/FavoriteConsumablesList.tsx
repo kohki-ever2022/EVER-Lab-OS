@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 // FIX: import from barrel file
 import { Consumable } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useConsumableContext } from '../../contexts/ConsumableContext';
+import { useConsumables } from '../../contexts/ConsumableContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useInventoryActions } from '../../hooks/useInventoryActions';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -12,29 +12,22 @@ import { useTranslation } from '../../hooks/useTranslation';
 const FavoriteConsumablesList: React.FC = () => {
     // FIX: Destructure 'isJapanese' from 'useTranslation' hook
     const { currentUser } = useSessionContext();
-    const { consumables } = useConsumableContext();
+    const consumables = useConsumables();
     const { showToast } = useToast();
     const { addOrder } = useInventoryActions();
     const { getFavorites, toggleFavorite } = useFavorites();
     const { t, isJapanese } = useTranslation();
 
-    const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
     const [quantities, setQuantities] = useState<Record<string, number>>({});
     const [orderingId, setOrderingId] = useState<string | null>(null);
+    const [togglingFavoriteId, setTogglingFavoriteId] = useState<string | null>(null);
+
+    const favoriteIds = useMemo(() => (currentUser ? getFavorites(currentUser.id) : []), [currentUser, getFavorites]);
 
     const favoriteItems = React.useMemo(() => {
         return consumables.filter(c => favoriteIds.includes(c.id));
     }, [consumables, favoriteIds]);
 
-    const updateFavorites = useCallback(() => {
-        if (currentUser) {
-            setFavoriteIds(getFavorites(currentUser.id));
-        }
-    }, [currentUser, getFavorites]);
-
-    useEffect(() => {
-        updateFavorites();
-    }, [currentUser, consumables, updateFavorites]);
 
     useEffect(() => {
         const initialQuantities: Record<string, number> = {};
@@ -44,10 +37,16 @@ const FavoriteConsumablesList: React.FC = () => {
         setQuantities(initialQuantities);
     }, [favoriteItems]);
 
-    const handleToggleFavorite = (consumableId: string) => {
+    const handleToggleFavorite = async (consumableId: string) => {
         if (currentUser) {
-            toggleFavorite(currentUser.id, consumableId);
-            updateFavorites(); // Re-fetch and update state
+            setTogglingFavoriteId(consumableId);
+            try {
+                await toggleFavorite(currentUser.id, consumableId);
+            } catch (error) {
+                showToast('Failed to update favorites', 'error');
+            } finally {
+                setTogglingFavoriteId(null);
+            }
         }
     };
 
@@ -125,7 +124,12 @@ const FavoriteConsumablesList: React.FC = () => {
                                         </button>
                                     </>
                                 )}
-                                <button onClick={() => handleToggleFavorite(item.id)} className="p-2 rounded-full hover:bg-red-100 transition-colors" title={t('removeFromFavorites')}>
+                                <button
+                                    onClick={() => handleToggleFavorite(item.id)}
+                                    className="p-2 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50"
+                                    title={t('removeFromFavorites')}
+                                    disabled={togglingFavoriteId === item.id}
+                                >
                                     <HeartIconFill />
                                 </button>
                             </div>

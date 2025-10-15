@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useMaintenanceLogContext } from '../../contexts/MaintenanceLogContext';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
+import { useUsers } from '../../contexts/UserContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -10,8 +10,8 @@ import { MaintenanceLog, MaintenanceLogStatus } from '../../types';
 
 export const MaintenanceLogViewer: React.FC = () => {
     const { maintenanceLogs } = useMaintenanceLogContext();
-    const { equipment } = useEquipmentContext();
-    const { users } = useUserContext();
+    const equipment = useEquipment();
+    const users = useUsers();
     const { t, isJapanese } = useTranslation();
     const { hasPermission } = usePermissions();
 

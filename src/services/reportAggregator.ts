@@ -5,6 +5,7 @@ import { SDS, Certificate, CertificateStatus, EhsIncident, SDSStatus } from '../
 import { Invoice } from '../types';
 import { User } from '../types';
 import { Language } from '../types';
+// FIX: Import standalone translate function
 import { translate } from '../i18n/translations';
 
 /**

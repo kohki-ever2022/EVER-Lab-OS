@@ -194,7 +194,6 @@ export const translations = {
   
   // Equipment
   equipmentList: { ja: '機器一覧', en: 'Equipment' },
-  // FIX: Add missing 'equipment' translation key
   equipment: { ja: '機器', en: 'Equipment' },
   schedule: { ja: 'スケジュール', en: 'Schedule' },
   manualsAndInfo: { ja: 'マニュアル & 情報', en: 'Manuals & Info' },
@@ -264,7 +263,6 @@ export const translations = {
   projectProgressDashboard: { ja: 'プロジェクト進捗', en: 'Project Progress' },
   progress: { ja: '進捗', en: 'Progress' },
   totalTasks: { ja: '総タスク', en: 'Total Tasks' },
-  done: { ja: '完了', en: 'Done' },
   projectTaskOverdue: { ja: '期限切れ', en: 'Overdue' },
   milestones: { ja: 'マイルストーン', en: 'Milestones' },
   totalEquipmentUsage: { ja: '総機器利用時間', en: 'Total Equipment Usage' },
@@ -287,6 +285,8 @@ export const translations = {
   taskStatusToDo: { ja: '未着手', en: 'To Do' },
   taskStatusInProgress: { ja: '進行中', en: 'In Progress' },
   taskStatusInReview: { ja: 'レビュー中', en: 'In Review' },
+  // FIX: Added 'taskStatusDone' for consistency and to resolve a duplicate key conflict with a more generic 'done' key.
+  taskStatusDone: { ja: '完了', en: 'Done' },
   
   // ELN
   electronicLabNotebook: { ja: '電子実験ノート', en: 'Electronic Lab Notebook' },
@@ -493,7 +493,6 @@ export const translations = {
   statusSubmitted: { ja: '提出済', en: 'Submitted' },
   statusApproved: { ja: '承認済', en: 'Approved' },
   statusRejected: { ja: '差戻し', en: 'Rejected' },
-  // FIX: Resolve duplicate key error by renaming `statusExpired` to `expired` and removing the other `expired` key.
   expired: { ja: '期限切れ', en: 'Expired' },
   insuranceManagement: { ja: '保険加入状況', en: 'Insurance Management' },
   uploadInsuranceCert: { ja: '保険証券アップロード', en: 'Upload Insurance Certificate' },
@@ -562,7 +561,6 @@ export const translations = {
   complete: { ja: '補充完了', en: 'Complete' },
   completedNotificationsHistory: { ja: '完了済み通知履歴', en: 'Completed Notifications History' },
   selectConsumableAndLocation: { ja: '消耗品名と設置場所を選択してください', en: 'Please select a consumable and location' },
-  // FIX: Add missing keys
   startDate: { ja: '開始日', en: 'Start Date' },
   permissionDeniedViewPage: { ja: 'このページを閲覧する権限がありません。', en: 'You do not have permission to view this page.' },
   cannotDisplayPdf: { ja: 'PDFを表示できません。', en: 'Cannot display PDF.' },
@@ -594,7 +592,7 @@ export const translations = {
   ordered: { ja: '発注済み', en: 'Ordered' },
   deliveryManagement: { ja: '納品管理', en: 'Delivery Management' },
   noItemsForDelivery: { ja: '納品予定の品目はありません。', en: 'No items scheduled for delivery.' },
-  project: { ja: 'プロジェクト', en: 'Project' },
+  // FIX: Removed duplicate 'project' key.
   sdsHazards: { ja: '危険有害性', en: 'Hazards' },
   sdsHandling: { ja: '取り扱い', en: 'Handling' },
   sdsStorage: { ja: '保管', en: 'Storage' },
@@ -603,32 +601,26 @@ export const translations = {
   sdsDisposal: { ja: '廃棄上の注意', en: 'Disposal' },
   sdsPpe: { ja: '個人用保護具(PPE)', en: 'Personal Protective Equipment (PPE)' },
   acknowledged: { ja: '承認済み', en: 'Acknowledged' },
-  // FIX: Remove duplicate regTypePharma key
   acknowledgeRule: { ja: 'このルールを理解し、遵守することに同意します', en: 'I understand and agree to comply with this rule' },
+  project: { ja: 'プロジェクト', en: 'Project' },
 };
 
+// FIX: Export a type for the translation keys to be used with the t function.
 export type TranslationKey = keyof typeof translations;
 
-/**
- * Translates a key for use outside of React components/hooks.
- * @param key The translation key.
- * @param language The target language.
- * @param replacements An object of placeholder/value pairs.
- * @returns The translated string.
- */
-export const translate = (key: TranslationKey, language: Language, replacements?: Record<string, string | number>): string => {
-  const entry = translations[key];
-  if (!entry) {
-      console.warn(`Translation key "${key}" not found.`);
-      return key;
-  }
-  const isJapanese = language === Language.JA;
-  let text: string = isJapanese ? (entry as any).ja : (entry as any).en;
+// FIX: Export a standalone translate function for use in non-React components.
+export function translate(key: TranslationKey, language: Language, replacements?: Record<string, string | number>): string {
+    const entry = translations[key];
+    if (!entry) {
+        console.warn(`Translation key "${key}" not found.`);
+        return key;
+    }
+    let text: string = language === Language.JA ? (entry as any).ja : (entry as any).en;
 
-  if (replacements) {
-      Object.entries(replacements).forEach(([placeholder, value]) => {
-          text = text.replace(`{${placeholder}}`, String(value));
-      });
-  }
-  return text;
-};
+    if (replacements) {
+        Object.entries(replacements).forEach(([placeholder, value]) => {
+            text = text.replace(`{${placeholder}}`, String(value));
+        });
+    }
+    return text;
+}

@@ -1,70 +1,59 @@
 // src/hooks/useFavorites.ts
-import { useState, useCallback } from 'react';
-
-interface FavoriteStore {
-  [userId: string]: string[];
-}
+import { useCallback } from 'react';
+import { useDataAdapter } from '../contexts/DataAdapterContext';
+import { useUsers } from '../contexts/UserContext';
+import { User } from '../types';
 
 export const useFavorites = () => {
-  // ✅ Reactのstateで管理
-  const [favoriteStore, setFavoriteStore] = useState<FavoriteStore>({});
+  const adapter = useDataAdapter();
+  const users = useUsers();
 
   const getFavorites = useCallback((userId: string): string[] => {
     if (!userId) return [];
-    return favoriteStore[userId] || [];
-  }, [favoriteStore]);
+    const user = users.find(u => u.id === userId);
+    return user?.favoriteConsumableIds || [];
+  }, [users]);
 
   const isFavorite = useCallback((userId: string, consumableId: string): boolean => {
-    const favorites = favoriteStore[userId] || [];
+    const favorites = getFavorites(userId);
     return favorites.includes(consumableId);
-  }, [favoriteStore]);
+  }, [getFavorites]);
 
-  const addFavorite = useCallback((userId: string, consumableId: string) => {
+  const updateUserFavorites = async (userId: string, newFavorites: string[]): Promise<void> => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    await adapter.updateUser({ ...user, favoriteConsumableIds: newFavorites } as User);
+    // Subscription in UserProvider handles UI update.
+  };
+
+  const addFavorite = useCallback(async (userId: string, consumableId: string) => {
     if (!userId || !consumableId) return;
+    const favorites = getFavorites(userId);
+    if (!favorites.includes(consumableId)) {
+      await updateUserFavorites(userId, [...favorites, consumableId]);
+    }
+  }, [getFavorites, users, adapter]);
+
+  const removeFavorite = useCallback(async (userId: string, consumableId: string) => {
+    if (!userId || !consumableId) return;
+    const favorites = getFavorites(userId);
+    if (favorites.includes(consumableId)) {
+      await updateUserFavorites(userId, favorites.filter(id => id !== consumableId));
+    }
+  }, [getFavorites, users, adapter]);
+
+  const toggleFavorite = useCallback(async (userId: string, consumableId: string) => {
+    if (!userId || !consumableId) return;
+    const favorites = getFavorites(userId);
+    const isCurrentlyFavorite = favorites.includes(consumableId);
     
-    setFavoriteStore(prev => {
-      const favorites = prev[userId] || [];
-      if (!favorites.includes(consumableId)) {
-        return {
-          ...prev,
-          [userId]: [...favorites, consumableId]
-        };
-      }
-      return prev;
-    });
-  }, []);
-
-  const removeFavorite = useCallback((userId: string, consumableId: string) => {
-    if (!userId || !consumableId) return;
-    
-    setFavoriteStore(prev => {
-      const favorites = prev[userId] || [];
-      return {
-        ...prev,
-        [userId]: favorites.filter(id => id !== consumableId)
-      };
-    });
-  }, []);
-
-  const toggleFavorite = useCallback((userId: string, consumableId: string) => {
-    if (!userId || !consumableId) return;
-    setFavoriteStore(prev => {
-        const currentFavorites = prev[userId] || [];
-        const isCurrentlyFavorite = currentFavorites.includes(consumableId);
-        
-        if (isCurrentlyFavorite) {
-            return {
-                ...prev,
-                [userId]: currentFavorites.filter(id => id !== consumableId)
-            };
-        } else {
-            return {
-                ...prev,
-                [userId]: [...currentFavorites, consumableId]
-            };
-        }
-    });
-  }, []);
+    const newFavorites = isCurrentlyFavorite
+      ? favorites.filter(id => id !== consumableId)
+      : [...favorites, consumableId];
+      
+    await updateUserFavorites(userId, newFavorites);
+  }, [getFavorites, users, adapter]);
 
   return {
     getFavorites,

@@ -8,7 +8,8 @@ interface EquipmentContextValue {
   loading: boolean;
 }
 
-const EquipmentContext = createContext<EquipmentContextValue | null>(null);
+const EquipmentDataContext = createContext<Equipment[]>([]);
+const EquipmentLoadingContext = createContext<boolean>(true);
 
 export const EquipmentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -21,16 +22,38 @@ export const EquipmentProvider: React.FC<{ children: ReactNode }> = ({ children 
       setEquipment(data);
       if (loading) setLoading(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
 
-  const value = useMemo(() => ({ equipment, loading }), [equipment, loading]);
-
-  return <EquipmentContext.Provider value={value}>{children}</EquipmentContext.Provider>;
+  return (
+    <EquipmentDataContext.Provider value={equipment}>
+        <EquipmentLoadingContext.Provider value={loading}>
+            {children}
+        </EquipmentLoadingContext.Provider>
+    </EquipmentDataContext.Provider>
+  );
 };
 
-export const useEquipmentContext = () => {
-  const context = useContext(EquipmentContext);
-  if (!context) throw new Error('useEquipmentContext must be used within EquipmentProvider');
-  return context;
+export const useEquipment = () => {
+    const context = useContext(EquipmentDataContext);
+    if (context === undefined) {
+        throw new Error('useEquipment must be used within an EquipmentProvider');
+    }
+    return context;
+};
+
+export const useEquipmentLoading = () => {
+    const context = useContext(EquipmentLoadingContext);
+    if (context === undefined) {
+        throw new Error('useEquipmentLoading must be used within an EquipmentProvider');
+    }
+    return context;
+};
+
+/** @deprecated Use `useEquipment` or `useEquipmentLoading` instead. */
+export const useEquipmentContext = (): EquipmentContextValue => {
+  const equipment = useEquipment();
+  const loading = useEquipmentLoading();
+  return { equipment, loading };
 };

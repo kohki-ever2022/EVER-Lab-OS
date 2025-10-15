@@ -4,8 +4,8 @@ import { Role, Language, View, NotificationType } from '../../types';
 // FIX: import from barrel file
 import { Equipment as EquipmentType, EquipmentStatus, ManualType } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useUserContext } from '../../contexts/UserContext';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
+import { useUsers } from '../../contexts/UserContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useAdminContext } from '../../contexts/AppProviders';
@@ -54,7 +54,7 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
     const { currentUser } = useSessionContext();
     const { t, isJapanese } = useTranslation();
     const { qualifications, userCertifications } = useQmsContext();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { openModal } = useModalContext();
     
     const requiredQualId = equipment.requiredQualificationId;
@@ -245,7 +245,7 @@ const EquipmentTable: React.FC<{
 };
 
 const Equipment: React.FC = () => {
-    const { equipment } = useEquipmentContext();
+    const equipment = useEquipment();
     const { t } = useTranslation();
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
     const [sortConfig, setSortConfig] = useState<{ key: keyof EquipmentType | 'name', direction: 'ascending' | 'descending' } | null>({ key: 'name', direction: 'ascending' });

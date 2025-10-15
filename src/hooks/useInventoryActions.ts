@@ -10,14 +10,14 @@ import { Consumable, Order, OrderStatus } from '../types';
 import { Result, Role } from '../types';
 // FIX: import from barrel file
 import { NotificationType } from '../types';
-import { useConsumableContext } from '../contexts/ConsumableContext';
-import { useUserContext } from '../contexts/UserContext';
+import { useConsumables } from '../contexts/ConsumableContext';
+import { useUsers } from '../contexts/UserContext';
 import { useTranslation } from './useTranslation';
 
 export const useInventoryActions = () => {
   const adapter = useDataAdapter();
-  const { consumables } = useConsumableContext();
-  const { users } = useUserContext();
+  const consumables = useConsumables();
+  const users = useUsers();
   const { currentUser } = useSessionContext();
   const { t } = useTranslation();
   const { addAuditLog } = useAudit();

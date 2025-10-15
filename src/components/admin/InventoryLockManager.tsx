@@ -1,8 +1,8 @@
 import React from 'react';
 import { InventorySnapshot } from '../../types';
 import { useModalContext } from '../../contexts/ModalContext';
-import { useUserContext } from '../../contexts/UserContext';
-import { useConsumableContext } from '../../contexts/ConsumableContext';
+import { useUsers } from '../../contexts/UserContext';
+import { useConsumables } from '../../contexts/ConsumableContext';
 import { useToast } from '../../contexts/ToastContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useInventorySnapshots } from '../../hooks/useInventorySnapshots';
@@ -12,8 +12,8 @@ import { useTranslation } from '../../hooks/useTranslation';
 const InventoryLockManager: React.FC = () => {
   const { currentUser } = useSessionContext();
   const { t, isJapanese } = useTranslation();
-  const { users } = useUserContext();
-  const { consumables } = useConsumableContext();
+  const users = useUsers();
+  const consumables = useConsumables();
   const { showToast } = useToast();
   const { hasPermission } = usePermissions();
   const { snapshots: inventorySnapshots, createMonthlySnapshot, unlockAllSnapshots } = useInventorySnapshots();

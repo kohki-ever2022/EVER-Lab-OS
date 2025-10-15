@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useProjectContext } from '../../contexts/ProjectContext';
-import { useUserContext } from '../../contexts/UserContext';
+import { useUsers } from '../../contexts/UserContext';
 
 import { useModalContext } from '../../contexts/ModalContext';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -10,7 +10,7 @@ const Projects: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t } = useTranslation();
     const { projects } = useProjectContext();
-    const { users } = useUserContext();
+    const users = useUsers();
     const { openModal } = useModalContext();
 
     const myProjects = projects.filter(p => p.companyId === currentUser?.companyId);

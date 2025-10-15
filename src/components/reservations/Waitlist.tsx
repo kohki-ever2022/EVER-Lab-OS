@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useLabStateContext } from '../../contexts/AppProviders';
-import { useEquipmentContext } from '../../contexts/EquipmentContext';
+import { useEquipment } from '../../contexts/EquipmentContext';
 import { useReservationActions } from '../../hooks/useReservationActions';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -9,7 +9,7 @@ const Waitlist: React.FC = () => {
   const { currentUser } = useSessionContext();
   const { t, isJapanese } = useTranslation();
   const { waitlist } = useLabStateContext();
-  const { equipment } = useEquipmentContext();
+  const equipment = useEquipment();
   const { removeFromWaitlist } = useReservationActions();
   const userWaitlistEntries = waitlist.filter(w => w.userId === currentUser?.id && w.status === 'Pending'); // Simplified
 
