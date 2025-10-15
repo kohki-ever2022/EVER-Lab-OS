@@ -80,11 +80,13 @@ const Settings: React.FC = () => {
                     {settings.surgePricingEnabled && (
                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                              <div>
-                                <label htmlFor="surgeStartTime" className="block text-sm font-medium text-gray-700">{t('startTime')}</label>
+                                {/* FIX: Use specific translation key 'surgeStartTime' to avoid conflict */}
+                                <label htmlFor="surgeStartTime" className="block text-sm font-medium text-gray-700">{t('surgeStartTime')}</label>
                                 <input type="time" id="surgeStartTime" name="surgeStartTime" value={settings.surgeStartTime} onChange={handleTimeChange} disabled={!canManageSettings} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm disabled:bg-gray-100" />
                             </div>
                             <div>
-                                <label htmlFor="surgeEndTime" className="block text-sm font-medium text-gray-700">{t('endTime')}</label>
+                                {/* FIX: Use specific translation key 'surgeEndTime' to avoid conflict */}
+                                <label htmlFor="surgeEndTime" className="block text-sm font-medium text-gray-700">{t('surgeEndTime')}</label>
                                 <input type="time" id="surgeEndTime" name="surgeEndTime" value={settings.surgeEndTime} onChange={handleTimeChange} disabled={!canManageSettings} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm disabled:bg-gray-100" />
                             </div>
                              <div>

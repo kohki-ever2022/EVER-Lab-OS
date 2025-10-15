@@ -20,9 +20,8 @@ export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ childre
     setLoading(true);
     const unsubscribe = adapter.subscribeToReservations((data) => {
       setReservations(data);
-      if (loading) setLoading(false);
+      setLoading(false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => unsubscribe();
   }, [adapter]);
 

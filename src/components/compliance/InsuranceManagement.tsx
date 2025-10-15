@@ -193,7 +193,7 @@ export const InsuranceManagement: React.FC = () => {
     const daysUntilExpiry = Math.floor((new Date(endDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     
     if (daysUntilExpiry < 0) {
-      return { status: 'expired', label: t('expired'), color: 'bg-red-100 text-red-700' };
+      return { status: 'expired', label: t('statusExpired'), color: 'bg-red-100 text-red-700' };
     } else if (daysUntilExpiry <= 30) {
       return { status: 'expiring-soon', label: `${t('daysLeft')}${daysUntilExpiry}${t('daysLeftSuffix')}`, color: 'bg-orange-100 text-orange-700' };
     } else if (daysUntilExpiry <= 90) {
@@ -205,8 +205,7 @@ export const InsuranceManagement: React.FC = () => {
   const statusConfig = {
       'PENDING': { key: 'pending', color: 'bg-yellow-100 text-yellow-700' },
       'VERIFIED': { key: 'statusVerified', color: 'bg-blue-100 text-blue-700' },
-      'EXPIRED': { key: 'expired', color: 'bg-gray-200 text-gray-600' },
-      // FIX: Use a more specific translation key 'insuranceStatusRejected' to avoid conflicts.
+      'EXPIRED': { key: 'statusExpired', color: 'bg-gray-200 text-gray-600' },
       'REJECTED': { key: 'insuranceStatusRejected', color: 'bg-red-100 text-red-700' },
   };
 

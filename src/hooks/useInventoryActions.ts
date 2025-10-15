@@ -10,6 +10,7 @@ import { NotificationType } from '../types';
 import { useConsumables } from '../contexts/ConsumableContext';
 import { useUsers } from '../contexts/UserContext';
 import { useTranslation } from './useTranslation';
+import { sanitizeObject } from '../utils/sanitization';
 
 export const useInventoryActions = () => {
   const adapter = useDataAdapter();
@@ -28,7 +29,7 @@ export const useInventoryActions = () => {
         }
 
         const prevConsumable = consumables.find(c => c.id === consumable.id);
-        const result = await adapter.updateConsumable(consumable);
+        const result = await adapter.updateConsumable(sanitizeObject(consumable));
 
         if (result.success && prevConsumable && addNotification && users) {
             const isNowLow = consumable.stock > 0 && consumable.stock <= consumable.lowStockThreshold;
@@ -59,7 +60,7 @@ export const useInventoryActions = () => {
         if (consumables.some(c => c.isLocked)) {
             throw new Error(t('inventoryLockedAdd'));
         }
-        return await adapter.createConsumable(consumable);
+        return await adapter.createConsumable(sanitizeObject(consumable));
     } catch (e) {
         return { success: false, error: e instanceof Error ? e : new Error(String(e)) };
     }
@@ -85,7 +86,7 @@ export const useInventoryActions = () => {
         status: OrderStatus.Ordered,
     };
 
-    const result = await adapter.createOrder(orderData);
+    const result = await adapter.createOrder(sanitizeObject(orderData));
     if (result.success) {
         addAuditLog('ORDER_CREATE', `User ${order.userId} ordered ${order.quantity} of consumable ${order.consumableId}.`);
     }

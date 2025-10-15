@@ -6,6 +6,12 @@ import { Invoice } from '../types';
 import { User } from '../types';
 import { Language } from '../types';
 import { translate } from '../i18n/translations';
+import { 
+  REPORT_TOP_N_EQUIPMENT, 
+  REPORT_ITEM_LIST_LIMIT, 
+  APPROX_DAYS_IN_MONTH, 
+  APPROX_WORK_HOURS_PER_DAY 
+} from '../config/constants';
 
 /**
  * 月次レポートのデータ集計に必要な入力データ
@@ -98,10 +104,10 @@ export const aggregateMonthlyData = (
       reservationCount: equipReservations.length,
     };
   }).sort((a, b) => b.totalHours - a.totalHours)
-  .slice(0, 5); // Limit to top 5 to reduce payload size
+  .slice(0, REPORT_TOP_N_EQUIPMENT);
 
   const totalUsageHours = byEquipmentUsage.reduce((sum, e) => sum + e.totalHours, 0);
-  const totalAvailableHours = equipment.length * 30 * 12; // Approximation: 30 days * 12h/day
+  const totalAvailableHours = equipment.length * APPROX_DAYS_IN_MONTH * APPROX_WORK_HOURS_PER_DAY;
   const overallUtilizationRate = totalAvailableHours > 0 ? Math.round((totalUsageHours / totalAvailableHours) * 100) : 0;
 
 
@@ -115,16 +121,16 @@ export const aggregateMonthlyData = (
   const hazardousRatio = hazardousItems.reduce((sum, item) => sum + calculateMultiple(item), 0);
   
   const allStockoutItems = consumables.filter(c => c.stock <= 0);
-  const stockoutItems = allStockoutItems.slice(0, 10).map(c => isJapanese ? c.nameJP : c.nameEN);
-  if (allStockoutItems.length > 10) {
-      const remainingCount = allStockoutItems.length - 10;
+  const stockoutItems = allStockoutItems.slice(0, REPORT_ITEM_LIST_LIMIT).map(c => isJapanese ? c.nameJP : c.nameEN);
+  if (allStockoutItems.length > REPORT_ITEM_LIST_LIMIT) {
+      const remainingCount = allStockoutItems.length - REPORT_ITEM_LIST_LIMIT;
       stockoutItems.push(translate('moreItems', language, { count: remainingCount }));
   }
 
   const allReorderItems = consumables.filter(c => c.stock > 0 && c.stock <= c.lowStockThreshold);
-  const reorderNeededItems = allReorderItems.slice(0, 10).map(c => isJapanese ? c.nameJP : c.nameEN);
-  if (allReorderItems.length > 10) {
-      const remainingCount = allReorderItems.length - 10;
+  const reorderNeededItems = allReorderItems.slice(0, REPORT_ITEM_LIST_LIMIT).map(c => isJapanese ? c.nameJP : c.nameEN);
+  if (allReorderItems.length > REPORT_ITEM_LIST_LIMIT) {
+      const remainingCount = allReorderItems.length - REPORT_ITEM_LIST_LIMIT;
       reorderNeededItems.push(translate('moreItems', language, { count: remainingCount }));
   }
 

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback, useMemo } from 'react';
+import { TOAST_TIMEOUT_MS } from '../config/constants';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -26,7 +27,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setToasts(prevToasts => [...prevToasts, { id, message, type }]);
     setTimeout(() => {
       setToasts(prevToasts => prevToasts.filter(toast => toast.id !== id));
-    }, 5000); // Auto-dismiss after 5 seconds
+    }, TOAST_TIMEOUT_MS); // Auto-dismiss after 5 seconds
   }, []);
 
   const value = useMemo(() => ({ toasts, showToast }), [toasts, showToast]);

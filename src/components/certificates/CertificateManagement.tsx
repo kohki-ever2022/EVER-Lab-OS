@@ -23,7 +23,7 @@ const CertificateManagement: React.FC = () => {
         thirtyDaysFromNow.setDate(now.getDate() + 30);
         
         if (new Date(expiryDate) < now) {
-            return { text: t('expired'), color: 'bg-red-100 text-red-700' };
+            return { text: t('statusExpired'), color: 'bg-red-100 text-red-700' };
         } else if (new Date(expiryDate) <= thirtyDaysFromNow) {
             return { text: t('expiringSoon'), color: 'bg-yellow-100 text-yellow-700' };
         } else {

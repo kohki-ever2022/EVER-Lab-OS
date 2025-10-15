@@ -20,9 +20,8 @@ export const EquipmentProvider: React.FC<{ children: ReactNode }> = ({ children 
     setLoading(true);
     const unsubscribe = adapter.subscribeToEquipment((data) => {
       setEquipment(data);
-      if (loading) setLoading(false);
+      setLoading(false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => unsubscribe();
   }, [adapter]);
 

@@ -49,9 +49,8 @@ export const RegulatoryCompliance: React.FC = () => {
     [SubmissionStatus.Preparing]: { key: 'statusPreparing', color: 'bg-yellow-100 text-yellow-700' },
     [SubmissionStatus.Submitted]: { key: 'statusSubmitted', color: 'bg-blue-100 text-blue-700' },
     [SubmissionStatus.Approved]: { key: 'statusApproved', color: 'bg-green-100 text-green-700' },
-    // FIX: Use a more specific translation key 'submissionStatusRejected' to avoid conflicts.
     [SubmissionStatus.Rejected]: { key: 'submissionStatusRejected', color: 'bg-red-200 text-red-800' },
-    [SubmissionStatus.Expired]: { key: 'expired', color: 'bg-gray-300 text-gray-800' }
+    [SubmissionStatus.Expired]: { key: 'statusExpired', color: 'bg-gray-300 text-gray-800' }
   };
 
   const handleOpenModal = () => {

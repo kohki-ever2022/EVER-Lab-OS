@@ -6,6 +6,7 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
 import { useNotifications } from './useNotifications';
 import { useToast } from '../contexts/ToastContext';
+import { sanitizeObject } from '../utils/sanitization';
 import {
   Result,
   LabRule,
@@ -76,8 +77,9 @@ export const useComplianceActions = () => {
                 showToast(t('failedToAddToCalendar'), 'warning');
             }
         }
-    
-        return await adapter.createRegulatoryRequirement(newReqWithCalendar);
+        
+        const sanitizedReq = sanitizeObject(newReqWithCalendar);
+        return await adapter.createRegulatoryRequirement(sanitizedReq);
     }, [adapter, companies, isJapanese, language, showToast, t]);
 
     const checkAndNotifyForCertificate = useCallback((cert: InsuranceCertificate) => {
@@ -106,7 +108,7 @@ export const useComplianceActions = () => {
     }, [addNotification, t, isJapanese]);
 
     const addInsuranceCertificate = useCallback(async (cert: Omit<InsuranceCertificate, 'id'>): Promise<Result<InsuranceCertificate, Error>> => {
-        const result = await adapter.createInsuranceCertificate(cert);
+        const result = await adapter.createInsuranceCertificate(sanitizeObject(cert));
         if(result.success) {
             checkAndNotifyForCertificate(result.data);
         }
@@ -114,7 +116,7 @@ export const useComplianceActions = () => {
     }, [adapter, checkAndNotifyForCertificate]);
     
     const updateInsuranceCertificate = useCallback(async (cert: InsuranceCertificate): Promise<Result<InsuranceCertificate, Error>> => {
-        const result = await adapter.updateInsuranceCertificate(cert);
+        const result = await adapter.updateInsuranceCertificate(sanitizeObject(cert));
         if(result.success) {
             checkAndNotifyForCertificate(result.data);
         }
@@ -122,7 +124,7 @@ export const useComplianceActions = () => {
     }, [adapter, checkAndNotifyForCertificate]);
 
     const addCertificate = useCallback(async (cert: Omit<Certificate, 'id'>): Promise<Result<Certificate, Error>> => {
-        const result = await adapter.createCertificate(cert);
+        const result = await adapter.createCertificate(sanitizeObject(cert));
         if (result.success) {
             addAuditLog('CERTIFICATE_UPLOAD', `Uploaded certificate '${cert.certificateType}' for user ${cert.userId}`);
         }
@@ -130,7 +132,7 @@ export const useComplianceActions = () => {
     }, [adapter, addAuditLog]);
 
     const updateCertificate = useCallback(async (cert: Certificate): Promise<Result<Certificate, Error>> => {
-        const result = await adapter.updateCertificate(cert);
+        const result = await adapter.updateCertificate(sanitizeObject(cert));
         if (result.success) {
             addAuditLog('CERTIFICATE_UPDATE', `Updated certificate '${cert.certificateType}' for user ${cert.userId}`);
         }
@@ -138,7 +140,7 @@ export const useComplianceActions = () => {
     }, [adapter, addAuditLog]);
 
     const updateSds = useCallback(async (sds: SDS): Promise<Result<SDS, Error>> => {
-        const result = await adapter.updateSds(sds);
+        const result = await adapter.updateSds(sanitizeObject(sds));
         if (result.success) {
             addAuditLog('SDS_UPDATE', `Updated SDS for '${sds.chemicalName}'`);
         }

@@ -22,9 +22,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     const unsubscribe = adapter.subscribeToUsers((data) => {
       setUsers(data);
-      if (loading) setLoading(false);
+      setLoading(false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => unsubscribe();
   }, [adapter]);
 

@@ -148,7 +148,6 @@ const MonthlyReportGenerator: React.FC = () => {
                 {reportMarkdown ? (
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex justify-between items-center mb-4 border-b pb-4 no-print">
-                            {/* FIX: Use a more specific translation key 'reportForPeriod' to avoid conflicts. */}
                             <h3 className="text-2xl font-bold">{t('reportForPeriod')}: {currentReportPeriod}</h3>
                             <div className="flex gap-2">
                                 <button onClick={handleDownloadPdf} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-1 px-3 border border-gray-300 rounded shadow text-sm">{t('downloadPdf')}</button>

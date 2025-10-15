@@ -67,7 +67,6 @@ const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
                     </div>
                     <div className="mt-8 flex justify-end space-x-3">
                         <button type="button" onClick={onClose} className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg">{t('cancel')}</button>
-                        {/* FIX: Use a more specific translation key 'submitReport' to avoid conflicts. */}
                         <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">{t('submitReport')}</button>
                     </div>
                 </form>

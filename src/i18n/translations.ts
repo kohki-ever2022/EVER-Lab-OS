@@ -38,8 +38,7 @@ export const translations = {
   langNameForPrompt: { ja: '日本語', en: 'English' },
   langCode: { ja: 'ja-JP', en: 'en-US' },
   unitItems: { ja: '個', en: 'items' },
-  // FIX: Add missing general keys
-  expired: { ja: '期限切れ', en: 'Expired' },
+  statusExpired: { ja: '期限切れ', en: 'Expired' },
   assigned: { ja: '割り当て済み', en: 'Assigned' },
   acknowledged: { ja: '同意済み', en: 'Acknowledged' },
   all: { ja: 'すべて', en: 'All' },
@@ -50,6 +49,11 @@ export const translations = {
   upload: { ja: 'アップロード', en: 'Upload' },
   errorOccurred: { ja: 'エラーが発生しました。', en: 'An error occurred.' },
   tenant: { ja: 'テナント', en: 'Tenant' },
+  reportForPeriod: { ja: 'レポート', en: 'Report' },
+  submitReport: { ja: '報告を送信', en: 'Submit Report' },
+  insuranceStatusRejected: { ja: '却下', en: 'Rejected' },
+  submissionStatusRejected: { ja: '却下', en: 'Rejected' },
+
 
   // Login
   signInToAccount: { ja: 'アカウントにサインイン', en: 'Sign in to your account' },
@@ -193,63 +197,6 @@ export const translations = {
   profile: { ja: 'プロフィール', en: 'Profile' },
   nameMinLength: { ja: '名前は2文字以上で入力してください。', en: 'Name must be at least 2 characters.' },
 
-  // Equipment
-  equipmentList: { ja: '機器一覧', en: 'Equipment List' },
-  available: { ja: '利用可能', en: 'Available' },
-  maintenance: { ja: 'メンテナンス中', en: 'Maintenance' },
-  calibration: { ja: '校正中', en: 'Calibration' },
-  notReservable: { ja: '予約不可', en: 'Not Reservable' },
-  rate: { ja: '料金', en: 'Rate' },
-  expert: { ja: '担当者', en: 'Expert' },
-  required: { ja: '必要資格', en: 'Required' },
-  schedule: { ja: 'スケジュール', en: 'Schedule' },
-  manualsAndInfo: { ja: 'マニュアル/情報', en: 'Manuals/Info' },
-  reportIssue: { ja: '不具合を報告', en: 'Report Issue' },
-  calibrationOverdue: { ja: '校正期限切れのため予約不可', en: 'Calibration overdue, cannot be booked' },
-  certExpired: { ja: '資格の有効期限が切れています', en: 'Your certification has expired' },
-  noCert: { ja: '必要な資格がありません', en: 'You do not have the required certification' },
-  notAvailable: { ja: '現在利用できません', en: 'Currently unavailable' },
-  modelProductCode: { ja: 'モデル/製品コード', en: 'Model/Product Code' },
-  manufacturer: { ja: 'メーカー', en: 'Manufacturer' },
-  priceFee: { ja: '価格/料金', en: 'Price/Fee' },
-  noEquipmentToDisplay: { ja: '表示する機器がありません。', en: 'No equipment to display.' },
-  
-  // EquipmentManagement
-  equipmentMasterManagement: { ja: '機器マスタ管理', en: 'Equipment Master Management' },
-  addNewEquipment: { ja: '新規機器追加', en: 'Add New Equipment' },
-  equipmentName: { ja: '機器名', en: 'Equipment Name' },
-  equipmentSaved: { ja: '機器情報が保存されました。', en: 'Equipment information saved.' },
-  deleteEquipmentConfirm: { ja: 'この機器を削除しますか？', en: 'Are you sure you want to delete this equipment?' },
-  deleteFailed: { ja: '削除に失敗しました', en: 'Deletion failed' },
-  equipmentDeleted: { ja: '機器を削除しました。', en: 'Equipment deleted.' },
-  editEquipment: { ja: '機器情報編集', en: 'Edit Equipment' },
-  nameJP: { ja: '名前 (日本語)', en: 'Name (Japanese)' },
-  nameEN: { ja: '名前 (英語)', en: 'Name (English)' },
-  categoryJP: { ja: 'カテゴリ (日本語)', en: 'Category (Japanese)' },
-  categoryEN: { ja: 'カテゴリ (英語)', en: 'Category (English)' },
-  rateUnitJP: { ja: '料金単位 (日本語)', en: 'Rate Unit (Japanese)' },
-  rateUnitEN: { ja: '料金単位 (英語)', en: 'Rate Unit (English)' },
-  imageUrl: { ja: '画像URL', en: 'Image URL' },
-  reservable: { ja: '予約可能', en: 'Reservable' },
-  maintenanceSettings: { ja: 'メンテナンス設定', en: 'Maintenance Settings' },
-  pmInterval: { ja: 'PM間隔 (日)', en: 'PM Interval (Days)' },
-  lastPmDate: { ja: '最終PM日', en: 'Last PM Date' },
-  calibrationInterval: { ja: '校正間隔 (日)', en: 'Calibration Interval (Days)' },
-  lastCalibrationDate: { ja: '最終校正日', en: 'Last Calibration Date' },
-  
-  // MaintenanceLogViewer
-  maintenanceLog: { ja: 'メンテナンスログ', en: 'Maintenance Log' },
-  equipment: { ja: '機器', en: 'Equipment' },
-  reportDate: { ja: '報告日', en: 'Report Date' },
-  reporter: { ja: '報告者', en: 'Reporter' },
-  noMaintenanceLogs: { ja: 'メンテナンスログはありません。', en: 'No maintenance logs.' },
-  
-  // MaintenanceStatus
-  maintenanceStatus: { ja: 'メンテナンス状況', en: 'Maintenance Status' },
-  latestReport: { ja: '最新の報告', en: 'Latest Report' },
-  noDetailedReport: { ja: '詳細な不具合報告はありません。', en: 'No detailed issue report.' },
-  noMaintenanceEquipment: { ja: '現在メンテナンス中の機器はありません。', en: 'No equipment is currently under maintenance.' },
-  
   // Modals
   saveFailed: { ja: '保存に失敗しました', en: 'Save failed' },
   bookEquipmentModalTitle: { ja: '機器予約', en: 'Book Equipment' },
@@ -305,8 +252,6 @@ export const translations = {
   generatingWait: { ja: 'レポートを生成しています。1分ほどかかる場合があります...', en: 'Generating report. This may take a minute...' },
   reportHistory: { ja: 'レポート履歴', en: 'Report History' },
   noHistory: { ja: '履歴はありません。', en: 'No history.' },
-  // FIX: Renamed 'report' to 'reportForPeriod' to avoid duplicate key.
-  reportForPeriod: { ja: 'レポート', en: 'Report' },
   downloadPdf: { ja: 'PDFダウンロード', en: 'Download PDF' },
   shareViaEmail: { ja: 'メールで共有', en: 'Share via Email' },
   emailNotSupported: { ja: 'メール機能は現在サポートされていません。', en: 'Email feature is not currently supported.' },
@@ -324,6 +269,9 @@ export const translations = {
   surgePricing: { ja: 'ピーク料金', en: 'Surge Pricing' },
   surgePricingDesc: { ja: '特定の時間帯に料金を割増しするかどうかを設定します。', en: 'Configure whether to apply a multiplier to rates during certain hours.' },
   enableSurgePricing: { ja: 'ピーク料金を有効にする', en: 'Enable surge pricing' },
+  // FIX: Renamed startTime and endTime to avoid duplicate keys
+  surgeStartTime: { ja: '開始時間', en: 'Start Time' },
+  surgeEndTime: { ja: '終了時間', en: 'End Time' },
   multiplier: { ja: '倍率', en: 'Multiplier' },
   billingSettingsPlaceholder: { ja: '請求関連の設定はここで管理します（開発中）。', en: 'Billing-related settings will be managed here (under development).' },
   saveSettings: { ja: '設定を保存', en: 'Save Settings' },
@@ -459,7 +407,6 @@ export const translations = {
   price: { ja: '価格', en: 'Price' },
   deliveryManagement: { ja: '納品管理', en: 'Delivery Management' },
   noItemsForDelivery: { ja: '納品予定の品目はありません。', en: 'No items scheduled for delivery.' },
-  // FIX: ADDED MISSING TRANSLATION KEYS
   notificationEquipmentMaintenance: { ja: '{name}がメンテナンス中に設定されました。', en: '{name} has been set to maintenance.' },
   notificationEquipmentMalfunctionTitle: { ja: '機器の不具合', en: 'Equipment Malfunction' },
   notificationEmergencyStopTitle: { ja: '緊急停止通知', en: 'Emergency Stop Notification' },
@@ -477,7 +424,6 @@ export const translations = {
   priorityHigh: { ja: '高', en: 'High' },
   priorityUrgent: { ja: '緊急', en: 'Urgent' },
   notesPlaceholder: { ja: '例：最後の1つですぐに交換が必要です', en: 'e.g., This is the last one, immediate replacement needed' },
-  submitReport: { ja: '報告を送信', en: 'Submit Report' },
   activeNotifications: { ja: 'アクティブな通知', en: 'Active Notifications' },
   noActiveNotifications: { ja: 'アクティブな通知はありません。', en: 'No active notifications.' },
   statusReported: { ja: '報告済み', en: 'Reported' },
@@ -556,8 +502,6 @@ export const translations = {
   insuranceTypeWorkersComp: { ja: '労働災害総合保険', en: 'Workers Compensation Insurance' },
   insuranceTypeOther: { ja: 'その他', en: 'Other' },
   statusVerified: { ja: '確認済み', en: 'Verified' },
-  // FIX: Renamed 'statusRejected' to 'insuranceStatusRejected' to avoid duplicate key.
-  insuranceStatusRejected: { ja: '却下', en: 'Rejected' },
   requiredFields: { ja: '必須項目をすべて入力してください。', en: 'Please fill in all required fields.' },
   addRequirementFailed: { ja: '要件の追加に失敗しました。', en: 'Failed to add requirement.' },
   addRequirementSuccess: { ja: '要件を追加しました。', en: 'Requirement added successfully.' },
@@ -589,8 +533,6 @@ export const translations = {
   statusPreparing: { ja: '準備中', en: 'Preparing' },
   statusSubmitted: { ja: '提出済', en: 'Submitted' },
   statusApproved: { ja: '承認済', en: 'Approved' },
-  // FIX: Renamed 'statusRejected' to 'submissionStatusRejected' to avoid duplicate key.
-  submissionStatusRejected: { ja: '却下', en: 'Rejected' },
   projectProgressDashboard: { ja: 'プロジェクト進捗ダッシュボード', en: 'Project Progress Dashboard' },
   progress: { ja: '進捗', en: 'Progress' },
   totalTasks: { ja: '全タスク', en: 'Total Tasks' },

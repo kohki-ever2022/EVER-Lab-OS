@@ -19,10 +19,10 @@ export const CompanyProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     const unsubscribe = adapter.subscribeToCompanies((data) => {
       setCompanies(data);
-      if (loading) setLoading(false);
+      setLoading(false);
     });
     return () => unsubscribe();
-  }, [adapter, loading]);
+  }, [adapter]);
 
   const value = useMemo(() => ({ companies, loading }), [companies, loading]);
 

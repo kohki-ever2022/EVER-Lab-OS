@@ -6,6 +6,13 @@ import { Language } from "../types";
 import { SDSSummary } from "../types";
 import { logger } from './logger';
 import { translate, TranslationKey } from '../i18n/translations';
+import { 
+  GEMINI_FLASH_MODEL, 
+  GEMINI_API_RETRY_COUNT, 
+  GEMINI_API_INITIAL_DELAY, 
+  GEMINI_API_TIMEOUT,
+  GEMINI_SDS_MAX_TEXT_LENGTH
+} from "../config/constants";
 
 // --- Interface Definition ---
 
@@ -44,9 +51,9 @@ class ProductionGeminiService implements IGeminiService {
   private ai: GoogleGenAI | null = null;
 
   constructor() {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const apiKey = process.env.API_KEY;
     if (apiKey) {
-      this.ai = new GoogleGenAI({ apiKey });
+      this.ai = new GoogleGenAI({ apiKey: apiKey });
     } else {
       logger.warn("Gemini API key not configured. Gemini features will be disabled.");
     }
@@ -74,13 +81,13 @@ class ProductionGeminiService implements IGeminiService {
   /**
    * 指数バックオフによるリトライメカニズム
    * @param fn 実行する関数
-   * @param maxRetries 最大リトライ回数（デフォルト: 3）
-   * @param initialDelay 初期遅延時間（ミリ秒、デフォルト: 1000）
+   * @param maxRetries 最大リトライ回数
+   * @param initialDelay 初期遅延時間（ミリ秒）
    */
   private async retryWithBackoff<T>(
     fn: () => Promise<T>,
-    maxRetries: number = 3,
-    initialDelay: number = 1000
+    maxRetries: number = GEMINI_API_RETRY_COUNT,
+    initialDelay: number = GEMINI_API_INITIAL_DELAY
   ): Promise<T> {
     let lastError: Error | undefined;
 
@@ -89,7 +96,7 @@ class ProductionGeminiService implements IGeminiService {
         const result = await Promise.race([
           fn(),
           new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('Request timeout')), 30000)
+            setTimeout(() => reject(new Error('Request timeout')), GEMINI_API_TIMEOUT)
           ),
         ]);
         
@@ -162,7 +169,7 @@ class ProductionGeminiService implements IGeminiService {
 
     try {
         const response: GenerateContentResponse = await this.retryWithBackoff(() => this.ai!.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: GEMINI_FLASH_MODEL,
             contents: prompt,
         }));
         return response.text;
@@ -202,7 +209,7 @@ class ProductionGeminiService implements IGeminiService {
 
     try {
         const response: GenerateContentResponse = await this.retryWithBackoff(() => this.ai!.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: GEMINI_FLASH_MODEL,
             contents: { parts: [imagePart, textPart] },
             config: {
                 responseMimeType: "application/json",
@@ -267,8 +274,8 @@ class ProductionGeminiService implements IGeminiService {
 
     try {
         const response: GenerateContentResponse = await this.retryWithBackoff(() => this.ai!.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: `${prompt}\n\nSDS TEXT:\n${sdsText.substring(0, 30000)}`,
+            model: GEMINI_FLASH_MODEL,
+            contents: `${prompt}\n\nSDS TEXT:\n${sdsText.substring(0, GEMINI_SDS_MAX_TEXT_LENGTH)}`,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -300,7 +307,7 @@ class ProductionGeminiService implements IGeminiService {
 
     try {
       const response: GenerateContentResponse = await this.retryWithBackoff(() => this.ai!.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: GEMINI_FLASH_MODEL,
         contents: prompt,
       }));
       return response.text;

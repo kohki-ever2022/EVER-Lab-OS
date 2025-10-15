@@ -4,6 +4,7 @@ import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useProjectContext } from '../contexts/ProjectContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
+import { sanitizeObject } from '../utils/sanitization';
 // FIX: import from barrel file
 import { Result } from '../types';
 // FIX: import from barrel file
@@ -16,7 +17,8 @@ export const useProjectActions = () => {
     const { addAuditLog } = useAudit();
 
     const addProject = useCallback(async (project: Omit<Project, 'id'>): Promise<Result<Project, Error>> => {
-        const result = await adapter.createProject(project);
+        const sanitizedProject = sanitizeObject(project);
+        const result = await adapter.createProject(sanitizedProject);
         if(result.success){
             addAuditLog('PROJECT_CREATE', `Created project '${result.data.name}'`);
         }
@@ -24,7 +26,8 @@ export const useProjectActions = () => {
     }, [adapter, addAuditLog]);
 
     const updateProject = useCallback(async (project: Project): Promise<Result<Project, Error>> => {
-        const result = await adapter.updateProject(project);
+        const sanitizedProject = sanitizeObject(project);
+        const result = await adapter.updateProject(sanitizedProject);
         if(result.success){
             addAuditLog('PROJECT_UPDATE', `Updated project '${project.name}'`);
         }
@@ -33,8 +36,11 @@ export const useProjectActions = () => {
 
     const addLabNotebookEntry = useCallback(async (entry: Omit<LabNotebookEntry, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<Result<LabNotebookEntry, Error>> => {
         if (!currentUser) return { success: false, error: new Error('User not logged in.') };
+        
+        const { content, ...restOfEntry } = entry;
         const newEntryData: Omit<LabNotebookEntry, 'id'> = {
-            ...entry,
+            ...sanitizeObject(restOfEntry),
+            content,
             userId: currentUser.id,
             createdAt: new Date(), // This will be replaced by serverTimestamp in FirebaseAdapter
             updatedAt: new Date(),
@@ -47,8 +53,13 @@ export const useProjectActions = () => {
     }, [currentUser, adapter, addAuditLog]);
 
     const updateLabNotebookEntry = useCallback(async (entry: LabNotebookEntry): Promise<Result<LabNotebookEntry, Error>> => {
-        const updatedEntry = { ...entry, updatedAt: new Date() }; // client-side update
-        const result = await adapter.updateLabNotebookEntry(updatedEntry);
+        const { content, ...restOfEntry } = entry;
+        const updatedEntry = { 
+            ...sanitizeObject(restOfEntry), 
+            content, 
+            updatedAt: new Date() 
+        };
+        const result = await adapter.updateLabNotebookEntry(updatedEntry as LabNotebookEntry);
         if (result.success) {
             addAuditLog('ELN_ENTRY_UPDATE', `Updated ELN entry '${entry.title}'`);
         }
@@ -72,7 +83,7 @@ export const useProjectActions = () => {
             createdAt: new Date(),
             updatedAt: new Date(),
         };
-        const result = await adapter.createTask(newTaskData);
+        const result = await adapter.createTask(sanitizeObject(newTaskData));
         if (result.success) {
             addAuditLog('TASK_CREATE', `Created task '${result.data.title}'`);
         }
@@ -81,7 +92,7 @@ export const useProjectActions = () => {
 
     const updateTask = useCallback(async (task: Task): Promise<Result<Task, Error>> => {
         const updatedTask = { ...task, updatedAt: new Date() };
-        const result = await adapter.updateTask(updatedTask);
+        const result = await adapter.updateTask(sanitizeObject(updatedTask));
         if (result.success) {
             addAuditLog('TASK_UPDATE', `Updated task '${task.title}'`);
         }
