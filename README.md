@@ -33,8 +33,8 @@ EVER-Lab OSは、共同利用型研究施設向けの統合管理アプリケー
     # When using mock data, set to 'true'; for Firebase, set to 'false'.
     VITE_USE_MOCK_DATA=true
 
-    # AI機能を使用する場合は 'true' を設定 (API_KEYが必須)
-    # Set to 'true' to use AI features (requires API_KEY).
+    # AI機能を使用する場合は 'true' を設定 (VITE_GEMINI_API_KEYが必須)
+    # Set to 'true' to use AI features (requires VITE_GEMINI_API_KEY).
     VITE_USE_MOCK_GEMINI=false
 
     # Firebaseを使用する場合の接続情報
@@ -48,7 +48,7 @@ EVER-Lab OSは、共同利用型研究施設向けの統合管理アプリケー
     
     # Gemini APIを使用する場合のAPIキー
     # Required if VITE_USE_MOCK_GEMINI is 'false'.
-    API_KEY="your-gemini-api-key"
+    VITE_GEMINI_API_KEY="your-gemini-api-key"
     ```
 
 3.  **開発サーバーの起動**:

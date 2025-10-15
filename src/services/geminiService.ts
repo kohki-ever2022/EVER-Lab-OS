@@ -5,6 +5,7 @@ import { Usage, Equipment } from "../types";
 import { Language } from "../types";
 import { SDSSummary } from "../types";
 import { logger } from './logger';
+import { translate, TranslationKey } from '../i18n/translations';
 
 // --- Interface Definition ---
 
@@ -43,25 +44,28 @@ class ProductionGeminiService implements IGeminiService {
   private ai: GoogleGenAI | null = null;
 
   constructor() {
-    // @ts-ignore
-    const apiKey = process.env.API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (apiKey) {
-      this.ai = new GoogleGenAI({ apiKey: apiKey });
+      this.ai = new GoogleGenAI({ apiKey });
     } else {
       logger.warn("Gemini API key not configured. Gemini features will be disabled.");
     }
   }
+  
+  private getErrorMessage(key: TranslationKey, language: Language): string {
+    return translate(key, language);
+  }
+  
+  private getErrorJson(key: TranslationKey, language: Language): string {
+    return JSON.stringify({ error: this.getErrorMessage(key, language) });
+  }
 
   private isAvailable(language: Language): { available: boolean; message: string, jsonMessage: string } {
-    const isJapanese = language === Language.JA;
     if (!this.ai) {
-      const message = isJapanese
-          ? "Gemini APIキーが設定されていないため、この機能は利用できません。"
-          : "This feature is unavailable because the Gemini API key is not set.";
       return {
         available: false,
-        message: message,
-        jsonMessage: JSON.stringify({ error: message })
+        message: this.getErrorMessage('geminiNotAvailable', language),
+        jsonMessage: this.getErrorJson('geminiNotAvailable', language)
       };
     }
     return { available: true, message: '', jsonMessage: '' };
@@ -164,7 +168,7 @@ class ProductionGeminiService implements IGeminiService {
         return response.text;
     } catch (error) {
         logger.error("Failed to fetch usage insights from Gemini after retries", { error: error instanceof Error ? error.message : String(error) });
-        return isJapanese ? "利用傾向の分析中にエラーが発生しました。" : "An error occurred while analyzing usage trends.";
+        return this.getErrorMessage('geminiUsageAnalysisError', language);
     }
   }
 
@@ -229,7 +233,7 @@ class ProductionGeminiService implements IGeminiService {
         return response.text || '';
     } catch (error) {
         logger.error("Failed to fetch UI/UX analysis from Gemini after retries", { error: error instanceof Error ? error.message : String(error) });
-        return JSON.stringify({ error: isJapanese ? "UI/UX分析中にエラーが発生しました。" : "An error occurred during UI/UX analysis." });
+        return this.getErrorJson('geminiUiUxAnalysisError', language);
     }
   }
 
@@ -286,15 +290,13 @@ class ProductionGeminiService implements IGeminiService {
         return response.text || '';
     } catch (error) {
         logger.error("Failed to fetch SDS summary from Gemini after retries", { error: error instanceof Error ? error.message : String(error) });
-        return JSON.stringify({ error: isJapanese ? "SDS要約中にエラーが発生しました。" : "An error occurred during SDS summary." });
+        return this.getErrorJson('geminiSdsSummaryError', language);
     }
   }
 
   async generateText(prompt: string, language: Language): Promise<string> {
     const availability = this.isAvailable(language);
     if (!availability.available) return availability.message;
-
-    const isJapanese = language === Language.JA;
 
     try {
       const response: GenerateContentResponse = await this.retryWithBackoff(() => this.ai!.models.generateContent({
@@ -304,7 +306,7 @@ class ProductionGeminiService implements IGeminiService {
       return response.text;
     } catch (error) {
       logger.error("Failed to generate text from Gemini after retries", { error: error instanceof Error ? error.message : String(error) });
-      return isJapanese ? "テキストの生成中にエラーが発生しました。" : "An error occurred while generating text.";
+      return this.getErrorMessage('geminiTextGenerationError', language);
     }
   }
 }
@@ -406,17 +408,8 @@ class GeminiServiceFactory {
   
   static getService(): IGeminiService {
     if (!this.instance) {
-      const useMock = (() => {
-        try {
-          // @ts-ignore
-          const envValue = process.env?.VITE_USE_MOCK_GEMINI;
-          // Default to production mode. Only use mock if explicitly set to 'true'.
-          return envValue === 'true';
-        } catch (e) {
-          console.warn('⚠️ Could not access process.env, defaulting to production mode for Gemini.');
-          return false;
-        }
-      })();
+      // Vite projects expose env variables on import.meta.env
+      const useMock = import.meta.env.VITE_USE_MOCK_GEMINI === 'true';
       
       if (useMock) {
         console.log('🔧 Using Mock Gemini Service (Development Mode)');

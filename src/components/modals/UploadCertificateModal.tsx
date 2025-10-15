@@ -5,6 +5,7 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useComplianceActions } from '../../hooks/useComplianceActions';
 import { useToast } from '../../contexts/ToastContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface Props {
   certificateToEdit?: Certificate;
@@ -12,7 +13,8 @@ interface Props {
 }
 
 const UploadCertificateModal: React.FC<Props> = ({ certificateToEdit, onClose }) => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t } = useTranslation();
     const { qualifications } = useQmsContext();
     const { addCertificate, updateCertificate } = useComplianceActions();
     const { showToast } = useToast();
@@ -39,7 +41,7 @@ const UploadCertificateModal: React.FC<Props> = ({ certificateToEdit, onClose })
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!currentUser || (!file && !certificateToEdit)) {
-            showToast(isJapanese ? 'ファイルを選択してください。' : 'Please select a file.', 'error');
+            showToast(t('selectFile'), 'error');
             return;
         }
 
@@ -75,20 +77,20 @@ const UploadCertificateModal: React.FC<Props> = ({ certificateToEdit, onClose })
             : await addCertificate(data as Omit<Certificate, 'id'>);
 
         if (result.success) {
-            showToast(isJapanese ? '証明書を保存しました。' : 'Certificate saved.', 'success');
+            showToast(t('certificateSaved'), 'success');
             onClose();
         } else {
-            showToast(isJapanese ? '保存に失敗しました。' : 'Failed to save certificate.', 'error');
+            showToast(t('certificateSaveFailed'), 'error');
         }
     }
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 modal-backdrop">
             <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg modal-content max-h-[90vh] overflow-y-auto">
-                <h3 className="text-xl font-bold mb-4">{certificateToEdit ? (isJapanese ? '証明書更新' : 'Update Certificate') : (isJapanese ? '新規証明書アップロード' : 'Upload New Certificate')}</h3>
+                <h3 className="text-xl font-bold mb-4">{certificateToEdit ? t('updateCertificate') : t('uploadNewCertificate')}</h3>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">{isJapanese ? '証明書タイプ' : 'Certificate Type'}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('certificateType')}</label>
                         <select name="certificateType" value={formData.certificateType} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                             <option value="TRAINING">Training</option>
                             <option value="MYCOPLASMA">Mycoplasma Test</option>
@@ -96,26 +98,26 @@ const UploadCertificateModal: React.FC<Props> = ({ certificateToEdit, onClose })
                         </select>
                     </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700">{isJapanese ? '発行日' : 'Issue Date'}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('issueDate')}</label>
                         <input type="date" name="issueDate" value={formData.issueDate} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">{isJapanese ? '有効期限' : 'Expiry Date'}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('expiryDate')}</label>
                         <input type="date" name="expiryDate" value={formData.expiryDate} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
                     </div>
                     <div>
-                         <label className="block text-sm font-medium text-gray-700">{isJapanese ? '証明書ファイル' : 'Certificate File'}</label>
+                         <label className="block text-sm font-medium text-gray-700">{t('certificateFile')}</label>
                          <input type="file" onChange={handleFileChange} className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required={!certificateToEdit} />
-                         {certificateToEdit?.fileName && <p className="text-xs text-gray-500 mt-1">{isJapanese ? '現在:' : 'Current:'} {certificateToEdit.fileName}</p>}
+                         {certificateToEdit?.fileName && <p className="text-xs text-gray-500 mt-1">{t('currentFile')} {certificateToEdit.fileName}</p>}
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'メモ' : 'Notes'}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('notes')}</label>
                         <textarea name="notes" value={formData.notes} onChange={handleChange} rows={3} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
                     </div>
                 </div>
                  <div className="mt-6 flex justify-end space-x-2">
-                    <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-                    <button type="submit" className="px-4 py-2 bg-ever-blue text-white rounded-md hover:bg-ever-blue-dark">{isJapanese ? '保存' : 'Save'}</button>
+                    <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{t('cancel')}</button>
+                    <button type="submit" className="px-4 py-2 bg-ever-blue text-white rounded-md hover:bg-ever-blue-dark">{t('save')}</button>
                 </div>
             </form>
         </div>

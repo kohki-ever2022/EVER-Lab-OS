@@ -5,9 +5,11 @@ import InvoiceCard from './InvoiceCard';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useBillingContext } from '../../contexts/AppProviders';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const Billing: React.FC = () => {
-  const { currentUser, isJapanese } = useSessionContext();
+  const { currentUser } = useSessionContext();
+  const { t } = useTranslation();
   const { invoices } = useBillingContext();
   const { hasPermission } = usePermissions();
   
@@ -16,8 +18,8 @@ const Billing: React.FC = () => {
   if (!hasPermission('billing', 'read')) {
       return (
           <div className="text-center py-12">
-              <h3 className="text-lg font-medium text-gray-900">{isJapanese ? 'アクセス権がありません' : 'Permission Denied'}</h3>
-              <p className="mt-1 text-sm text-gray-500">{isJapanese ? 'このページを閲覧する権限がありません。' : 'You do not have permission to view this page.'}</p>
+              <h3 className="text-lg font-medium text-gray-900">{t('permissionDenied')}</h3>
+              <p className="mt-1 text-sm text-gray-500">{t('permissionDeniedViewPage')}</p>
           </div>
       );
   }
@@ -28,21 +30,21 @@ const Billing: React.FC = () => {
     if (invoice.mfPdfUrl) {
       window.open(invoice.mfPdfUrl, '_blank');
     } else {
-      alert(isJapanese ? 'PDFデータを表示できません。この機能は現在利用できません。' : 'Cannot display PDF data. This feature is currently unavailable.');
+      alert(t('cannotDisplayPdf'));
     }
   };
 
   const downloadPDF = async (invoice: Invoice) => {
     if (invoice.mfPdfUrl) {
-        alert(isJapanese ? 'このPDFは直接ダウンロードできません。「PDF表示」から保存してください。' : 'This PDF cannot be downloaded directly. Please save from "View PDF".');
+        alert(t('cannotDownloadPdf'));
     } else {
-        alert(isJapanese ? 'PDFデータをダウンロードできません。この機能は現在利用できません。' : 'Cannot download PDF data. This feature is currently unavailable.');
+        alert(t('cannotDisplayPdf'));
     }
   };
   
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">{isJapanese ? '請求書一覧' : 'Invoices'}</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('invoices')}</h1>
       
       {myInvoices.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
@@ -56,7 +58,7 @@ const Billing: React.FC = () => {
             ))}
         </div>
       ) : (
-        <p>{isJapanese ? '利用可能な請求書はありません。' : 'No invoices available.'}</p>
+        <p>{t('noInvoicesAvailable')}</p>
       )}
     </div>
   );

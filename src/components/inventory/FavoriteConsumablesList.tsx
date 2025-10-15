@@ -7,13 +7,16 @@ import { useToast } from '../../contexts/ToastContext';
 import { useInventoryActions } from '../../hooks/useInventoryActions';
 import { useFavorites } from '../../hooks/useFavorites';
 import { HeartIconFill } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const FavoriteConsumablesList: React.FC = () => {
-    const { currentUser, isJapanese } = useSessionContext();
+    // FIX: Destructure 'isJapanese' from 'useTranslation' hook
+    const { currentUser } = useSessionContext();
     const { consumables } = useConsumableContext();
     const { showToast } = useToast();
     const { addOrder } = useInventoryActions();
     const { getFavorites, toggleFavorite } = useFavorites();
+    const { t, isJapanese } = useTranslation();
 
     const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
     const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -60,7 +63,7 @@ const FavoriteConsumablesList: React.FC = () => {
         const quantity = quantities[item.id] || 1;
 
         if (item.price === undefined) {
-            showToast(isJapanese ? 'このアイテムは購入できません。' : 'This item cannot be purchased.', 'error');
+            showToast(t('itemCannotBePurchased'), 'error');
             setOrderingId(null);
             return;
         }
@@ -76,7 +79,7 @@ const FavoriteConsumablesList: React.FC = () => {
         if (result.success === false) {
             showToast(result.error.message, 'error');
         } else {
-            showToast(isJapanese ? '注文が完了しました。' : 'Order placed successfully.', 'success');
+            showToast(t('orderPlacedSuccessfully'), 'success');
         }
         setOrderingId(null);
     };
@@ -86,12 +89,12 @@ const FavoriteConsumablesList: React.FC = () => {
     return (
         <div>
             <h2 className="text-3xl font-bold mb-6 text-ever-black">
-                {isJapanese ? 'お気に入り' : 'Favorites'}
+                {t('favorites')}
             </h2>
 
             {favoriteItems.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-lg shadow">
-                    <p className="text-gray-500">{isJapanese ? 'お気に入りに登録されたアイテムはありません。' : 'You have no favorite items.'}</p>
+                    <p className="text-gray-500">{t('noFavorites')}</p>
                 </div>
             ) : (
                 <div className="space-y-4">
@@ -99,7 +102,7 @@ const FavoriteConsumablesList: React.FC = () => {
                         <div key={item.id} className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
                             <div className="flex-1 min-w-0">
                                 <p className="font-bold truncate">{isJapanese ? item.nameJP : item.nameEN}</p>
-                                <p className="text-sm text-gray-600">{isJapanese ? '在庫:' : 'Stock:'} {item.stock}</p>
+                                <p className="text-sm text-gray-600">{t('stock')} {item.stock}</p>
                                 {item.price !== undefined && <p className="text-sm font-semibold text-ever-purple">¥{item.price.toLocaleString()}</p>}
                             </div>
                             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 ml-4">
@@ -118,11 +121,11 @@ const FavoriteConsumablesList: React.FC = () => {
                                             className="bg-ever-blue text-white font-bold py-2 px-4 rounded-lg text-sm disabled:bg-gray-400"
                                             disabled={orderingId === item.id}
                                         >
-                                            {orderingId === item.id ? (isJapanese ? '注文中...' : 'Ordering...') : (isJapanese ? '注文' : 'Order')}
+                                            {orderingId === item.id ? t('ordering') : t('order')}
                                         </button>
                                     </>
                                 )}
-                                <button onClick={() => handleToggleFavorite(item.id)} className="p-2 rounded-full hover:bg-red-100 transition-colors" title={isJapanese ? 'お気に入りから削除' : 'Remove from favorites'}>
+                                <button onClick={() => handleToggleFavorite(item.id)} className="p-2 rounded-full hover:bg-red-100 transition-colors" title={t('removeFromFavorites')}>
                                     <HeartIconFill />
                                 </button>
                             </div>

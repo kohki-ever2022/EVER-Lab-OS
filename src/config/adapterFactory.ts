@@ -24,25 +24,14 @@ class AdapterFactory {
    */
   static getAdapter(): IDataAdapter {
     if (!this.instance) {
-      const useMock = (() => {
-        try {
-          // @ts-ignore
-          const envValue = process.env?.VITE_USE_MOCK_DATA;
-          if (envValue === undefined || envValue === null || envValue === '') {
-            console.warn('⚠️ VITE_USE_MOCK_DATA not set, defaulting to mock mode');
-            return true;
-          }
-          return envValue === 'true';
-        } catch (e) {
-          console.warn('⚠️ Could not access process.env, defaulting to mock mode');
-          return true;
-        }
-      })();
+      // Vite projects expose env variables on import.meta.env
+      const useMock = import.meta.env.VITE_USE_MOCK_DATA === 'true';
       
       if (useMock) {
         console.log('🔧 Using Mock Adapter (Development Mode)');
         this.instance = new MockAdapter();
       } else {
+        // Default to Firebase if VITE_USE_MOCK_DATA is not 'true'
         console.log('🚀 Using Firebase Adapter (Production Mode)');
         this.instance = new FirebaseAdapter();
       }

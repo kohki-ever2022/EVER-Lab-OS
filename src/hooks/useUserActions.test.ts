@@ -9,7 +9,6 @@ import { SessionContext, SessionContextType } from '../contexts/SessionContext';
 import { DataAdapterContext } from '../contexts/DataAdapterContext';
 import { UserContext, UserContextValue } from '../contexts/UserContext';
 import { AdminContext, AdminContextValue } from '../contexts/app/AdminContext';
-// FIX: Add missing 'Language' import and other types for a complete mock
 import { Role, RoleCategory, User, Language, SystemSettings, Plan, EquipmentManual, MonthlyReport, BenchAssignment, InventorySnapshot, AuditLog } from '../types';
 
 // Mock Data Adapter
@@ -26,7 +25,6 @@ const mockUsers: User[] = [
 const mockFacilityDirector: User = { id: 'admin-user', name: 'Admin', email: 'admin@test.com', companyId: 'company-lab', role: Role.FacilityDirector, roleCategory: RoleCategory.Facility, password: 'password' };
 
 
-// FIX: Refactored createWrapper to use a fully-typed mock for AdminContext, which resolves TSX parsing issues in .ts files by removing the problematic type cast on a partial object.
 const createWrapper = (
     adapter: IDataAdapter, 
     sessionContextValue: Partial<SessionContextType>,
@@ -38,7 +36,6 @@ const createWrapper = (
     setLanguage: vi.fn(),
     login: vi.fn(),
     logout: vi.fn(),
-    isJapanese: false,
     isFacilityStaff: false,
     isTenantStaff: false,
     ...sessionContextValue,
@@ -60,17 +57,25 @@ const createWrapper = (
 
   const userContextValue: UserContextValue = { users, loading: false };
 
-  return ({ children }: { children: ReactNode }) => (
-    <DataAdapterContext.Provider value={adapter}>
-      <SessionContext.Provider value={fullSessionContextValue}>
-        <AdminContext.Provider value={adminContextValue}>
-            <UserContext.Provider value={userContextValue}>
-                {children}
-            </UserContext.Provider>
-        </AdminContext.Provider>
-      </SessionContext.Provider>
-    </DataAdapterContext.Provider>
-  );
+  return ({ children }: { children: ReactNode }) => {
+    return React.createElement(
+      DataAdapterContext.Provider,
+      { value: adapter },
+      React.createElement(
+        SessionContext.Provider,
+        { value: fullSessionContextValue },
+        React.createElement(
+          AdminContext.Provider,
+          { value: adminContextValue },
+          React.createElement(
+            UserContext.Provider,
+            { value: userContextValue },
+            children
+          )
+        )
+      )
+    );
+  };
 };
 
 
@@ -81,7 +86,7 @@ describe('useUserActions', () => {
 
   const adminSessionContext: Partial<SessionContextType> = {
     currentUser: mockFacilityDirector,
-    isJapanese: false,
+    language: Language.EN,
     isFacilityStaff: true,
     isTenantStaff: false,
   };
@@ -107,7 +112,7 @@ describe('useUserActions', () => {
   it('should fail to add a user if lacking permissions', async () => {
     const researcherSessionContext: Partial<SessionContextType> = {
       currentUser: mockUsers[0], // A researcher
-      isJapanese: false,
+      language: Language.EN,
       isFacilityStaff: false,
       isTenantStaff: true,
     };

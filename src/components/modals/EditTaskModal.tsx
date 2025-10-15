@@ -6,6 +6,7 @@ import { useUserContext } from '../../contexts/UserContext';
 import { useProjectContext } from '../../contexts/ProjectContext';
 import { useProjectActions } from '../../hooks/useProjectActions';
 import { useToast } from '../../contexts/ToastContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface Props {
     task: Task | null;
@@ -13,7 +14,8 @@ interface Props {
 }
 
 const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t } = useTranslation();
     const { users } = useUserContext();
     const { projects } = useProjectContext();
     const { addTask, updateTask, deleteTask } = useProjectActions();
@@ -65,7 +67,7 @@ const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.title) {
-            showToast(isJapanese ? 'タイトルは必須です。' : 'Title is required.', 'error');
+            showToast(t('titleRequired'), 'error');
             return;
         }
 
@@ -77,22 +79,22 @@ const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
             : await updateTask({ ...task, ...taskData } as Task);
         
         if (result.success) {
-            showToast(isJapanese ? 'タスクを保存しました。' : 'Task saved.', 'success');
+            showToast(t('taskSaved'), 'success');
             onClose();
         } else {
-            showToast(isJapanese ? '保存に失敗しました。' : 'Failed to save task.', 'error');
+            showToast(t('taskSaveFailed'), 'error');
         }
     };
     
     const handleDelete = async () => {
         if (!task) return;
-        if (window.confirm(isJapanese ? 'このタスクを削除しますか？' : 'Are you sure you want to delete this task?')) {
+        if (window.confirm(t('deleteTaskConfirm'))) {
             const result = await deleteTask(task.id);
             if (result.success) {
-                showToast(isJapanese ? 'タスクを削除しました。' : 'Task deleted.', 'success');
+                showToast(t('taskDeleted'), 'success');
                 onClose();
             } else {
-                showToast(isJapanese ? '削除に失敗しました。' : 'Failed to delete task.', 'error');
+                showToast(t('deleteTaskFailed'), 'error');
             }
         }
     };
@@ -100,15 +102,15 @@ const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 modal-backdrop">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl modal-content max-h-[90vh] flex flex-col">
-                <h3 className="text-xl font-bold mb-4">{isNewTask ? (isJapanese ? '新規タスク' : 'New Task') : (isJapanese ? 'タスク編集' : 'Edit Task')}</h3>
+                <h3 className="text-xl font-bold mb-4">{isNewTask ? t('newTask') : t('editTask')}</h3>
                 <div className="flex-grow overflow-y-auto pr-2 space-y-4">
-                    <input type="text" name="title" placeholder={isJapanese ? "タスクのタイトル" : "Task Title"} value={formData.title} onChange={handleChange} className="w-full text-lg font-bold border-b-2 pb-1 focus:outline-none focus:border-ever-blue" />
-                    <textarea name="description" placeholder={isJapanese ? "詳細..." : "Description..."} value={formData.description} onChange={handleChange} className="w-full border rounded-md p-2 text-sm" rows={4}></textarea>
+                    <input type="text" name="title" placeholder={t("taskTitle")} value={formData.title} onChange={handleChange} className="w-full text-lg font-bold border-b-2 pb-1 focus:outline-none focus:border-ever-blue" />
+                    <textarea name="description" placeholder={t("description")} value={formData.description} onChange={handleChange} className="w-full border rounded-md p-2 text-sm" rows={4}></textarea>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Assignees */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">{isJapanese ? '担当者' : 'Assignees'}</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('assignees')}</label>
                             <div className="max-h-24 overflow-y-auto border rounded-md p-2 space-y-1">
                                 {companyMembers.map(member => (
                                     <label key={member.id} className="flex items-center text-sm">
@@ -120,9 +122,10 @@ const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
                         </div>
                         {/* Project */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'プロジェクト' : 'Project'}</label>
+                            {/* FIX: Use 'project' translation key which has been added to translations.ts. */}
+                            <label className="block text-sm font-medium text-gray-700">{t('project')}</label>
                             <select name="projectId" value={formData.projectId} onChange={handleChange} className="w-full border rounded p-2 mt-1 text-sm">
-                                <option value="">{isJapanese ? 'なし' : 'None'}</option>
+                                <option value="">{t('none')}</option>
                                 {myProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                             </select>
                         </div>
@@ -130,23 +133,23 @@ const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'ステータス' : 'Status'}</label>
+                            <label className="block text-sm font-medium text-gray-700">{t('status')}</label>
                             <select name="status" value={formData.status} onChange={handleChange} className="w-full border rounded p-2 mt-1 text-sm">
                                 {Object.values(TaskStatus).map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">{isJapanese ? '優先度' : 'Priority'}</label>
+                            <label className="block text-sm font-medium text-gray-700">{t('priority')}</label>
                             <select name="priority" value={formData.priority} onChange={handleChange} className="w-full border rounded p-2 mt-1 text-sm">
                                 {Object.values(TaskPriority).map(p => <option key={p} value={p}>{p}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">{isJapanese ? '開始日' : 'Start Date'}</label>
+                            <label className="block text-sm font-medium text-gray-700">{t('startDate')}</label>
                             <input type="date" value={formData.startDate ? new Date(formData.startDate).toISOString().split('T')[0] : ''} onChange={e => handleDateChange('startDate', e.target.value)} className="w-full border rounded p-2 mt-1 text-sm" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">{isJapanese ? '期限日' : 'Due Date'}</label>
+                            <label className="block text-sm font-medium text-gray-700">{t('taskDueDate')}</label>
                             <input type="date" value={formData.dueDate ? new Date(formData.dueDate).toISOString().split('T')[0] : ''} onChange={e => handleDateChange('dueDate', e.target.value)} className="w-full border rounded p-2 mt-1 text-sm" />
                         </div>
                     </div>
@@ -154,12 +157,12 @@ const EditTaskModal: React.FC<Props> = ({ task, onClose }) => {
                 <div className="flex justify-between items-center mt-6 pt-4 border-t">
                     <div>
                         {!isNewTask && (
-                             <button onClick={handleDelete} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">{isJapanese ? '削除' : 'Delete'}</button>
+                             <button onClick={handleDelete} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">{t('delete')}</button>
                         )}
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-                        <button onClick={handleSave} className="px-4 py-2 bg-ever-blue text-white rounded-md hover:bg-ever-blue-dark">{isJapanese ? '保存' : 'Save'}</button>
+                        <button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{t('cancel')}</button>
+                        <button onClick={handleSave} className="px-4 py-2 bg-ever-blue text-white rounded-md hover:bg-ever-blue-dark">{t('save')}</button>
                     </div>
                 </div>
             </div>

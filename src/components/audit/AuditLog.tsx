@@ -34,7 +34,6 @@ const AuditLog: React.FC = () => {
                     <thead className="bg-gray-50">
                         <tr>
                             <th scope="col" className="px-2 py-3 sm:px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('timestamp')}</th>
-                            {/* FIX: Use translation key for 'User' header */}
                             <th scope="col" className="px-2 py-3 sm:px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('user')}</th>
                             <th scope="col" className="px-2 py-3 sm:px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('actions')}</th>
                             <th scope="col" className="px-2 py-3 sm:px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('details')}</th>

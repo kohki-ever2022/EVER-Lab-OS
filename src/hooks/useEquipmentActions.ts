@@ -11,12 +11,11 @@ import {
   MaintenanceLog,
   Result,
 } from '../types';
-// FIX: import from barrel file
 import { NotificationType } from '../types';
-// FIX: import from barrel file
 import { RoleCategory } from '../types';
 import { useEquipmentContext } from '../contexts/EquipmentContext';
 import { useUserContext } from '../contexts/UserContext';
+import { useTranslation } from './useTranslation';
 
 export const useEquipmentActions = () => {
     const adapter = useDataAdapter();
@@ -25,6 +24,7 @@ export const useEquipmentActions = () => {
     const { users } = useUserContext();
     const { addAuditLog } = useAudit();
     const { addNotification } = useNotifications();
+    const { t, isJapanese } = useTranslation();
 
     const addEquipment = useCallback(async (equipmentItem: Omit<Equipment, 'id'>): Promise<Result<Equipment, Error>> => {
         const result = await adapter.createEquipment(equipmentItem);
@@ -43,21 +43,26 @@ export const useEquipmentActions = () => {
 
             if (prevEq && prevEq.status !== EquipmentStatus.Maintenance && equipmentItem.status === EquipmentStatus.Maintenance) {
                 const staffToNotify = users.filter(u => u.roleCategory === RoleCategory.Facility);
+                const equipmentName = isJapanese ? equipmentItem.nameJP : equipmentItem.nameEN;
+                const notificationMessage = t('notificationEquipmentMaintenance', { name: equipmentName });
+                const notificationTitle = t('notificationEquipmentMalfunctionTitle');
+
                 staffToNotify.forEach(staff => {
                     addNotification({
                         recipientUserId: staff.id,
                         type: NotificationType.EquipmentMalfunction,
                         priority: 'HIGH',
-                        titleJP: '機器の不具合報告', titleEN: 'Equipment Malfunction',
-                        messageJP: `${equipmentItem.nameJP}がメンテナンス状態になりました。`,
-                        messageEN: `${equipmentItem.nameEN} has been set to maintenance status.`,
+                        titleJP: notificationTitle,
+                        titleEN: notificationTitle,
+                        messageJP: notificationMessage,
+                        messageEN: notificationMessage,
                         actionUrl: `#/equipmentManagement`,
                     });
                 });
             }
         }
         return result;
-    }, [adapter, equipment, users, addAuditLog, addNotification]);
+    }, [adapter, equipment, users, addAuditLog, addNotification, t, isJapanese]);
     
     const deleteEquipment = useCallback(async (equipmentId: string): Promise<Result<void, Error>> => {
         const itemToDelete = equipment.find(e => e.id === equipmentId);
@@ -101,10 +106,10 @@ export const useEquipmentActions = () => {
                     recipientUserId: staff.id,
                     type: NotificationType.EquipmentMalfunction,
                     priority: 'HIGH',
-                    titleJP: '緊急停止発動',
-                    titleEN: 'Emergency Stop Activated',
-                    messageJP: '全ての機器が緊急停止されました。',
-                    messageEN: 'All equipment has been put into emergency maintenance status.',
+                    titleJP: t('notificationEmergencyStopTitle'),
+                    titleEN: t('notificationEmergencyStopTitle'),
+                    messageJP: t('notificationEmergencyStop'),
+                    messageEN: t('notificationEmergencyStop'),
                     actionUrl: `#/equipmentManagement`,
                 });
             });
@@ -113,7 +118,7 @@ export const useEquipmentActions = () => {
         } catch (e) {
             return { success: false, error: e instanceof Error ? e : new Error(String(e)) };
         }
-    }, [equipment, users, adapter, addAuditLog, addNotification]);
+    }, [equipment, users, adapter, addAuditLog, addNotification, t]);
 
     return useMemo(() => ({
         addEquipment,

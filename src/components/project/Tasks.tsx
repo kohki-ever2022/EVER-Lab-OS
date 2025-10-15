@@ -6,6 +6,7 @@ import { useModalContext } from '../../contexts/ModalContext';
 // FIX: import from barrel file
 import { Task, TaskStatus, TaskPriority, User } from '../../types';
 import { PriorityUrgentIcon, PriorityHighIcon, PriorityMediumIcon, PriorityLowIcon } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const PriorityIcon: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
     const iconMap = {
@@ -53,7 +54,8 @@ const TaskCard: React.FC<{ task: Task, users: User[] }> = ({ task, users }) => {
 };
 
 const Tasks: React.FC = () => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t } = useTranslation();
     const { tasks } = useProjectContext();
     const { users } = useUserContext();
     const { openModal } = useModalContext();
@@ -63,11 +65,12 @@ const Tasks: React.FC = () => {
         return tasks.filter(t => t.assigneeIds.includes(currentUser.id) || t.createdByUserId === currentUser.id);
     }, [tasks, currentUser]);
 
-    const columns: { status: TaskStatus, titleJP: string, titleEN: string }[] = [
-        { status: TaskStatus.ToDo, titleJP: '未着手', titleEN: 'To Do' },
-        { status: TaskStatus.InProgress, titleJP: '進行中', titleEN: 'In Progress' },
-        { status: TaskStatus.InReview, titleJP: 'レビュー中', titleEN: 'In Review' },
-        { status: TaskStatus.Done, titleJP: '完了', titleEN: 'Done' },
+    // FIX: Use translation keys for task statuses.
+    const columns: { status: TaskStatus, title: string }[] = [
+        { status: TaskStatus.ToDo, title: t('taskStatusToDo') },
+        { status: TaskStatus.InProgress, title: t('taskStatusInProgress') },
+        { status: TaskStatus.InReview, title: t('taskStatusInReview') },
+        { status: TaskStatus.Done, title: t('done') },
     ];
 
     const tasksByStatus = useMemo(() => {
@@ -87,20 +90,21 @@ const Tasks: React.FC = () => {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-ever-black">
-                    {isJapanese ? 'タスク管理' : 'Task Management'}
+                    {/* FIX: Use 'taskManagement' translation key. */}
+                    {t('taskManagement')}
                 </h2>
                 <button
                     onClick={() => openModal({ type: 'editTask', props: { task: null } })}
                     className="bg-ever-blue hover:bg-ever-blue-dark text-white font-bold py-2 px-4 rounded-lg"
                 >
-                    {isJapanese ? '新規タスク' : 'New Task'}
+                    {t('newTask')}
                 </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {columns.map(col => (
                     <div key={col.status} className="bg-gray-100 rounded-lg p-3">
-                        <h3 className="font-semibold mb-3 px-1">{isJapanese ? col.titleJP : col.titleEN} ({tasksByStatus[col.status].length})</h3>
+                        <h3 className="font-semibold mb-3 px-1">{col.title} ({tasksByStatus[col.status].length})</h3>
                         <div className="space-y-3 h-[calc(100vh-20rem)] overflow-y-auto pr-1">
                             {tasksByStatus[col.status].map(task => (
                                 <TaskCard key={task.id} task={task} users={users} />

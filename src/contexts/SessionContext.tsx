@@ -7,7 +7,6 @@ export interface SessionContextType {
   currentUser: CurrentUser | null;
   login: (user: User) => boolean;
   logout: () => void;
-  isJapanese: boolean;
   isFacilityStaff: boolean;
   isTenantStaff: boolean;
 }
@@ -25,8 +24,6 @@ interface SessionProviderProps {
 export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [language, setLanguage] = useState<Language>(Language.JA);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  
-  const isJapanese = useMemo(() => language === Language.JA, [language]);
 
   const isFacilityStaff = useMemo(() => {
     if (!currentUser) return false;
@@ -57,10 +54,9 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     currentUser,
     login,
     logout,
-    isJapanese,
     isFacilityStaff,
     isTenantStaff,
-  }), [language, setLanguage, currentUser, login, logout, isJapanese, isFacilityStaff, isTenantStaff]);
+  }), [language, currentUser, login, logout, isFacilityStaff, isTenantStaff]);
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 };

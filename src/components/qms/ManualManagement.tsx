@@ -12,9 +12,11 @@ import MarkdownRenderer from '../common/MarkdownRenderer';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export const ManualManagement: React.FC = () => {
-  const { currentUser, isFacilityStaff, isJapanese } = useSessionContext();
+  const { currentUser, isFacilityStaff } = useSessionContext();
+  const { t, isJapanese } = useTranslation();
   const { manuals } = useQmsContext();
   const { hasPermission } = usePermissions();
 
@@ -63,33 +65,33 @@ export const ManualManagement: React.FC = () => {
 
 
   if (!canReadManuals) {
-    return <div>{isJapanese ? 'アクセス権がありません。' : 'Permission Denied.'}</div>;
+    return <div>{t('permissionDenied')}</div>;
   }
   
-  const categoryLabels: Record<ManualCategory, { jp: string, en: string }> = {
-    [ManualCategory.GettingStarted]: { jp: 'はじめに', en: 'Getting Started' },
-    [ManualCategory.EquipmentOperation]: { jp: '機器操作', en: 'Equipment Operation' },
-    [ManualCategory.SafetyProcedures]: { jp: '安全手順', en: 'Safety Procedures' },
-    [ManualCategory.EmergencyResponse]: { jp: '緊急時対応', en: 'Emergency Response' },
-    [ManualCategory.Compliance]: { jp: 'コンプライアンス', en: 'Compliance' },
-    [ManualCategory.DataManagement]: { jp: 'データ管理', en: 'Data Management' },
-    [ManualCategory.Maintenance]: { jp: 'メンテナンス', en: 'Maintenance' },
-    [ManualCategory.TenantGuide]: { jp: 'テナントガイド', en: 'Tenant Guide' },
-    [ManualCategory.FacilityStaffGuide]: { jp: '施設スタッフガイド', en: 'Facility Staff Guide' },
-    [ManualCategory.FAQ]: { jp: 'FAQ', en: 'FAQ' },
-    [ManualCategory.Other]: { jp: 'その他', en: 'Other' },
+  const categoryLabels = {
+    [ManualCategory.GettingStarted]: { key: 'categoryGettingStarted' },
+    [ManualCategory.EquipmentOperation]: { key: 'categoryEquipment' },
+    [ManualCategory.SafetyProcedures]: { key: 'categorySafety' },
+    [ManualCategory.EmergencyResponse]: { key: 'categoryEmergency' },
+    [ManualCategory.Compliance]: { key: 'categoryCompliance' },
+    [ManualCategory.DataManagement]: { key: 'categoryData' },
+    [ManualCategory.Maintenance]: { key: 'categoryMaintenance' },
+    [ManualCategory.TenantGuide]: { key: 'categoryTenant' },
+    [ManualCategory.FacilityStaffGuide]: { key: 'categoryFacility' },
+    [ManualCategory.FAQ]: { key: 'categoryFAQ' },
+    [ManualCategory.Other]: { key: 'categoryOther' },
   };
 
   return (
     <div>
-      <h2 className="text-3xl font-bold mb-6 text-ever-black">{isJapanese ? 'マニュアル' : 'Manuals'}</h2>
+      <h2 className="text-3xl font-bold mb-6 text-ever-black">{t('manuals')}</h2>
       <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-12rem)]">
         {/* Left Panel */}
         <div className="w-full md:w-1/3 bg-white rounded-lg shadow-md flex flex-col">
           <div className="p-4 border-b">
             <input
               type="text"
-              placeholder={isJapanese ? "検索..." : "Search..."}
+              placeholder={t('search')}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full border rounded-md p-2 text-sm mb-2"
@@ -99,9 +101,9 @@ export const ManualManagement: React.FC = () => {
               onChange={e => setSelectedCategory(e.target.value as ManualCategory | 'ALL')}
               className="w-full border rounded-md p-2 text-sm"
             >
-              <option value="ALL">{isJapanese ? '全カテゴリ' : 'All Categories'}</option>
-              {Object.entries(categoryLabels).map(([key, labels]) => (
-                <option key={key} value={key as ManualCategory}>{isJapanese ? labels.jp : labels.en}</option>
+              <option value="ALL">{t('allCategories')}</option>
+              {Object.entries(categoryLabels).map(([key, {key: tKey}]) => (
+                <option key={key} value={key as ManualCategory}>{t(tKey as any)}</option>
               ))}
             </select>
           </div>
@@ -113,7 +115,7 @@ export const ManualManagement: React.FC = () => {
                 className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${selectedManual?.id === manual.id ? 'bg-ever-blue-light' : ''}`}
               >
                 <h4 className="font-semibold truncate">{isJapanese ? manual.titleJP : manual.titleEN}</h4>
-                <p className="text-sm text-gray-500">{isJapanese ? categoryLabels[manual.category].jp : categoryLabels[manual.category].en}</p>
+                <p className="text-sm text-gray-500">{t(categoryLabels[manual.category].key as any)}</p>
               </div>
             ))}
           </div>
@@ -124,14 +126,14 @@ export const ManualManagement: React.FC = () => {
           {selectedManual ? (
             <div className="p-6">
               <h3 className="text-2xl font-bold mb-2">{isJapanese ? selectedManual.titleJP : selectedManual.titleEN}</h3>
-              <p className="text-sm text-gray-500 mb-4">{isJapanese ? '最終更新日:' : 'Last Updated:'} {new Date(selectedManual.updatedAt).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-500 mb-4">{t('lastUpdated')} {new Date(selectedManual.updatedAt).toLocaleDateString()}</p>
               <div className="prose max-w-none">
                 <MarkdownRenderer markdown={isJapanese ? selectedManual.contentJP : selectedManual.contentEN} />
               </div>
             </div>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500">
-              <p>{isJapanese ? 'マニュアルを選択してください。' : 'Please select a manual.'}</p>
+              <p>{t('selectManual')}</p>
             </div>
           )}
         </div>

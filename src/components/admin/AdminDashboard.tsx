@@ -20,7 +20,6 @@ interface ResultModalProps {
     title: string;
     results: string[];
     onClose: () => void;
-    isJapanese: boolean;
 }
 
 const InfoCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode }> = ({ title, value, icon }) => (
@@ -34,7 +33,7 @@ const InfoCard: React.FC<{ title: string; value: string | number; icon: React.Re
 );
 
 
-const ResultModal: React.FC<ResultModalProps> = ({ title, results, onClose, isJapanese }) => {
+const ResultModal: React.FC<ResultModalProps> = ({ title, results, onClose }) => {
     const { t } = useTranslation();
     return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -93,17 +92,17 @@ export const AdminDashboard: React.FC = () => {
 
     const handleProcessNoShows = () => {
         // This is a mock implementation. Real implementation would be more complex.
-        showToast(isJapanese ? 'No-Showの処理を実行しました。' : 'Processed No-Shows.', 'success');
+        showToast(t('noShowProcessed'), 'success');
     };
 
     const handleProcessAutoCheckouts = () => {
         // This is a mock implementation.
-        showToast(isJapanese ? '自動チェックアウトの処理を実行しました。' : 'Processed Auto Check-outs.', 'success');
+        showToast(t('autoCheckoutProcessed'), 'success');
     }
     
     const handleSendReminders = () => {
         // This is a mock implementation.
-        showToast(isJapanese ? 'リマインダーを送信しました。' : 'Reminders sent.', 'success');
+        showToast(t('remindersSent'), 'success');
     };
 
     const handleEmergencyStop = async () => {
@@ -111,9 +110,9 @@ export const AdminDashboard: React.FC = () => {
             if (emergencyStopAllEquipment) {
                 const result = await emergencyStopAllEquipment();
                 if (result.success === false) {
-                    showToast(isJapanese ? `緊急停止に失敗しました: ${result.error.message}` : `Emergency stop failed: ${result.error.message}`, 'error');
+                    showToast(t('emergencyStopFailed') + `: ${result.error.message}`, 'error');
                 } else {
-                    showToast(isJapanese ? '全機器を緊急停止し、ユーザーに通知しました。' : 'All equipment has been stopped and users have been notified.', 'info');
+                    showToast(t('emergencyStopSuccess'), 'info');
                 }
             }
         }
@@ -142,11 +141,9 @@ export const AdminDashboard: React.FC = () => {
             });
     }, [usage, equipment, isJapanese]);
     
-    const timeFormat: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
-
     return (
         <div>
-            {modalContent && <ResultModal title={modalContent.title} results={modalContent.results} onClose={() => setModalContent(null)} isJapanese={isJapanese} />}
+            {modalContent && <ResultModal title={modalContent.title} results={modalContent.results} onClose={() => setModalContent(null)} />}
             <h2 className="text-3xl font-bold mb-6 text-ever-black">
                 {t('adminDashboard')}
             </h2>

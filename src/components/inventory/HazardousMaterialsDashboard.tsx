@@ -1,9 +1,9 @@
 import React from 'react';
-import { useSessionContext } from '../../contexts/SessionContext';
 import { useConsumableContext } from '../../contexts/ConsumableContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useModalContext } from '../../contexts/ModalContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 // FIX: import from barrel file
 import { View } from '../../types';
@@ -11,7 +11,7 @@ import { View } from '../../types';
 import { Consumable } from '../../types';
 
 export const HazardousMaterialsDashboard: React.FC = () => {
-  const { isJapanese } = useSessionContext();
+  const { t, isJapanese } = useTranslation();
   const { consumables } = useConsumableContext();
   const { companies } = useCompanyContext();
   const { sds } = useQmsContext();
@@ -48,21 +48,22 @@ export const HazardousMaterialsDashboard: React.FC = () => {
   }, {} as CompanyItemsMap);
 
   const getCompanyName = (id: string) => {
-    if (id === 'facility') return isJapanese ? '施設' : 'Facility';
+    // FIX: Use a translation key for 'facility'.
+    if (id === 'facility') return t('facility');
     const company = companies.find(c => c.id === id);
     return company ? (isJapanese ? company.nameJP : company.nameEN) : 'Unknown';
   };
   
   const handleViewSds = (sdsId?: string) => {
     if (!sdsId) {
-        alert(isJapanese ? 'SDSが関連付けられていません。' : 'No SDS associated.');
+        alert(t('noSdsAssociated'));
         return;
     }
     const sdsDoc = sds.find(s => s.id === sdsId);
     if (sdsDoc) {
         openModal({ type: 'sdsDetails', props: { sds: sdsDoc } });
     } else {
-        alert(isJapanese ? 'SDS情報が見つかりません。' : 'SDS information not found.');
+        alert(t('sdsNotFound'));
     }
   };
 
@@ -70,22 +71,22 @@ export const HazardousMaterialsDashboard: React.FC = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-ever-black">
-          {isJapanese ? '危険物管理ダッシュボード' : 'Hazardous Materials Dashboard'}
+          {t('hazardousMaterialsDashboard')}
         </h2>
         <button
           onClick={() => handleNavigate('internalConsumablesManagement')}
           className="bg-ever-blue text-white font-bold py-2 px-4 rounded-lg hover:bg-ever-blue-dark"
         >
-          {isJapanese ? '在庫管理へ' : 'Go to Inventory'}
+          {t('goToInventory')}
         </button>
       </div>
 
       <div className={`p-6 rounded-lg mb-6 ${isOverLimit ? 'bg-red-100 border-red-500' : 'bg-green-100 border-green-500'} border-l-4`}>
-        <h3 className="text-lg font-bold">{isJapanese ? '施設全体の指定数量倍率' : 'Facility-Wide Designated Quantity Multiple'}</h3>
+        <h3 className="text-lg font-bold">{t('facilityWideMultiple')}</h3>
         <p className="text-4xl font-mono font-bold mt-2">{totalMultiple.toFixed(3)}</p>
-        <p className="text-sm mt-1">{isJapanese ? `消防法に基づく届出基準は倍率1.0です。` : `The reporting standard based on the Fire Service Act is a multiple of 1.0.`}</p>
+        <p className="text-sm mt-1">{t('fireServiceActStandard')}</p>
         {isOverLimit && (
-          <p className="font-bold text-red-700 mt-2">{isJapanese ? '警告: 指定数量の倍率が1.0を超えています。消防署への届出が必要です。' : 'Warning: The designated quantity multiple exceeds 1.0. Notification to the fire department is required.'}</p>
+          <p className="font-bold text-red-700 mt-2">{t('fireServiceActWarning')}</p>
         )}
       </div>
 
@@ -94,16 +95,16 @@ export const HazardousMaterialsDashboard: React.FC = () => {
           const data = itemsByCompany[companyId];
           return (
           <div key={companyId} className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-xl font-semibold mb-4">{getCompanyName(companyId)} - {isJapanese ? '合計倍率' : 'Total Multiple'}: {data.totalMultiple.toFixed(3)}</h3>
+            <h3 className="text-xl font-semibold mb-4">{getCompanyName(companyId)} - {t('totalMultiple')}: {data.totalMultiple.toFixed(3)}</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '物質名' : 'Substance'}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '分類' : 'Category'}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '在庫量' : 'Stock'}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '倍率' : 'Multiple'}</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '操作' : 'Actions'}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('substance')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('category')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('stock')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('multiple')}</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -115,7 +116,7 @@ export const HazardousMaterialsDashboard: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap font-mono">{item.multiple.toFixed(3)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button onClick={() => handleViewSds(item.sdsId)} className="text-indigo-600 hover:text-indigo-900">
-                          {isJapanese ? 'SDS詳細' : 'SDS Details'}
+                          {t('sdsDetails')}
                         </button>
                       </td>
                     </tr>

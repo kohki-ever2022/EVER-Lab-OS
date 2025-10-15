@@ -51,7 +51,6 @@ const ProjectGanttChart = lazy(() => import('./components/project/ProjectGanttCh
 const NotificationCenter = lazy(() => import('./components/notifications/NotificationCenter'));
 
 const AppLayout: React.FC = () => {
-    const { isJapanese } = useSessionContext();
     const { t } = useTranslation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);

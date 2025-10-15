@@ -1,43 +1,63 @@
 // src/adapters/MockAdapter.ts
 
 import {
-  User,
-  Company,
-  Announcement,
-  Equipment,
-  Reservation,
-  Usage,
-  MaintenanceLog,
-  EquipmentStatus,
-  ReservationStatus,
-  Consumable,
-  Order,
-  Project,
-  Task,
-  LabNotebookEntry,
-  Certificate,
-  SDS,
-  Ticket,
-  RegulatoryRequirement,
-  InsuranceCertificate,
-  MonthlyReport,
-  ChatRoom,
-  ChatMessage,
-  Invoice,
-  Result,
+  User, Company, Announcement, Equipment, Reservation, Usage, MaintenanceLog,
+  EquipmentStatus, ReservationStatus, Consumable, Order, Project, Task,
+  LabNotebookEntry, Certificate, SDS, Ticket, RegulatoryRequirement,
+  InsuranceCertificate, MonthlyReport, ChatRoom, ChatMessage, Invoice, Result,
 } from '../types';
 import { IDataAdapter } from './IDataAdapter';
 import { getMockData } from '../data/mockData';
 import { ValidationError, validateDateRange } from '../utils/validation';
 import { simpleUUID } from '../utils/uuid';
 
-/**
- * モックデータを操作するためのIDataAdapterの実装。
- * 実際のAPIコールをシミュレートし、メモリ上のデータを操作する。
- * getMockData.tsから初期データをロードし、useAppActions.tsのロジックを統合している。
- */
+// Generic CRUD factory
+function createGenericCrud<T extends { id: string }>(
+  collection: T[],
+  collectionName: string,
+  adapter: MockAdapter
+) {
+  const notify = (data: T[]) => (adapter as any).notifySubscribers(collectionName, data);
+
+  return {
+    async getAll(): Promise<Result<T[]>> {
+      return { success: true, data: [...collection] };
+    },
+    async getById(id: string): Promise<Result<T | null>> {
+      return { success: true, data: collection.find(i => i.id === id) || null };
+    },
+    async create(data: Omit<T, 'id'>): Promise<Result<T>> {
+      const newItem = { ...data, id: simpleUUID() } as T;
+      collection.push(newItem);
+      notify(collection);
+      return { success: true, data: newItem };
+    },
+    async update(item: T): Promise<Result<T>> {
+      const index = collection.findIndex(i => i.id === item.id);
+      if (index === -1) return { success: false, error: new Error(`${collectionName} not found`) };
+      collection[index] = item;
+      notify(collection);
+      return { success: true, data: item };
+    },
+    async delete(id: string): Promise<Result<void>> {
+      const newCollection = collection.filter(i => i.id !== id);
+      if (newCollection.length === collection.length) {
+        // No item was deleted, maybe warn or handle as needed
+      }
+      collection.length = 0;
+      Array.prototype.push.apply(collection, newCollection);
+      notify(collection);
+      return { success: true, data: undefined };
+    },
+    subscribe(callback: (data: T[]) => void): () => void {
+      return (adapter as any).createSubscription(collectionName, collection, callback);
+    }
+  };
+}
+
+
 export class MockAdapter implements IDataAdapter {
-  // 各エンティティのデータを保持するプライベートプロパティ
+  // Data properties
   private users: User[];
   private companies: Company[];
   private equipment: Equipment[];
@@ -60,81 +80,98 @@ export class MockAdapter implements IDataAdapter {
   private chatMessages: ChatMessage[];
   private invoices: Invoice[];
 
+  // Generic CRUD instances
+  private companyCrud;
+  private equipmentCrud;
+  private usageCrud;
+  private consumableCrud;
+  private orderCrud;
+  private projectCrud;
+  private labNotebookCrud;
+  private maintenanceLogCrud;
+  private announcementCrud;
+  private certificateCrud;
+  private sdsCrud;
+  private monthlyReportCrud;
+  private ticketCrud;
+  private regulatoryRequirementCrud;
+  private insuranceCertificateCrud;
+
   private subscribers: Map<string, Function[]> = new Map();
 
   constructor() {
-    // getMockDataフックから初期データを取得してクラスプロパティに設定
-    const initialData = getMockData();
-    this.users = initialData.users;
-    this.companies = initialData.companies;
-    this.equipment = initialData.equipment;
-    this.reservations = initialData.reservations;
-    this.usages = initialData.usage; // useMockDataでは 'usage'
-    this.consumables = initialData.consumables;
-    this.orders = initialData.orders;
-    this.projects = initialData.projects;
-    this.tasks = initialData.tasks;
-    this.labNotebookEntries = initialData.labNotebookEntries;
-    this.maintenanceLogs = initialData.maintenanceLogs;
-    this.announcements = initialData.announcements;
-    this.certificates = initialData.certificates;
-    this.sdsList = initialData.sds; // useMockDataでは 'sds'
-    this.monthlyReports = [];
-    this.tickets = []; // mockData does not have tickets yet
-    this.regulatoryRequirements = initialData.regulatoryRequirements;
-    this.insuranceCertificates = initialData.insuranceCertificates;
-    this.chatRooms = initialData.chatRooms;
-    this.chatMessages = initialData.chatMessages;
-    this.invoices = initialData.invoices;
+    const d = getMockData();
+    this.users = d.users; this.companies = d.companies; this.equipment = d.equipment;
+    this.reservations = d.reservations; this.usages = d.usage; this.consumables = d.consumables;
+    this.orders = d.orders; this.projects = d.projects; this.tasks = d.tasks;
+    this.labNotebookEntries = d.labNotebookEntries; this.maintenanceLogs = d.maintenanceLogs;
+    this.announcements = d.announcements; this.certificates = d.certificates; this.sdsList = d.sds;
+    this.monthlyReports = []; this.tickets = []; this.regulatoryRequirements = d.regulatoryRequirements;
+    this.insuranceCertificates = d.insuranceCertificates; this.chatRooms = d.chatRooms;
+    this.chatMessages = d.chatMessages; this.invoices = d.invoices;
+    
+    // Initialize generic CRUD helpers
+    this.companyCrud = createGenericCrud(this.companies, 'companies', this);
+    this.equipmentCrud = createGenericCrud(this.equipment, 'equipment', this);
+    this.usageCrud = createGenericCrud(this.usages, 'usages', this);
+    this.consumableCrud = createGenericCrud(this.consumables, 'consumables', this);
+    this.orderCrud = createGenericCrud(this.orders, 'orders', this);
+    this.projectCrud = createGenericCrud(this.projects, 'projects', this);
+    this.labNotebookCrud = createGenericCrud(this.labNotebookEntries, 'labNotebookEntries', this);
+    this.maintenanceLogCrud = createGenericCrud(this.maintenanceLogs, 'maintenanceLogs', this);
+    this.announcementCrud = createGenericCrud(this.announcements, 'announcements', this);
+    this.certificateCrud = createGenericCrud(this.certificates, 'certificates', this);
+    this.sdsCrud = createGenericCrud(this.sdsList, 'sdsList', this);
+    this.monthlyReportCrud = createGenericCrud(this.monthlyReports, 'monthlyReports', this);
+    this.ticketCrud = createGenericCrud(this.tickets, 'tickets', this);
+    this.regulatoryRequirementCrud = createGenericCrud(this.regulatoryRequirements, 'regulatoryRequirements', this);
+    this.insuranceCertificateCrud = createGenericCrud(this.insuranceCertificates, 'insuranceCertificates', this);
+
+    // FIX: Moved generic implementations from class property initializers to the constructor
+    // to ensure CRUD helpers are initialized before being used.
+    this.getCompanies = this.companyCrud.getAll; this.getCompanyById = this.companyCrud.getById; this.createCompany = this.companyCrud.create; this.updateCompany = this.companyCrud.update; this.deleteCompany = this.companyCrud.delete; this.subscribeToCompanies = this.companyCrud.subscribe;
+    this.getEquipmentList = this.equipmentCrud.getAll; this.getEquipmentById = this.equipmentCrud.getById; this.createEquipment = this.equipmentCrud.create; this.updateEquipment = this.equipmentCrud.update; this.deleteEquipment = this.equipmentCrud.delete; this.subscribeToEquipment = this.equipmentCrud.subscribe;
+    this.getUsages = this.usageCrud.getAll; this.getUsageById = this.usageCrud.getById; this.createUsage = this.usageCrud.create; this.updateUsage = this.usageCrud.update; this.deleteUsage = this.usageCrud.delete; this.subscribeToUsages = this.usageCrud.subscribe;
+    this.getConsumables = this.consumableCrud.getAll; this.getConsumableById = this.consumableCrud.getById; this.createConsumable = this.consumableCrud.create; this.updateConsumable = this.consumableCrud.update; this.deleteConsumable = this.consumableCrud.delete; this.subscribeToConsumables = this.consumableCrud.subscribe;
+    this.getOrders = this.orderCrud.getAll; this.getOrderById = this.orderCrud.getById; this.updateOrder = this.orderCrud.update; this.deleteOrder = this.orderCrud.delete; this.subscribeToOrders = this.orderCrud.subscribe;
+    this.getProjects = this.projectCrud.getAll; this.getProjectById = this.projectCrud.getById; this.createProject = this.projectCrud.create; this.updateProject = this.projectCrud.update; this.deleteProject = this.projectCrud.delete; this.subscribeToProjects = this.projectCrud.subscribe;
+    this.getLabNotebookEntries = this.labNotebookCrud.getAll; this.createLabNotebookEntry = this.labNotebookCrud.create; this.updateLabNotebookEntry = this.labNotebookCrud.update; this.deleteLabNotebookEntry = this.labNotebookCrud.delete; this.subscribeToLabNotebookEntries = this.labNotebookCrud.subscribe;
+    this.getMaintenanceLogs = this.maintenanceLogCrud.getAll; this.getMaintenanceLogById = this.maintenanceLogCrud.getById; this.createMaintenanceLog = this.maintenanceLogCrud.create; this.updateMaintenanceLog = this.maintenanceLogCrud.update; this.deleteMaintenanceLog = this.maintenanceLogCrud.delete; this.subscribeToMaintenanceLogs = this.maintenanceLogCrud.subscribe;
+    this.getAnnouncements = this.announcementCrud.getAll; this.getAnnouncementById = this.announcementCrud.getById; this.createAnnouncement = this.announcementCrud.create; this.updateAnnouncement = this.announcementCrud.update; this.deleteAnnouncement = this.announcementCrud.delete; this.subscribeToAnnouncements = this.announcementCrud.subscribe;
+    this.getCertificates = this.certificateCrud.getAll; this.getCertificateById = this.certificateCrud.getById; this.createCertificate = this.certificateCrud.create; this.updateCertificate = this.certificateCrud.update; this.deleteCertificate = this.certificateCrud.delete; this.subscribeToCertificates = this.certificateCrud.subscribe;
+    this.getSdsList = this.sdsCrud.getAll; this.getSdsById = this.sdsCrud.getById; this.createSds = this.sdsCrud.create; this.updateSds = this.sdsCrud.update; this.deleteSds = this.sdsCrud.delete; this.subscribeToSds = this.sdsCrud.subscribe;
+    this.getMonthlyReports = this.monthlyReportCrud.getAll; this.createMonthlyReport = this.monthlyReportCrud.create; this.subscribeToMonthlyReports = this.monthlyReportCrud.subscribe;
+    this.getTickets = this.ticketCrud.getAll; this.getTicketById = this.ticketCrud.getById; this.createTicket = this.ticketCrud.create; this.updateTicket = this.ticketCrud.update; this.deleteTicket = this.ticketCrud.delete; this.subscribeToTickets = this.ticketCrud.subscribe;
+    this.getRegulatoryRequirements = this.regulatoryRequirementCrud.getAll; this.getRegulatoryRequirementById = this.regulatoryRequirementCrud.getById; this.createRegulatoryRequirement = this.regulatoryRequirementCrud.create; this.updateRegulatoryRequirement = this.regulatoryRequirementCrud.update; this.deleteRegulatoryRequirement = this.regulatoryRequirementCrud.delete; this.subscribeToRegulatoryRequirements = this.regulatoryRequirementCrud.subscribe;
+    this.getInsuranceCertificates = this.insuranceCertificateCrud.getAll; this.getInsuranceCertificateById = this.insuranceCertificateCrud.getById; this.createInsuranceCertificate = this.insuranceCertificateCrud.create; this.updateInsuranceCertificate = this.insuranceCertificateCrud.update; this.deleteInsuranceCertificate = this.insuranceCertificateCrud.delete; this.subscribeToInsuranceCertificates = this.insuranceCertificateCrud.subscribe;
   }
 
-  /**
-   * 購読者に更新を通知するためのプライベートメソッド。
-   * @param collectionName - 更新があったコレクション名 (e.g., 'users')
-   * @param data - 更新後のデータ配列
-   */
-  private notifySubscribers(collectionName: string, data: any[]) {
+  // --- Subscription Management (made public for generic helper) ---
+  public notifySubscribers(collectionName: string, data: any[]) {
     const callbacks = this.subscribers.get(collectionName);
-    if (callbacks) {
-      callbacks.forEach(cb => cb(data));
-    }
+    if (callbacks) callbacks.forEach(cb => cb(data));
   }
   
-  /**
-   * 購読を管理するための汎用メソッド。
-   * @param collectionName - 購読対象のコレクション名
-   * @param dataArray - 現在のデータ配列
-   * @param callback - 呼び出すコールバック関数
-   * @returns 購読解除用の関数
-   */
-  private createSubscription(collectionName: string, dataArray: any[], callback: (data: any[]) => void): () => void {
-    const currentCallbacks = this.subscribers.get(collectionName) || [];
-    this.subscribers.set(collectionName, [...currentCallbacks, callback]);
-    
-    // 初回実行
+  public createSubscription(collectionName: string, dataArray: any[], callback: (data: any[]) => void): () => void {
+    const cbs = this.subscribers.get(collectionName) || [];
+    this.subscribers.set(collectionName, [...cbs, callback]);
     callback(dataArray);
-
-    // 購読解除関数
     return () => {
-      const updatedCallbacks = (this.subscribers.get(collectionName) || []).filter(cb => cb !== callback);
-      this.subscribers.set(collectionName, updatedCallbacks);
+      const updatedCbs = (this.subscribers.get(collectionName) || []).filter(cb => cb !== callback);
+      this.subscribers.set(collectionName, updatedCbs);
     };
   }
 
-  // --- User Operations ---
-  async getUsers(): Promise<Result<User[]>> {
-    return { success: true, data: [...this.users] };
-  }
-  async getUserById(id: string): Promise<Result<User | null>> {
-    const user = this.users.find(u => u.id === id) || null;
-    return { success: true, data: user };
-  }
+  // --- Specific Implementations ---
+
+  // --- User Operations (custom logic) ---
+  async getUsers(): Promise<Result<User[]>> { return { success: true, data: [...this.users] }; }
+  async getUserById(id: string): Promise<Result<User | null>> { return { success: true, data: this.users.find(u => u.id === id) || null }; }
   async createUser(data: Omit<User, 'id'>): Promise<Result<User>> {
     try {
       if (this.users.some(u => u.email.toLowerCase() === data.email.toLowerCase())) {
         throw new ValidationError('email', 'EXISTS', 'Email already exists.');
       }
-      
       const newUser: User = { ...data, id: simpleUUID() };
       this.users.push(newUser);
       this.notifySubscribers('users', this.users);
@@ -144,11 +181,9 @@ export class MockAdapter implements IDataAdapter {
     }
   }
   async updateUser(user: User): Promise<Result<User>> {
-    const userIndex = this.users.findIndex(u => u.id === user.id);
-    if (userIndex === -1) {
-      return { success: false, error: new Error('User not found') };
-    }
-    this.users[userIndex] = user;
+    const i = this.users.findIndex(u => u.id === user.id);
+    if (i === -1) return { success: false, error: new Error('User not found') };
+    this.users[i] = user;
     this.notifySubscribers('users', this.users);
     return { success: true, data: user };
   }
@@ -161,89 +196,14 @@ export class MockAdapter implements IDataAdapter {
     return this.createSubscription('users', this.users, callback);
   }
 
-  // --- Company Operations ---
-  async getCompanies(): Promise<Result<Company[]>> {
-    return { success: true, data: [...this.companies] };
-  }
-  async getCompanyById(id: string): Promise<Result<Company | null>> {
-    const company = this.companies.find(c => c.id === id) || null;
-    return { success: true, data: company };
-  }
-  async createCompany(data: Omit<Company, 'id'>): Promise<Result<Company>> {
-    const newCompany: Company = { ...data, id: simpleUUID() };
-    this.companies.push(newCompany);
-    this.notifySubscribers('companies', this.companies);
-    return { success: true, data: newCompany };
-  }
-  async updateCompany(company: Company): Promise<Result<Company>> {
-     const index = this.companies.findIndex(c => c.id === company.id);
-     if (index === -1) return { success: false, error: new Error('Company not found') };
-     this.companies[index] = company;
-     this.notifySubscribers('companies', this.companies);
-     return { success: true, data: company };
-  }
-  async deleteCompany(id: string): Promise<Result<void>> {
-    this.companies = this.companies.filter(c => c.id !== id);
-    this.notifySubscribers('companies', this.companies);
-    return { success: true, data: undefined };
-  }
-  subscribeToCompanies(callback: (data: Company[]) => void): () => void {
-    return this.createSubscription('companies', this.companies, callback);
-  }
-
-  // --- Equipment Operations ---
-  async getEquipmentList(): Promise<Result<Equipment[]>> {
-    return { success: true, data: [...this.equipment] };
-  }
-  async getEquipmentById(id: string): Promise<Result<Equipment | null>> {
-    const item = this.equipment.find(e => e.id === id) || null;
-    return { success: true, data: item };
-  }
-  async createEquipment(data: Omit<Equipment, 'id'>): Promise<Result<Equipment>> {
-    const newItem: Equipment = { ...data, id: simpleUUID() };
-    this.equipment.push(newItem);
-    this.notifySubscribers('equipment', this.equipment);
-    return { success: true, data: newItem };
-  }
-  async updateEquipment(equipment: Equipment): Promise<Result<Equipment>> {
-    const index = this.equipment.findIndex(e => e.id === equipment.id);
-    if (index === -1) return { success: false, error: new Error('Equipment not found') };
-    this.equipment[index] = equipment;
-    this.notifySubscribers('equipment', this.equipment);
-    return { success: true, data: equipment };
-  }
-  async deleteEquipment(id: string): Promise<Result<void>> {
-    this.equipment = this.equipment.filter(e => e.id !== id);
-    this.notifySubscribers('equipment', this.equipment);
-    return { success: true, data: undefined };
-  }
-  subscribeToEquipment(callback: (data: Equipment[]) => void): () => void {
-    return this.createSubscription('equipment', this.equipment, callback);
-  }
-
-  // --- Reservation Operations ---
-  async getReservations(): Promise<Result<Reservation[]>> {
-    return { success: true, data: [...this.reservations] };
-  }
-  async getReservationById(id: string): Promise<Result<Reservation | null>> {
-    const item = this.reservations.find(r => r.id === id) || null;
-    return { success: true, data: item };
-  }
+  // --- Reservation Operations (custom logic) ---
+  async getReservations(): Promise<Result<Reservation[]>> { return { success: true, data: [...this.reservations] }; }
+  async getReservationById(id: string): Promise<Result<Reservation | null>> { return { success: true, data: this.reservations.find(r => r.id === id) || null }; }
   async createReservation(data: Omit<Reservation, 'id'>): Promise<Result<Reservation>> {
      try {
         validateDateRange(data.startTime, data.endTime);
-        const overlapping = this.reservations.some(r => 
-            r.equipmentId === data.equipmentId &&
-            r.status !== ReservationStatus.Cancelled &&
-            (
-                (data.startTime >= r.startTime && data.startTime < r.endTime) ||
-                (data.endTime > r.startTime && data.endTime <= r.endTime) ||
-                (data.startTime <= r.startTime && data.endTime >= r.endTime)
-            )
-        );
-        if (overlapping) {
-            throw new Error('OVERLAP_ERROR');
-        }
+        const overlapping = this.reservations.some(r => r.equipmentId === data.equipmentId && r.status !== ReservationStatus.Cancelled && ((data.startTime >= r.startTime && data.startTime < r.endTime) || (data.endTime > r.startTime && data.endTime <= r.endTime) || (data.startTime <= r.startTime && data.endTime >= r.endTime)));
+        if (overlapping) throw new Error('OVERLAP_ERROR');
         const newReservation: Reservation = { ...data, id: simpleUUID() };
         this.reservations.push(newReservation);
         this.notifySubscribers('reservations', this.reservations);
@@ -253,9 +213,9 @@ export class MockAdapter implements IDataAdapter {
     }
   }
   async updateReservation(reservation: Reservation): Promise<Result<Reservation>> {
-    const index = this.reservations.findIndex(r => r.id === reservation.id);
-    if (index === -1) return { success: false, error: new Error('Reservation not found') };
-    this.reservations[index] = reservation;
+    const i = this.reservations.findIndex(r => r.id === reservation.id);
+    if (i === -1) return { success: false, error: new Error('Reservation not found') };
+    this.reservations[i] = reservation;
     this.notifySubscribers('reservations', this.reservations);
     return { success: true, data: reservation };
   }
@@ -268,57 +228,7 @@ export class MockAdapter implements IDataAdapter {
     return this.createSubscription('reservations', this.reservations, callback);
   }
 
-  // --- CRUD Stubs for other entities ---
-  // The following methods are implemented as simple in-memory operations.
-  // In a real application, they would involve API calls.
-
-  async getUsages(): Promise<Result<Usage[]>> { return { success: true, data: [...this.usages] }; }
-  async getUsageById(id: string): Promise<Result<Usage | null>> { return { success: true, data: this.usages.find(i => i.id === id) || null }; }
-  async createUsage(data: Omit<Usage, 'id'>): Promise<Result<Usage>> { const n: Usage = {...data, id: simpleUUID()}; this.usages.push(n); this.notifySubscribers('usages', this.usages); return { success: true, data: n }; }
-  async updateUsage(usage: Usage): Promise<Result<Usage>> { const i = this.usages.findIndex(item => item.id === usage.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.usages[i] = usage; this.notifySubscribers('usages', this.usages); return { success: true, data: this.usages[i] }; }
-  async deleteUsage(id: string): Promise<Result<void>> { this.usages = this.usages.filter(i => i.id !== id); this.notifySubscribers('usages', this.usages); return { success: true, data: undefined }; }
-  subscribeToUsages(callback: (data: Usage[]) => void): () => void { return this.createSubscription('usages', this.usages, callback); }
-
-  async getConsumables(): Promise<Result<Consumable[]>> { return { success: true, data: [...this.consumables] }; }
-  async getConsumableById(id: string): Promise<Result<Consumable | null>> { return { success: true, data: this.consumables.find(i => i.id === id) || null }; }
-  async createConsumable(data: Omit<Consumable, 'id'>): Promise<Result<Consumable>> { const n: Consumable = {...data, id: simpleUUID()}; this.consumables.push(n); this.notifySubscribers('consumables', this.consumables); return { success: true, data: n }; }
-  async updateConsumable(consumable: Consumable): Promise<Result<Consumable>> { const i = this.consumables.findIndex(item => item.id === consumable.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.consumables[i] = consumable; this.notifySubscribers('consumables', this.consumables); return { success: true, data: this.consumables[i] }; }
-  async deleteConsumable(id: string): Promise<Result<void>> { this.consumables = this.consumables.filter(i => i.id !== id); this.notifySubscribers('consumables', this.consumables); return { success: true, data: undefined }; }
-  subscribeToConsumables(callback: (data: Consumable[]) => void): () => void { return this.createSubscription('consumables', this.consumables, callback); }
-
-  async getOrders(): Promise<Result<Order[]>> { return { success: true, data: [...this.orders] }; }
-  async getOrderById(id: string): Promise<Result<Order | null>> { return { success: true, data: this.orders.find(i => i.id === id) || null }; }
-  async createOrder(data: Omit<Order, 'id'>): Promise<Result<Order>> {
-    const consumable = this.consumables.find(c => c.id === data.consumableId);
-    if (!consumable) {
-        return { success: false, error: new Error("Consumable not found.") };
-    }
-    if (consumable.stock < data.quantity) {
-        return { success: false, error: new Error("Insufficient stock.") };
-    }
-    if (consumable.isLocked) {
-        return { success: false, error: new Error("Inventory is locked.") };
-    }
-    this.consumables = this.consumables.map(c => 
-        c.id === data.consumableId ? { ...c, stock: c.stock - data.quantity } : c
-    );
-    this.notifySubscribers('consumables', this.consumables);
-    const newOrder: Order = {...data, id: simpleUUID()};
-    this.orders.push(newOrder);
-    this.notifySubscribers('orders', this.orders);
-    return { success: true, data: newOrder };
-  }
-  async updateOrder(order: Order): Promise<Result<Order>> { const i = this.orders.findIndex(item => item.id === order.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.orders[i] = order; this.notifySubscribers('orders', this.orders); return { success: true, data: this.orders[i] }; }
-  async deleteOrder(id: string): Promise<Result<void>> { this.orders = this.orders.filter(i => i.id !== id); this.notifySubscribers('orders', this.orders); return { success: true, data: undefined }; }
-  subscribeToOrders(callback: (data: Order[]) => void): () => void { return this.createSubscription('orders', this.orders, callback); }
-
-  async getProjects(): Promise<Result<Project[]>> { return { success: true, data: [...this.projects] }; }
-  async getProjectById(id: string): Promise<Result<Project | null>> { return { success: true, data: this.projects.find(i => i.id === id) || null }; }
-  async createProject(data: Omit<Project, 'id'>): Promise<Result<Project>> { const n: Project = {...data, id: simpleUUID()}; this.projects.push(n); this.notifySubscribers('projects', this.projects); return { success: true, data: n }; }
-  async updateProject(project: Project): Promise<Result<Project>> { const i = this.projects.findIndex(item => item.id === project.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.projects[i] = project; this.notifySubscribers('projects', this.projects); return { success: true, data: this.projects[i] }; }
-  async deleteProject(id: string): Promise<Result<void>> { this.projects = this.projects.filter(i => i.id !== id); this.notifySubscribers('projects', this.projects); return { success: true, data: undefined }; }
-  subscribeToProjects(callback: (data: Project[]) => void): () => void { return this.createSubscription('projects', this.projects, callback); }
-
+  // --- Task Operations (custom logic, simple) ---
   async getTasks(): Promise<Result<Task[]>> { return { success: true, data: [...this.tasks] }; }
   subscribeToTasks(callback: (data: Task[]) => void): () => void { return this.createSubscription('tasks', this.tasks, callback); }
   async createTask(data: Omit<Task, 'id'>): Promise<Result<Task>> {
@@ -328,9 +238,9 @@ export class MockAdapter implements IDataAdapter {
     return { success: true, data: newTask };
   }
   async updateTask(task: Task): Promise<Result<Task>> {
-    const index = this.tasks.findIndex(t => t.id === task.id);
-    if (index === -1) return { success: false, error: new Error('Task not found') };
-    this.tasks[index] = task;
+    const i = this.tasks.findIndex(t => t.id === task.id);
+    if (i === -1) return { success: false, error: new Error('Task not found') };
+    this.tasks[i] = task;
     this.notifySubscribers('tasks', this.tasks);
     return { success: true, data: task };
   }
@@ -340,99 +250,40 @@ export class MockAdapter implements IDataAdapter {
     return { success: true, data: undefined };
   }
   
-  // --- Lab Notebook Operations ---
-  async getLabNotebookEntries(): Promise<Result<LabNotebookEntry[]>> {
-    return { success: true, data: [...this.labNotebookEntries] };
-  }
-  async createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>> {
-    const newEntry: LabNotebookEntry = { ...data, id: simpleUUID() };
-    this.labNotebookEntries.push(newEntry);
-    this.notifySubscribers('labNotebookEntries', this.labNotebookEntries);
-    return { success: true, data: newEntry };
-  }
-  async updateLabNotebookEntry(entry: LabNotebookEntry): Promise<Result<LabNotebookEntry>> {
-    const index = this.labNotebookEntries.findIndex(e => e.id === entry.id);
-    if (index === -1) return { success: false, error: new Error('Entry not found') };
-    this.labNotebookEntries[index] = entry;
-    this.notifySubscribers('labNotebookEntries', this.labNotebookEntries);
-    return { success: true, data: entry };
-  }
-  async deleteLabNotebookEntry(id: string): Promise<Result<void>> {
-    this.labNotebookEntries = this.labNotebookEntries.filter(e => e.id !== id);
-    this.notifySubscribers('labNotebookEntries', this.labNotebookEntries);
-    return { success: true, data: undefined };
-  }
-  subscribeToLabNotebookEntries(callback: (data: LabNotebookEntry[]) => void): () => void {
-    return this.createSubscription('labNotebookEntries', this.labNotebookEntries, callback);
+  // --- Order Creation (custom logic with side effect) ---
+  async createOrder(data: Omit<Order, 'id'>): Promise<Result<Order>> {
+    const consumable = this.consumables.find(c => c.id === data.consumableId);
+    if (!consumable) return { success: false, error: new Error("Consumable not found.") };
+    if (consumable.stock < data.quantity) return { success: false, error: new Error("Insufficient stock.") };
+    if (consumable.isLocked) return { success: false, error: new Error("Inventory is locked.") };
+    
+    this.consumables = this.consumables.map(c => c.id === data.consumableId ? { ...c, stock: c.stock - data.quantity } : c);
+    this.notifySubscribers('consumables', this.consumables);
+    
+    const newOrder: Order = {...data, id: simpleUUID()};
+    this.orders.push(newOrder);
+    this.notifySubscribers('orders', this.orders);
+    return { success: true, data: newOrder };
   }
 
-  async getMaintenanceLogs(): Promise<Result<MaintenanceLog[]>> { return { success: true, data: [...this.maintenanceLogs] }; }
-  async getMaintenanceLogById(id: string): Promise<Result<MaintenanceLog | null>> { return { success: true, data: this.maintenanceLogs.find(i => i.id === id) || null }; }
-  async createMaintenanceLog(data: Omit<MaintenanceLog, 'id'>): Promise<Result<MaintenanceLog>> { const n: MaintenanceLog = {...data, id: simpleUUID()}; this.maintenanceLogs.push(n); this.notifySubscribers('maintenanceLogs', this.maintenanceLogs); return { success: true, data: n }; }
-  async updateMaintenanceLog(log: MaintenanceLog): Promise<Result<MaintenanceLog>> { const i = this.maintenanceLogs.findIndex(item => item.id === log.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.maintenanceLogs[i] = log; this.notifySubscribers('maintenanceLogs', this.maintenanceLogs); return { success: true, data: this.maintenanceLogs[i] }; }
-  async deleteMaintenanceLog(id: string): Promise<Result<void>> { this.maintenanceLogs = this.maintenanceLogs.filter(i => i.id !== id); this.notifySubscribers('maintenanceLogs', this.maintenanceLogs); return { success: true, data: undefined }; }
-  subscribeToMaintenanceLogs(callback: (data: MaintenanceLog[]) => void): () => void { return this.createSubscription('maintenanceLogs', this.maintenanceLogs, callback); }
+  // --- Generic Implementations ---
+  getCompanies; getCompanyById; createCompany; updateCompany; deleteCompany; subscribeToCompanies;
+  getEquipmentList; getEquipmentById; createEquipment; updateEquipment; deleteEquipment; subscribeToEquipment;
+  getUsages; getUsageById; createUsage; updateUsage; deleteUsage; subscribeToUsages;
+  getConsumables; getConsumableById; createConsumable; updateConsumable; deleteConsumable; subscribeToConsumables;
+  getOrders; getOrderById; updateOrder; deleteOrder; subscribeToOrders;
+  getProjects; getProjectById; createProject; updateProject; deleteProject; subscribeToProjects;
+  getLabNotebookEntries; createLabNotebookEntry; updateLabNotebookEntry; deleteLabNotebookEntry; subscribeToLabNotebookEntries;
+  getMaintenanceLogs; getMaintenanceLogById; createMaintenanceLog; updateMaintenanceLog; deleteMaintenanceLog; subscribeToMaintenanceLogs;
+  getAnnouncements; getAnnouncementById; createAnnouncement; updateAnnouncement; deleteAnnouncement; subscribeToAnnouncements;
+  getCertificates; getCertificateById; createCertificate; updateCertificate; deleteCertificate; subscribeToCertificates;
+  getSdsList; getSdsById; createSds; updateSds; deleteSds; subscribeToSds;
+  getMonthlyReports; createMonthlyReport; subscribeToMonthlyReports;
+  getTickets; getTicketById; createTicket; updateTicket; deleteTicket; subscribeToTickets;
+  getRegulatoryRequirements; getRegulatoryRequirementById; createRegulatoryRequirement; updateRegulatoryRequirement; deleteRegulatoryRequirement; subscribeToRegulatoryRequirements;
+  getInsuranceCertificates; getInsuranceCertificateById; createInsuranceCertificate; updateInsuranceCertificate; deleteInsuranceCertificate; subscribeToInsuranceCertificates;
 
-  async getAnnouncements(): Promise<Result<Announcement[]>> { return { success: true, data: [...this.announcements] }; }
-  async getAnnouncementById(id: string): Promise<Result<Announcement | null>> { return { success: true, data: this.announcements.find(i => i.id === id) || null }; }
-  async createAnnouncement(data: Omit<Announcement, 'id'>): Promise<Result<Announcement>> { const n: Announcement = {...data, id: simpleUUID()}; this.announcements.push(n); this.notifySubscribers('announcements', this.announcements); return { success: true, data: n }; }
-  async updateAnnouncement(announcement: Announcement): Promise<Result<Announcement>> { const i = this.announcements.findIndex(item => item.id === announcement.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.announcements[i] = announcement; this.notifySubscribers('announcements', this.announcements); return { success: true, data: this.announcements[i] }; }
-  async deleteAnnouncement(id: string): Promise<Result<void>> { this.announcements = this.announcements.filter(i => i.id !== id); this.notifySubscribers('announcements', this.announcements); return { success: true, data: undefined }; }
-  subscribeToAnnouncements(callback: (data: Announcement[]) => void): () => void { return this.createSubscription('announcements', this.announcements, callback); }
-
-  async getCertificates(): Promise<Result<Certificate[]>> { return { success: true, data: [...this.certificates] }; }
-  async getCertificateById(id: string): Promise<Result<Certificate | null>> { return { success: true, data: this.certificates.find(i => i.id === id) || null }; }
-  async createCertificate(data: Omit<Certificate, 'id'>): Promise<Result<Certificate>> { const n: Certificate = {...data, id: simpleUUID()}; this.certificates.push(n); this.notifySubscribers('certificates', this.certificates); return { success: true, data: n }; }
-  async updateCertificate(certificate: Certificate): Promise<Result<Certificate>> { const i = this.certificates.findIndex(item => item.id === certificate.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.certificates[i] = certificate; this.notifySubscribers('certificates', this.certificates); return { success: true, data: this.certificates[i] }; }
-  async deleteCertificate(id: string): Promise<Result<void>> { this.certificates = this.certificates.filter(i => i.id !== id); this.notifySubscribers('certificates', this.certificates); return { success: true, data: undefined }; }
-  subscribeToCertificates(callback: (data: Certificate[]) => void): () => void { return this.createSubscription('certificates', this.certificates, callback); }
-
-  async getSdsList(): Promise<Result<SDS[]>> { return { success: true, data: [...this.sdsList] }; }
-  async getSdsById(id: string): Promise<Result<SDS | null>> { return { success: true, data: this.sdsList.find(i => i.id === id) || null }; }
-  async createSds(data: Omit<SDS, 'id'>): Promise<Result<SDS>> { const n: SDS = {...data, id: simpleUUID()}; this.sdsList.push(n); this.notifySubscribers('sdsList', this.sdsList); return { success: true, data: n }; }
-  async updateSds(sds: SDS): Promise<Result<SDS>> { const i = this.sdsList.findIndex(item => item.id === sds.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.sdsList[i] = sds; this.notifySubscribers('sdsList', this.sdsList); return { success: true, data: this.sdsList[i] }; }
-  async deleteSds(id: string): Promise<Result<void>> { this.sdsList = this.sdsList.filter(i => i.id !== id); this.notifySubscribers('sdsList', this.sdsList); return { success: true, data: undefined }; }
-  subscribeToSds(callback: (data: SDS[]) => void): () => void { return this.createSubscription('sdsList', this.sdsList, callback); }
-  
-  // --- Monthly Report Operations ---
-  async getMonthlyReports(): Promise<Result<MonthlyReport[]>> {
-    return { success: true, data: [...this.monthlyReports] };
-  }
-  async createMonthlyReport(data: Omit<MonthlyReport, 'id'>): Promise<Result<MonthlyReport>> {
-    const newReport: MonthlyReport = { ...data, id: simpleUUID() };
-    this.monthlyReports.push(newReport);
-    this.notifySubscribers('monthlyReports', this.monthlyReports);
-    return { success: true, data: newReport };
-  }
-  subscribeToMonthlyReports(callback: (data: MonthlyReport[]) => void): () => void {
-    return this.createSubscription('monthlyReports', this.monthlyReports, callback);
-  }
-
-  // --- Ticket Operations ---
-  async getTickets(): Promise<Result<Ticket[]>> { return { success: true, data: [...this.tickets] }; }
-  async getTicketById(id: string): Promise<Result<Ticket | null>> { return { success: true, data: this.tickets.find(i => i.id === id) || null }; }
-  async createTicket(data: Omit<Ticket, 'id'>): Promise<Result<Ticket>> { const n: Ticket = {...data, id: simpleUUID()}; this.tickets.push(n); this.notifySubscribers('tickets', this.tickets); return { success: true, data: n }; }
-  async updateTicket(ticket: Ticket): Promise<Result<Ticket>> { const i = this.tickets.findIndex(item => item.id === ticket.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.tickets[i] = ticket; this.notifySubscribers('tickets', this.tickets); return { success: true, data: this.tickets[i] }; }
-  async deleteTicket(id: string): Promise<Result<void>> { this.tickets = this.tickets.filter(i => i.id !== id); this.notifySubscribers('tickets', this.tickets); return { success: true, data: undefined }; }
-  subscribeToTickets(callback: (data: Ticket[]) => void): () => void { return this.createSubscription('tickets', this.tickets, callback); }
-  
-  // --- RegulatoryRequirement Operations ---
-  async getRegulatoryRequirements(): Promise<Result<RegulatoryRequirement[]>> { return { success: true, data: [...this.regulatoryRequirements] }; }
-  async getRegulatoryRequirementById(id: string): Promise<Result<RegulatoryRequirement | null>> { return { success: true, data: this.regulatoryRequirements.find(i => i.id === id) || null }; }
-  async createRegulatoryRequirement(data: Omit<RegulatoryRequirement, 'id'>): Promise<Result<RegulatoryRequirement>> { const n: RegulatoryRequirement = {...data, id: simpleUUID()}; this.regulatoryRequirements.push(n); this.notifySubscribers('regulatoryRequirements', this.regulatoryRequirements); return { success: true, data: n }; }
-  async updateRegulatoryRequirement(req: RegulatoryRequirement): Promise<Result<RegulatoryRequirement>> { const i = this.regulatoryRequirements.findIndex(item => item.id === req.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.regulatoryRequirements[i] = req; this.notifySubscribers('regulatoryRequirements', this.regulatoryRequirements); return { success: true, data: this.regulatoryRequirements[i] }; }
-  async deleteRegulatoryRequirement(id: string): Promise<Result<void>> { this.regulatoryRequirements = this.regulatoryRequirements.filter(i => i.id !== id); this.notifySubscribers('regulatoryRequirements', this.regulatoryRequirements); return { success: true, data: undefined }; }
-  subscribeToRegulatoryRequirements(callback: (data: RegulatoryRequirement[]) => void): () => void { return this.createSubscription('regulatoryRequirements', this.regulatoryRequirements, callback); }
-
-  // --- InsuranceCertificate Operations ---
-  async getInsuranceCertificates(): Promise<Result<InsuranceCertificate[]>> { return { success: true, data: [...this.insuranceCertificates] }; }
-  async getInsuranceCertificateById(id: string): Promise<Result<InsuranceCertificate | null>> { return { success: true, data: this.insuranceCertificates.find(i => i.id === id) || null }; }
-  async createInsuranceCertificate(data: Omit<InsuranceCertificate, 'id'>): Promise<Result<InsuranceCertificate>> { const n: InsuranceCertificate = {...data, id: simpleUUID()}; this.insuranceCertificates.push(n); this.notifySubscribers('insuranceCertificates', this.insuranceCertificates); return { success: true, data: n }; }
-  async updateInsuranceCertificate(cert: InsuranceCertificate): Promise<Result<InsuranceCertificate>> { const i = this.insuranceCertificates.findIndex(item => item.id === cert.id); if(i===-1) return {success: false, error: new Error('Not found')}; this.insuranceCertificates[i] = cert; this.notifySubscribers('insuranceCertificates', this.insuranceCertificates); return { success: true, data: this.insuranceCertificates[i] }; }
-  async deleteInsuranceCertificate(id: string): Promise<Result<void>> { this.insuranceCertificates = this.insuranceCertificates.filter(i => i.id !== id); this.notifySubscribers('insuranceCertificates', this.insuranceCertificates); return { success: true, data: undefined }; }
-  subscribeToInsuranceCertificates(callback: (data: InsuranceCertificate[]) => void): () => void { return this.createSubscription('insuranceCertificates', this.insuranceCertificates, callback); }
-  
-  // --- Invoice Operations ---
+  // --- Invoice Operations (simple) ---
   async createInvoice(data: Omit<Invoice, 'id'>): Promise<Result<Invoice>> {
     const newInvoice: Invoice = { ...data, id: simpleUUID() };
     this.invoices.push(newInvoice);
@@ -440,77 +291,53 @@ export class MockAdapter implements IDataAdapter {
     return { success: true, data: newInvoice };
   }
   async updateInvoice(invoice: Invoice): Promise<Result<Invoice>> {
-    const index = this.invoices.findIndex(inv => inv.id === invoice.id);
-    if (index === -1) return { success: false, error: new Error('Invoice not found') };
-    this.invoices[index] = invoice;
+    const i = this.invoices.findIndex(inv => inv.id === invoice.id);
+    if (i === -1) return { success: false, error: new Error('Invoice not found') };
+    this.invoices[i] = invoice;
     this.notifySubscribers('invoices', this.invoices);
     return { success: true, data: invoice };
   }
 
-  // --- Chat Operations ---
+  // --- Chat Operations (custom logic) ---
   async getChatRooms(userId: string): Promise<Result<ChatRoom[]>> {
-    const userRooms = this.chatRooms.filter(r => r.participantIds.includes(userId));
-    return { success: true, data: userRooms };
+    return { success: true, data: this.chatRooms.filter(r => r.participantIds.includes(userId)) };
   }
-
   subscribeToChatRooms(userId: string, callback: (data: ChatRoom[]) => void): () => void {
     return this.createSubscription('chatRooms', this.chatRooms, (allRooms) => {
-        const userRooms = allRooms.filter(r => r.participantIds.includes(userId))
-                                  .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+        const userRooms = allRooms.filter(r => r.participantIds.includes(userId)).sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
         callback(userRooms);
     });
   }
-
   async createChatRoom(data: Omit<ChatRoom, 'id'>): Promise<Result<ChatRoom>> {
     const newRoom: ChatRoom = { ...data, id: simpleUUID() };
     this.chatRooms.push(newRoom);
     this.notifySubscribers('chatRooms', this.chatRooms);
     return { success: true, data: newRoom };
   }
-
   async getChatMessages(roomId: string): Promise<Result<ChatMessage[]>> {
-      const roomMessages = this.chatMessages
-          .filter(m => m.roomId === roomId)
-          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-      return { success: true, data: roomMessages };
+      return { success: true, data: this.chatMessages.filter(m => m.roomId === roomId).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) };
   }
-
   subscribeToChatMessages(roomId: string, callback: (data: ChatMessage[]) => void): () => void {
       return this.createSubscription('chatMessages', this.chatMessages, (allMessages) => {
-          const roomMessages = allMessages
-              .filter(m => m.roomId === roomId)
-              .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+          const roomMessages = allMessages.filter(m => m.roomId === roomId).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
           callback(roomMessages);
       });
   }
-
   async sendChatMessage(data: Omit<ChatMessage, 'id' | 'readBy'>): Promise<Result<ChatMessage>> {
-      const newMessage: ChatMessage = {
-          ...data,
-          id: simpleUUID(),
-          readBy: [data.senderId],
-          createdAt: data.createdAt || new Date(),
-      };
+      const newMessage: ChatMessage = { ...data, id: simpleUUID(), readBy: [data.senderId], createdAt: data.createdAt || new Date() };
       this.chatMessages.push(newMessage);
-  
       const roomIndex = this.chatRooms.findIndex(r => r.id === data.roomId);
       if (roomIndex > -1) {
           const room = this.chatRooms[roomIndex];
           room.lastMessage = data.content;
           room.lastMessageAt = newMessage.createdAt;
-          room.participantIds.forEach(pid => {
-            if (pid !== data.senderId) {
-                room.unreadCount[pid] = (room.unreadCount[pid] || 0) + 1;
-            }
-          });
+          room.participantIds.forEach(pid => { if (pid !== data.senderId) room.unreadCount[pid] = (room.unreadCount[pid] || 0) + 1; });
           this.chatRooms[roomIndex] = room;
       }
-      
       this.notifySubscribers('chatMessages', this.chatMessages);
       this.notifySubscribers('chatRooms', this.chatRooms);
       return { success: true, data: newMessage };
   }
-
   async markMessageAsRead(roomId: string, userId: string): Promise<Result<void>> {
       const roomIndex = this.chatRooms.findIndex(r => r.id === roomId);
       if (roomIndex > -1) {

@@ -4,9 +4,11 @@ import { useProjectContext } from '../../contexts/ProjectContext';
 import { useUserContext } from '../../contexts/UserContext';
 
 import { useModalContext } from '../../contexts/ModalContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const Projects: React.FC = () => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t } = useTranslation();
     const { projects } = useProjectContext();
     const { users } = useUserContext();
     const { openModal } = useModalContext();
@@ -16,12 +18,12 @@ const Projects: React.FC = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold text-ever-black">{isJapanese ? 'プロジェクト一覧' : 'Projects'}</h2>
+                <h2 className="text-3xl font-bold text-ever-black">{t('projects')}</h2>
                 <button 
                     onClick={() => openModal({ type: 'projectDetails', props: { project: null } })}
                     className="bg-ever-blue hover:bg-ever-blue-dark text-white font-bold py-2 px-4 rounded-lg"
                 >
-                    {isJapanese ? '新規プロジェクト' : 'New Project'}
+                    {t('newProject')}
                 </button>
             </div>
 
@@ -38,7 +40,7 @@ const Projects: React.FC = () => {
                                 <h3 className="text-xl font-bold text-ever-purple mb-2">{project.name}</h3>
                                 <p className="text-gray-600 text-sm mb-4 flex-grow">{project.description}</p>
                                 <div className="border-t pt-4">
-                                    <p className="text-xs font-semibold text-gray-500 mb-2">{isJapanese ? 'メンバー' : 'Members'}</p>
+                                    <p className="text-xs font-semibold text-gray-500 mb-2">{t('members')}</p>
                                     <div className="flex -space-x-2">
                                         {members.slice(0, 5).map(member => (
                                             <div key={member.id} title={member.name} className="relative inline-block">
@@ -64,12 +66,12 @@ const Projects: React.FC = () => {
                 </div>
             ) : (
                 <div className="text-center py-12 bg-white rounded-lg shadow">
-                    <p className="text-gray-500">{isJapanese ? 'プロジェクトがありません。' : 'No projects found.'}</p>
+                    <p className="text-gray-500">{t('noProjects')}</p>
                     <button 
                         onClick={() => openModal({ type: 'projectDetails', props: { project: null } })}
                         className="mt-4 bg-ever-blue hover:bg-ever-blue-dark text-white font-bold py-2 px-4 rounded-lg"
                     >
-                        {isJapanese ? '最初のプロジェクトを作成' : 'Create your first project'}
+                        {t('createFirstProject')}
                     </button>
                 </div>
             )}

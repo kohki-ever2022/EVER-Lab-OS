@@ -26,11 +26,11 @@ export const useComplianceActions = () => {
     const adapter = useDataAdapter();
     const { labRules, setLabRules } = useQmsContext();
     const { companies } = useCompanyContext();
-    const { currentUser, isJapanese, language } = useSessionContext();
+    const { currentUser } = useSessionContext();
     const { addAuditLog } = useAudit();
     const { addNotification } = useNotifications();
     const { showToast } = useToast();
-    const { t } = useTranslation();
+    const { t, isJapanese, language } = useTranslation();
 
     const acknowledgeRule = useCallback(async (ruleId: string): Promise<Result<LabRule, Error>> => {
         if (!currentUser) return { success: false, error: new Error('User not logged in.') };
@@ -87,18 +87,23 @@ export const useComplianceActions = () => {
         thirtyDaysFromNow.setDate(now.getDate() + 30);
         
         if (expiry > now && expiry <= thirtyDaysFromNow) {
+            const message = t('notificationCertExpiring', {
+                name: cert.insuranceCompany,
+                date: expiry.toLocaleDateString(isJapanese ? 'ja-JP' : 'en-US')
+            });
+
             addNotification({
                 recipientUserId: cert.uploadedBy,
                 type: NotificationType.CertificateExpiring,
                 priority: 'MEDIUM',
-                titleJP: '保険証明書の有効期限警告',
-                titleEN: 'Insurance Certificate Expiring Soon',
-                messageJP: `保険「${cert.insuranceCompany}」が${expiry.toLocaleDateString('ja-JP')}に失効します。`,
-                messageEN: `Your insurance from "${cert.insuranceCompany}" will expire on ${expiry.toLocaleDateString('en-US')}.`,
+                titleJP: t('notificationCertExpiringTitle'),
+                titleEN: t('notificationCertExpiringTitle'),
+                messageJP: message,
+                messageEN: message,
                 actionUrl: `#/insuranceManagement`
             });
         }
-    }, [addNotification]);
+    }, [addNotification, t, isJapanese]);
 
     const addInsuranceCertificate = useCallback(async (cert: Omit<InsuranceCertificate, 'id'>): Promise<Result<InsuranceCertificate, Error>> => {
         const result = await adapter.createInsuranceCertificate(cert);

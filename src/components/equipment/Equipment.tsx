@@ -9,39 +9,32 @@ import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useAdminContext } from '../../contexts/AppProviders';
-import { YoutubeIcon, PdfIcon, LinkIcon, ArrowRightIcon, WarningIcon } from '../common/Icons';
-
-const getManualIcon = (type: ManualType) => {
-    switch (type) {
-        case ManualType.YouTube: return <YoutubeIcon className="w-6 h-6 text-red-600" />;
-        case ManualType.PDF: return <PdfIcon className="w-6 h-6 text-red-800" />;
-        case ManualType.ExternalLink: return <LinkIcon className="w-6 h-6 text-blue-600" />;
-    }
-}
+// FIX: Import getManualIcon to resolve error
+import { YoutubeIcon, PdfIcon, LinkIcon, ArrowRightIcon, WarningIcon, getManualIcon } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 
 const StatusBadge: React.FC<{ status: EquipmentStatus }> = ({ status }) => {
-    const { language } = useSessionContext();
-    const isJapanese = language === Language.JA;
+    const { t } = useTranslation();
 
     const statusMap = {
         [EquipmentStatus.Available]: { 
-            text: isJapanese ? '利用可' : 'Available',
+            text: t('available'),
             color: 'bg-green-100 text-green-800', 
             dot: 'bg-green-500' 
         },
         [EquipmentStatus.InUse]: { 
-            text: isJapanese ? '使用中' : 'In Use',
+            text: t('statusInUse'),
             color: 'bg-red-100 text-red-800', 
             dot: 'bg-red-500' 
         },
         [EquipmentStatus.Maintenance]: { 
-            text: isJapanese ? 'メンテ中' : 'Maintenance',
+            text: t('maintenance'),
             color: 'bg-yellow-100 text-yellow-800', 
             dot: 'bg-yellow-500' 
         },
         [EquipmentStatus.Calibration]: { 
-            text: isJapanese ? '校正中' : 'Calibration',
+            text: t('calibration'),
             color: 'bg-blue-100 text-blue-800', 
             dot: 'bg-blue-500' 
         },
@@ -58,13 +51,12 @@ const StatusBadge: React.FC<{ status: EquipmentStatus }> = ({ status }) => {
 };
 
 const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) => {
-    const { language, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t, isJapanese } = useTranslation();
     const { qualifications, userCertifications } = useQmsContext();
     const { users } = useUserContext();
     const { openModal } = useModalContext();
     
-    const isJapanese = language === Language.JA;
-
     const requiredQualId = equipment.requiredQualificationId;
     const userCertification = userCertifications.find(cert => 
         cert.userId === currentUser?.id &&
@@ -86,18 +78,16 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
     const locationDetails = isJapanese ? equipment.locationDetailsJP : equipment.locationDetailsEN;
 
     const getBookingButtonTitle = () => {
-        if (!equipment.isReservable) return isJapanese ? 'この機器は予約不要です' : 'This equipment does not require reservation';
-        if (isCalibrationOverdue) return isJapanese ? '校正期限切れのため予約不可' : 'Cannot book, calibration is overdue';
+        if (!equipment.isReservable) return t('notReservable');
+        if (isCalibrationOverdue) return t('calibrationOverdue');
         if (!userHasQualification) {
             if (!userCertification && requiredQualId) {
                 const hasEverHadCert = userCertifications.some(c => c.userId === currentUser?.id && (c as any).qualificationId === requiredQualId);
-                return hasEverHadCert
-                    ? (isJapanese ? '資格の有効期限が切れています' : 'Your certification has expired')
-                    : (isJapanese ? '有効な資格がありません' : 'You lack the required certification');
+                return hasEverHadCert ? t('certExpired') : t('noCert');
             }
-            return isJapanese ? '資格がありません' : 'Qualification required';
+            return t('noCert');
         }
-        if (equipment.status !== EquipmentStatus.Available) return isJapanese ? '現在利用できません' : 'Currently unavailable';
+        if (equipment.status !== EquipmentStatus.Available) return t('notAvailable');
         return '';
     };
 
@@ -109,19 +99,20 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
                 <h3 className="text-lg font-bold text-ever-black mt-2">{equipmentName}</h3>
                 <p className="text-sm text-gray-500">{equipmentCategory}</p>
                 <div className="mt-2 text-sm text-gray-700 space-y-1">
-                    <p><span className="font-semibold">{isJapanese ? '料金' : 'Rate'}:</span> {equipment.isReservable ? `${equipment.rate.toLocaleString()} ${rateUnit}` : (isJapanese ? '予約不要' : 'No Reservation')}</p>
-                    <p><span className="font-semibold">{isJapanese ? '場所' : 'Location'}:</span> {equipment.location} {locationDetails && `(${locationDetails})`}</p>
+                    <p><span className="font-semibold">{t('rate')}:</span> {equipment.isReservable ? `${equipment.rate.toLocaleString()} ${rateUnit}` : t('notReservable')}</p>
+                    <p><span className="font-semibold">{t('location')}:</span> {equipment.location} {locationDetails && `(${locationDetails})`}</p>
                     {requiredQual && (
-                         <p className="text-xs text-yellow-600 font-semibold">{isJapanese ? '必要資格' : 'Required'}: {requiredQualName}</p>
+                         <p className="text-xs text-yellow-600 font-semibold">{t('required')}: {requiredQualName}</p>
                     )}
                     {personInCharge && (
-                        <p className="text-xs text-gray-600">{isJapanese ? '担当者' : 'Expert'}: {personInCharge.name}</p>
+                        // FIX: Add 'expert' key to translations
+                        <p className="text-xs text-gray-600">{t('expert')}: {personInCharge.name}</p>
                     )}
                 </div>
                 <div className="mt-auto pt-4 space-y-2">
                     <div className="flex space-x-2">
-                        {equipment.isReservable && <button onClick={() => openModal({ type: 'scheduleEquipment', props: { equipment } })} className="flex-1 bg-white hover:bg-gray-100 text-text-primary font-semibold py-2 px-4 rounded-lg border border-gray-300 transition-colors text-sm">{isJapanese ? 'スケジュール' : 'Schedule'}</button>}
-                        <button onClick={() => openModal({ type: 'equipmentManuals', props: { equipment } })} className={`flex-1 font-semibold py-2 px-4 rounded-lg border transition-colors text-sm ${equipment.manualIds && equipment.manualIds.length > 0 ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' : 'bg-white hover:bg-gray-100 text-text-primary border-gray-300'}`}>{isJapanese ? 'マニュアル & 情報' : 'Manuals & Info'}</button>
+                        {equipment.isReservable && <button onClick={() => openModal({ type: 'scheduleEquipment', props: { equipment } })} className="flex-1 bg-white hover:bg-gray-100 text-text-primary font-semibold py-2 px-4 rounded-lg border border-gray-300 transition-colors text-sm">{t('schedule')}</button>}
+                        <button onClick={() => openModal({ type: 'equipmentManuals', props: { equipment } })} className={`flex-1 font-semibold py-2 px-4 rounded-lg border transition-colors text-sm ${equipment.manualIds && equipment.manualIds.length > 0 ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' : 'bg-white hover:bg-gray-100 text-text-primary border-gray-300'}`}>{t('manualsAndInfo')}</button>
                     </div>
                     <div className="flex space-x-2">
                         <button 
@@ -134,12 +125,12 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
                             }`}
                              title={getBookingButtonTitle()}
                         >
-                            {isJapanese ? '予約する' : 'Book'}
+                            {t('bookEquipment')}
                         </button>
                         <button 
                             onClick={() => openModal({ type: 'reportIssue', props: { equipment } })}
                             className="flex-shrink-0 bg-yellow-500 hover:bg-yellow-600 text-white font-bold p-2 rounded-lg"
-                            title={isJapanese ? "不具合を報告" : "Report Issue"}
+                            title={t("reportIssue")}
                         >
                             <WarningIcon />
                         </button>
@@ -156,8 +147,7 @@ const EquipmentTable: React.FC<{
     requestSort: (key: keyof EquipmentType | 'name') => void;
 }> = ({ equipmentList, sortConfig, requestSort }) => {
     const { equipmentManuals } = useAdminContext();
-    const { language } = useSessionContext();
-    const isJapanese = language === Language.JA;
+    const { t, isJapanese } = useTranslation();
 
     const sortedEquipment = useMemo(() => {
         let sortableItems = [...equipmentList];
@@ -204,19 +194,19 @@ const EquipmentTable: React.FC<{
                 <thead className="bg-gray-50">
                     <tr>
                         <th onClick={() => requestSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            {isJapanese ? '機器名' : 'Equipment Name'}{getSortIndicator('name')}
+                            {t('equipmentName')}{getSortIndicator('name')}
                         </th>
                         <th onClick={() => requestSort('model')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            {isJapanese ? 'モデル / 製品コード' : 'Model / Product Code'}{getSortIndicator('model')}
+                            {t('modelProductCode')}{getSortIndicator('model')}
                         </th>
                         <th onClick={() => requestSort('manufacturer')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            {isJapanese ? 'メーカー' : 'Manufacturer'}{getSortIndicator('manufacturer')}
+                            {t('manufacturer')}{getSortIndicator('manufacturer')}
                         </th>
                         <th onClick={() => requestSort('rate')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            {isJapanese ? '価格 / 料金' : 'Price / Fee'}{getSortIndicator('rate')}
+                            {t('priceFee')}{getSortIndicator('rate')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            {isJapanese ? 'マニュアル' : 'Manuals'}
+                            {t('manuals')}
                         </th>
                     </tr>
                 </thead>
@@ -226,7 +216,7 @@ const EquipmentTable: React.FC<{
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{isJapanese ? eq.nameJP : eq.nameEN}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{eq.model || '-'}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{eq.manufacturer || '-'}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{eq.isReservable ? `${eq.rate.toLocaleString()} ${isJapanese ? eq.rateUnitJP : eq.rateUnitEN}` : (isJapanese ? '予約不要' : 'No Reservation')}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{eq.isReservable ? `${eq.rate.toLocaleString()} ${isJapanese ? eq.rateUnitJP : eq.rateUnitEN}` : t('notReservable')}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <div className="flex space-x-2">
                                     {(eq.manualIds || []).map(manualId => {
@@ -244,7 +234,7 @@ const EquipmentTable: React.FC<{
                     )) : (
                         <tr>
                             <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                                {isJapanese ? '表示する機器はありません。' : 'No equipment to display.'}
+                                {t('noEquipmentToDisplay')}
                             </td>
                         </tr>
                     )}
@@ -256,7 +246,7 @@ const EquipmentTable: React.FC<{
 
 const Equipment: React.FC = () => {
     const { equipment } = useEquipmentContext();
-    const { isJapanese } = useSessionContext();
+    const { t } = useTranslation();
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
     const [sortConfig, setSortConfig] = useState<{ key: keyof EquipmentType | 'name', direction: 'ascending' | 'descending' } | null>({ key: 'name', direction: 'ascending' });
     
@@ -272,7 +262,7 @@ const Equipment: React.FC = () => {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-ever-black">
-                    {isJapanese ? '機器一覧' : 'Equipment'}
+                    {t('equipmentList')}
                 </h2>
                 <div>
                     <button onClick={() => setViewMode('grid')} className={`mr-2 p-2 rounded ${viewMode === 'grid' ? 'bg-ever-blue text-white' : 'bg-gray-200'}`}>Grid</button>

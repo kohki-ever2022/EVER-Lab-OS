@@ -7,9 +7,11 @@ import { useToast } from '../../contexts/ToastContext';
 // FIX: import from barrel file
 import { ChatRoom, ChatMessage } from '../../types';
 import { SendIcon } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export const ChatInterface: React.FC = () => {
-  const { currentUser, isJapanese } = useSessionContext();
+  const { currentUser } = useSessionContext();
+  const { t, isJapanese } = useTranslation();
   const { users } = useUserContext();
   const adapter = useDataAdapter();
   const { showToast } = useToast();
@@ -68,7 +70,7 @@ export const ChatInterface: React.FC = () => {
     });
 
     if (result.success === false) {
-        showToast(isJapanese ? `メッセージの送信に失敗しました: ${result.error.message}` : `Failed to send message: ${result.error.message}`, 'error');
+        showToast(`${t('failedToSend')}: ${result.error.message}`, 'error');
     } else {
       setNewMessage('');
     }
@@ -86,7 +88,7 @@ export const ChatInterface: React.FC = () => {
       <div className="w-full md:w-1/3 border-r bg-gray-50 flex flex-col">
         <div className="p-4 border-b bg-white flex-shrink-0">
           <h2 className="text-xl font-bold">
-            {isJapanese ? 'チャット' : 'Messages'}
+            {t('messages')}
           </h2>
         </div>
         <div className="overflow-y-auto">
@@ -157,7 +159,7 @@ export const ChatInterface: React.FC = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder={isJapanese ? "メッセージを入力..." : "Type a message..."}
+                  placeholder={t('typeAMessage')}
                   className="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ever-blue"
                 />
                 <button
@@ -171,7 +173,7 @@ export const ChatInterface: React.FC = () => {
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">
-            <p>{isJapanese ? 'チャットを選択してください' : 'Select a chat to start messaging'}</p>
+            <p>{t('selectChatToStart')}</p>
           </div>
         )}
       </div>

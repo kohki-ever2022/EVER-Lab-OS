@@ -12,13 +12,15 @@ import { useQmsContext } from '../../contexts/AppProviders';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useToast } from '../../contexts/ToastContext';
 import { useComplianceActions } from '../../hooks/useComplianceActions';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export const RegulatoryCompliance: React.FC = () => {
-  const { currentUser, isFacilityStaff, isJapanese } = useSessionContext();
+  const { currentUser, isFacilityStaff } = useSessionContext();
   const { regulatoryRequirements } = useQmsContext();
   const { hasPermission } = usePermissions();
   const { showToast } = useToast();
   const { addRegulatoryRequirement } = useComplianceActions();
+  const { t, isJapanese } = useTranslation();
   
   const [requirements, setRequirements] = useState<RegulatoryRequirement[]>(regulatoryRequirements || []);
   const [selectedType, setSelectedType] = useState<RegulationType | 'ALL'>('ALL');
@@ -30,56 +32,25 @@ export const RegulatoryCompliance: React.FC = () => {
     setRequirements(regulatoryRequirements);
   }, [regulatoryRequirements]);
 
-  // 権限チェック
   const canManageSupport = isFacilityStaff || hasPermission('regulatory', 'manage');
 
-  // 法規制タイプのラベル
   const regulationTypeLabels = {
-    [RegulationType.PharmaceuticalLaw]: { jp: '薬機法', en: 'Pharmaceutical Affairs Law' },
-    [RegulationType.CartegenaLaw]: { jp: 'カルタヘナ法', en: 'Cartagena Protocol' },
-    [RegulationType.SafetyHealthLaw]: { jp: '労働安全衛生法', en: 'Industrial Safety and Health Act' },
-    [RegulationType.FireServiceLaw]: { jp: '消防法', en: 'Fire Service Act' },
-    [RegulationType.PoisonControlLaw]: { jp: '毒物及び劇物取締法', en: 'Poisonous and Deleterious Substances Control Law' },
-    [RegulationType.Other]: { jp: 'その他', en: 'Other' }
+    [RegulationType.PharmaceuticalLaw]: { key: 'regTypePharma' },
+    [RegulationType.CartegenaLaw]: { key: 'regTypeCartegena' },
+    [RegulationType.SafetyHealthLaw]: { key: 'regTypeSafetyHealth' },
+    [RegulationType.FireServiceLaw]: { key: 'regTypeFireService' },
+    [RegulationType.PoisonControlLaw]: { key: 'regTypePoisonControl' },
+    [RegulationType.Other]: { key: 'categoryOther' }
   };
 
-  // ステータスのラベルと色
   const statusConfig = {
-    [SubmissionStatus.NotRequired]: { 
-      labelJP: '不要', 
-      labelEN: 'Not Required', 
-      color: 'bg-gray-200 text-gray-700' 
-    },
-    [SubmissionStatus.Required]: { 
-      labelJP: '提出必要', 
-      labelEN: 'Required', 
-      color: 'bg-red-100 text-red-700' 
-    },
-    [SubmissionStatus.Preparing]: { 
-      labelJP: '準備中', 
-      labelEN: 'Preparing', 
-      color: 'bg-yellow-100 text-yellow-700' 
-    },
-    [SubmissionStatus.Submitted]: { 
-      labelJP: '提出済み', 
-      labelEN: 'Submitted', 
-      color: 'bg-blue-100 text-blue-700' 
-    },
-    [SubmissionStatus.Approved]: { 
-      labelJP: '承認済み', 
-      labelEN: 'Approved', 
-      color: 'bg-green-100 text-green-700' 
-    },
-    [SubmissionStatus.Rejected]: { 
-      labelJP: '却下', 
-      labelEN: 'Rejected', 
-      color: 'bg-red-200 text-red-800' 
-    },
-    [SubmissionStatus.Expired]: { 
-      labelJP: '期限切れ', 
-      labelEN: 'Expired', 
-      color: 'bg-gray-300 text-gray-800' 
-    }
+    [SubmissionStatus.NotRequired]: { key: 'statusNotRequired', color: 'bg-gray-200 text-gray-700' },
+    [SubmissionStatus.Required]: { key: 'statusRequired', color: 'bg-red-100 text-red-700' },
+    [SubmissionStatus.Preparing]: { key: 'statusPreparing', color: 'bg-yellow-100 text-yellow-700' },
+    [SubmissionStatus.Submitted]: { key: 'statusSubmitted', color: 'bg-blue-100 text-blue-700' },
+    [SubmissionStatus.Approved]: { key: 'statusApproved', color: 'bg-green-100 text-green-700' },
+    [SubmissionStatus.Rejected]: { key: 'statusRejected', color: 'bg-red-200 text-red-800' },
+    [SubmissionStatus.Expired]: { key: 'expired', color: 'bg-gray-300 text-gray-800' }
   };
 
   const handleOpenModal = () => {
@@ -94,25 +65,23 @@ export const RegulatoryCompliance: React.FC = () => {
   const handleAddRequirement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRequirement.requirementNameJP || !newRequirement.requirementNameEN || !newRequirement.submissionAuthority) {
-        showToast(isJapanese ? '必須項目を入力してください。' : 'Please fill in required fields.', 'error');
+        showToast(t('requiredFields'), 'error');
         return;
     }
     const result = await addRegulatoryRequirement(newRequirement as any);
     if (result.success === false) {
-        showToast(isJapanese ? '要件の追加に失敗しました。' : 'Failed to add requirement.', 'error');
+        showToast(t('addRequirementFailed'), 'error');
     } else {
-        showToast(isJapanese ? '新しい法規制要件を追加しました。' : 'Added new regulatory requirement.', 'success');
+        showToast(t('addRequirementSuccess'), 'success');
         setIsModalOpen(false);
     }
   };
 
-  // フィルタリングされた要件
   const filteredRequirements = requirements.filter(req => 
     (isFacilityStaff || req.tenantId === currentUser?.companyId) &&
     (selectedType === 'ALL' || req.type === selectedType)
   );
 
-  // 期限が近い要件の警告
   const getDeadlineWarning = (deadline?: Date) => {
     if (!deadline) return null;
     
@@ -121,11 +90,11 @@ export const RegulatoryCompliance: React.FC = () => {
     );
     
     if (daysUntilDeadline < 0) {
-      return { text: isJapanese ? '期限超過' : 'Overdue', color: 'text-red-600' };
+      return { text: t('overdue'), color: 'text-red-600' };
     } else if (daysUntilDeadline <= 7) {
-      return { text: isJapanese ? `あと${daysUntilDeadline}日` : `${daysUntilDeadline} days left`, color: 'text-orange-600' };
+      return { text: `${t('daysLeft')}${daysUntilDeadline}${t('daysLeftSuffix')}`, color: 'text-orange-600' };
     } else if (daysUntilDeadline <= 30) {
-      return { text: isJapanese ? `あと${daysUntilDeadline}日` : `${daysUntilDeadline} days left`, color: 'text-yellow-600' };
+      return { text: `${t('daysLeft')}${daysUntilDeadline}${t('daysLeftSuffix')}`, color: 'text-yellow-600' };
     }
     return null;
   };
@@ -134,7 +103,7 @@ export const RegulatoryCompliance: React.FC = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">
-          {isJapanese ? '法規制・コンプライアンス管理' : 'Regulatory Compliance Management'}
+          {t('regComplianceManagement')}
         </h2>
         
         <div className="flex gap-2">
@@ -143,96 +112,58 @@ export const RegulatoryCompliance: React.FC = () => {
                 onClick={() => setShowSupportPanel(!showSupportPanel)}
                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
               >
-                {isJapanese ? 'サポート情報' : 'Support Info'}
+                {t('supportInfo')}
               </button>
             )}
             <button onClick={handleOpenModal} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                {isJapanese ? '新規要件追加' : 'New Requirement'}
+                {t('newRequirement')}
             </button>
         </div>
       </div>
 
-      {/* 概要カード */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-          <div className="text-sm text-red-600 font-medium">
-            {isJapanese ? '提出必要' : 'Required'}
-          </div>
-          <div className="text-2xl font-bold text-red-700">
-            {filteredRequirements.filter(r => r.submissionStatus === SubmissionStatus.Required).length}
-          </div>
+          <div className="text-sm text-red-600 font-medium">{t('statusRequired')}</div>
+          <div className="text-2xl font-bold text-red-700">{filteredRequirements.filter(r => r.submissionStatus === SubmissionStatus.Required).length}</div>
         </div>
-        
         <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-          <div className="text-sm text-yellow-600 font-medium">
-            {isJapanese ? '準備中' : 'Preparing'}
-          </div>
-          <div className="text-2xl font-bold text-yellow-700">
-            {filteredRequirements.filter(r => r.submissionStatus === SubmissionStatus.Preparing).length}
-          </div>
+          <div className="text-sm text-yellow-600 font-medium">{t('statusPreparing')}</div>
+          <div className="text-2xl font-bold text-yellow-700">{filteredRequirements.filter(r => r.submissionStatus === SubmissionStatus.Preparing).length}</div>
         </div>
-        
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <div className="text-sm text-blue-600 font-medium">
-            {isJapanese ? '提出済み' : 'Submitted'}
-          </div>
-          <div className="text-2xl font-bold text-blue-700">
-            {filteredRequirements.filter(r => r.submissionStatus === SubmissionStatus.Submitted).length}
-          </div>
+          <div className="text-sm text-blue-600 font-medium">{t('statusSubmitted')}</div>
+          <div className="text-2xl font-bold text-blue-700">{filteredRequirements.filter(r => r.submissionStatus === SubmissionStatus.Submitted).length}</div>
         </div>
-        
         <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-          <div className="text-sm text-green-600 font-medium">
-            {isJapanese ? '承認済み' : 'Approved'}
-          </div>
-          <div className="text-2xl font-bold text-green-700">
-            {filteredRequirements.filter(r => r.submissionStatus === SubmissionStatus.Approved).length}
-          </div>
+          <div className="text-sm text-green-600 font-medium">{t('statusApproved')}</div>
+          <div className="text-2xl font-bold text-green-700">{filteredRequirements.filter(r => r.submissionStatus === SubmissionStatus.Approved).length}</div>
         </div>
       </div>
 
-      {/* フィルター */}
       <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <label className="block text-sm font-medium mb-2">
-          {isJapanese ? '法規制タイプでフィルター' : 'Filter by Regulation Type'}
-        </label>
+        <label className="block text-sm font-medium mb-2">{t('filterByRegulation')}</label>
         <select
           value={selectedType}
           onChange={(e) => setSelectedType(e.target.value as RegulationType | 'ALL')}
           className="w-full border rounded p-2"
         >
-          <option value="ALL">{isJapanese ? 'すべて' : 'All'}</option>
-          {Object.entries(regulationTypeLabels).map(([key, label]) => (
-            <option key={key} value={key as RegulationType}>
-              {isJapanese ? label.jp : label.en}
-            </option>
+          <option value="ALL">{t('all')}</option>
+          {Object.entries(regulationTypeLabels).map(([key, {key: tKey}]) => (
+            <option key={key} value={key as RegulationType}>{t(tKey as any)}</option>
           ))}
         </select>
       </div>
 
-      {/* 要件一覧テーブル */}
       <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="min-w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isJapanese ? '法規制' : 'Regulation'}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isJapanese ? '要件名' : 'Requirement'}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isJapanese ? '提出先' : 'Authority'}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isJapanese ? '期限' : 'Deadline'}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isJapanese ? 'ステータス' : 'Status'}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isJapanese ? '操作' : 'Actions'}
-              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('regulation')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('requirementName')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('authority')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('deadline')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('actions')}</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -242,56 +173,26 @@ export const RegulatoryCompliance: React.FC = () => {
               
               return (
                 <tr key={req.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {isJapanese 
-                      ? regulationTypeLabels[req.type].jp 
-                      : regulationTypeLabels[req.type].en
-                    }
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">{t(regulationTypeLabels[req.type].key as any)}</td>
                   <td className="px-6 py-4 text-sm">
-                    <div className="font-medium">
-                      {isJapanese ? req.requirementNameJP : req.requirementNameEN}
-                    </div>
-                    <div className="text-gray-500 text-xs mt-1">
-                      {isJapanese ? req.descriptionJP : req.descriptionEN}
-                    </div>
+                    <div className="font-medium">{isJapanese ? req.requirementNameJP : req.requirementNameEN}</div>
+                    <div className="text-gray-500 text-xs mt-1">{isJapanese ? req.descriptionJP : req.descriptionEN}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {req.submissionAuthority}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">{req.submissionAuthority}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     {req.submissionDeadline ? (
                       <>
                         <div>{new Date(req.submissionDeadline).toLocaleDateString()}</div>
-                        {deadlineWarning && (
-                          <div className={`text-xs mt-1 font-medium ${deadlineWarning.color}`}>
-                            {deadlineWarning.text}
-                          </div>
-                        )}
+                        {deadlineWarning && (<div className={`text-xs mt-1 font-medium ${deadlineWarning.color}`}>{deadlineWarning.text}</div>)}
                       </>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
+                    ) : (<span className="text-gray-400">-</span>)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded ${status.color}`}>
-                      {isJapanese ? status.labelJP : status.labelEN}
-                    </span>
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${status.color}`}>{t(status.key as any)}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <button className="text-blue-600 hover:text-blue-800 mr-3">
-                      {isJapanese ? '詳細' : 'Details'}
-                    </button>
-                    {req.documentUrl && (
-                      <a 
-                        href={req.documentUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-green-600 hover:text-green-800"
-                      >
-                        {isJapanese ? '書類' : 'Document'}
-                      </a>
-                    )}
+                    <button className="text-blue-600 hover:text-blue-800 mr-3">{t('details')}</button>
+                    {req.documentUrl && (<a href={req.documentUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-800">{t('document')}</a>)}
                   </td>
                 </tr>
               );
@@ -303,78 +204,61 @@ export const RegulatoryCompliance: React.FC = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
-            <h3 className="text-lg font-bold mb-4">{isJapanese ? '新規法規制要件の追加' : 'Add New Regulatory Requirement'}</h3>
+            <h3 className="text-lg font-bold mb-4">{t('newRequirement')}</h3>
             <form onSubmit={handleAddRequirement} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium">{isJapanese ? '要件名 (日本語)' : 'Requirement Name (JP)'}</label>
+                <label className="block text-sm font-medium">{t('requirementNameJP')}</label>
                 <input type="text" value={newRequirement.requirementNameJP || ''} onChange={e => setNewRequirement(p => ({...p, requirementNameJP: e.target.value}))} className="w-full border rounded p-2 mt-1" required />
               </div>
               <div>
-                <label className="block text-sm font-medium">{isJapanese ? '要件名 (英語)' : 'Requirement Name (EN)'}</label>
+                <label className="block text-sm font-medium">{t('requirementNameEN')}</label>
                 <input type="text" value={newRequirement.requirementNameEN || ''} onChange={e => setNewRequirement(p => ({...p, requirementNameEN: e.target.value}))} className="w-full border rounded p-2 mt-1" required />
               </div>
               <div>
-                <label className="block text-sm font-medium">{isJapanese ? '提出先' : 'Authority'}</label>
+                <label className="block text-sm font-medium">{t('authority')}</label>
                 <input type="text" value={newRequirement.submissionAuthority || ''} onChange={e => setNewRequirement(p => ({...p, submissionAuthority: e.target.value}))} className="w-full border rounded p-2 mt-1" required />
               </div>
               <div>
-                <label className="block text-sm font-medium">{isJapanese ? '提出期限' : 'Submission Deadline'}</label>
+                <label className="block text-sm font-medium">{t('deadline')}</label>
                 <input type="date" value={newRequirement.submissionDeadline ? new Date(newRequirement.submissionDeadline).toISOString().split('T')[0] : ''} onChange={e => setNewRequirement(p => ({...p, submissionDeadline: new Date(e.target.value)}))} className="w-full border rounded p-2 mt-1" />
               </div>
               <div className="flex justify-end gap-2 mt-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border rounded hover:bg-gray-50">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{isJapanese ? '追加' : 'Add'}</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border rounded hover:bg-gray-50">{t('cancel')}</button>
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{t('add')}</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* 社労士・行政書士向けサポート情報パネル */}
       {canManageSupport && showSupportPanel && (
         <div className="mt-6 bg-blue-50 p-6 rounded-lg border border-blue-200">
-          <h3 className="text-lg font-bold mb-4">
-            {isJapanese ? 'サポート担当者向け情報' : 'Support Staff Information'}
-          </h3>
-          
+          <h3 className="text-lg font-bold mb-4">{t('supportStaffInfo')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* 社労士向け */}
             <div className="bg-white p-4 rounded-lg">
-              <h4 className="font-bold text-blue-700 mb-3">
-                {isJapanese ? '社労士担当分野' : 'Social Insurance Labor Consultant'}
-              </h4>
+              <h4 className="font-bold text-blue-700 mb-3">{t('socialInsuranceLaborConsultant')}</h4>
               <ul className="space-y-2 text-sm">
-                <li>• {isJapanese ? '労働安全衛生法関連' : 'Industrial Safety and Health Act'}</li>
-                <li>• {isJapanese ? '労働基準法関連' : 'Labor Standards Act'}</li>
-                <li>• {isJapanese ? '社会保険手続き' : 'Social Insurance Procedures'}</li>
-                <li>• {isJapanese ? '就業規則作成・届出' : 'Employment Regulations'}</li>
+                <li>• {t('regTypeSafetyHealth')}</li>
+                <li>• {t('laborStandardsAct')}</li>
+                <li>• {t('socialInsuranceProcedures')}</li>
+                <li>• {t('employmentRegulations')}</li>
               </ul>
             </div>
-
-            {/* 行政書士向け */}
             <div className="bg-white p-4 rounded-lg">
-              <h4 className="font-bold text-green-700 mb-3">
-                {isJapanese ? '行政書士担当分野' : 'Administrative Scrivener'}
-              </h4>
+              <h4 className="font-bold text-green-700 mb-3">{t('administrativeScrivener')}</h4>
               <ul className="space-y-2 text-sm">
-                <li>• {isJapanese ? '薬機法関連届出' : 'Pharmaceutical Affairs Law'}</li>
-                <li>• {isJapanese ? 'カルタヘナ法届出' : 'Cartagena Protocol'}</li>
-                <li>• {isJapanese ? '毒劇法関連' : 'Poison Control Law'}</li>
-                <li>• {isJapanese ? '各種許認可申請' : 'Various License Applications'}</li>
+                <li>• {t('regTypePharma')}</li>
+                <li>• {t('regTypeCartegena')}</li>
+                <li>• {t('regTypePoisonControl')}</li>
+                <li>• {t('licenseApplications')}</li>
               </ul>
             </div>
           </div>
         </div>
       )}
 
-      {/* 注意事項 */}
       <div className="mt-6 p-4 bg-yellow-50 rounded border border-yellow-200">
-        <p className="text-sm text-yellow-800">
-          {isJapanese 
-            ? '※ 法規制要件は企業の事業内容により異なります。不明な点は施設管理者または専門家にご相談ください。'
-            : '※ Regulatory requirements vary by business type. Please consult facility staff or specialists for clarification.'
-          }
-        </p>
+        <p className="text-sm text-yellow-800">{t('regDisclaimer')}</p>
       </div>
     </div>
   );

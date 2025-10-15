@@ -5,6 +5,7 @@ import { SDS, Certificate, CertificateStatus, EhsIncident, SDSStatus } from '../
 import { Invoice } from '../types';
 import { User } from '../types';
 import { Language } from '../types';
+import { translate } from '../i18n/translations';
 
 /**
  * 月次レポートのデータ集計に必要な入力データ
@@ -60,8 +61,6 @@ export interface MonthlyReportData {
   };
 }
 
-const isJapanese = (language: Language) => language === Language.JA;
-
 /**
  * 指定された年月のデータを集計します。
  * @param year - 集計対象の年
@@ -75,7 +74,7 @@ export const aggregateMonthlyData = (
   sources: MonthlyDataSources
 ): MonthlyReportData => {
   const { reservations, equipment, consumables, sds, certificates, invoices, users, incidents, language } = sources;
-
+  const isJapanese = language === Language.JA;
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0, 23, 59, 59);
 
@@ -94,7 +93,7 @@ export const aggregateMonthlyData = (
         return sum;
     }, 0);
     return {
-      equipmentName: isJapanese(language) ? e.nameJP : e.nameEN,
+      equipmentName: isJapanese ? e.nameJP : e.nameEN,
       totalHours: Math.round(totalMinutes / 60),
       reservationCount: equipReservations.length,
     };
@@ -116,17 +115,17 @@ export const aggregateMonthlyData = (
   const hazardousRatio = hazardousItems.reduce((sum, item) => sum + calculateMultiple(item), 0);
   
   const allStockoutItems = consumables.filter(c => c.stock <= 0);
-  const stockoutItems = allStockoutItems.slice(0, 10).map(c => isJapanese(language) ? c.nameJP : c.nameEN);
+  const stockoutItems = allStockoutItems.slice(0, 10).map(c => isJapanese ? c.nameJP : c.nameEN);
   if (allStockoutItems.length > 10) {
       const remainingCount = allStockoutItems.length - 10;
-      stockoutItems.push(isJapanese(language) ? `...他${remainingCount}件` : `...and ${remainingCount} more`);
+      stockoutItems.push(translate('moreItems', language, { count: remainingCount }));
   }
 
   const allReorderItems = consumables.filter(c => c.stock > 0 && c.stock <= c.lowStockThreshold);
-  const reorderNeededItems = allReorderItems.slice(0, 10).map(c => isJapanese(language) ? c.nameJP : c.nameEN);
+  const reorderNeededItems = allReorderItems.slice(0, 10).map(c => isJapanese ? c.nameJP : c.nameEN);
   if (allReorderItems.length > 10) {
       const remainingCount = allReorderItems.length - 10;
-      reorderNeededItems.push(isJapanese(language) ? `...他${remainingCount}件` : `...and ${remainingCount} more`);
+      reorderNeededItems.push(translate('moreItems', language, { count: remainingCount }));
   }
 
 

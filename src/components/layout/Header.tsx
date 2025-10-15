@@ -7,6 +7,7 @@ import { useNotificationsContext } from '../../contexts/NotificationContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { BellIcon, QrCodeIcon, MenuIcon, LabIcon } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -24,7 +25,8 @@ const StatusIndicator: React.FC<{ status: UserAvailabilityStatus }> = ({ status 
 
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick, onNotificationsClick }) => {
-  const { language, setLanguage, currentUser, isFacilityStaff, isJapanese } = useSessionContext();
+  const { language, setLanguage, currentUser, isFacilityStaff } = useSessionContext();
+  const { t, isJapanese } = useTranslation();
   const { notifications } = useNotificationsContext();
   const { companies } = useCompanyContext();
   const { openModal } = useModalContext();
@@ -41,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onNotificationsClick }) =>
         <button
           onClick={onMenuClick}
           className="p-3 mr-2 text-ever-black md:hidden"
-          aria-label={isJapanese ? "メニューを開く" : "Open menu"}
+          aria-label={t('openMenu')}
         >
           <MenuIcon className="h-6 w-6" />
         </button>
@@ -55,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onNotificationsClick }) =>
         <button
             onClick={() => openModal({ type: 'qrScanner', props: {} })}
             className="p-3 text-ever-black hover:bg-white/20 rounded-full transition-colors relative"
-            aria-label={isJapanese ? "QRスキャン" : "QR Scan"}
+            aria-label={t('qrScan')}
         >
             <QrCodeIcon className="h-6 w-6" />
         </button>
@@ -63,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onNotificationsClick }) =>
         <button
             onClick={onNotificationsClick}
             className="p-3 text-ever-black hover:bg-white/20 rounded-full transition-colors relative"
-            aria-label={isJapanese ? "通知" : "Notifications"}
+            aria-label={t('notifications')}
         >
             <BellIcon className="h-6 w-6" />
             {unreadCount > 0 && (
@@ -76,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, onNotificationsClick }) =>
         <button
           onClick={() => setLanguage(isJapanese ? Language.EN : Language.JA)}
           className="p-3 text-ever-black hover:bg-white/20 rounded-full transition-colors font-semibold text-sm"
-          aria-label={isJapanese ? "言語を英語に切り替え" : "Switch language to Japanese"}
+          aria-label={isJapanese ? t('switchLangToEN') : t('switchLangToJA')}
         >
           {isJapanese ? 'EN' : 'JA'}
         </button>

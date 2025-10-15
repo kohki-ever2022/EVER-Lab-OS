@@ -13,7 +13,7 @@ class Logger {
   
   constructor() {
     // This relies on the build tool (like Vite) correctly setting this environment variable.
-    this.isDevelopment = process.env.NODE_ENV !== 'production';
+    this.isDevelopment = import.meta.env.MODE !== 'production';
     this.level = this.isDevelopment ? LogLevel.DEBUG : LogLevel.WARN;
   }
   

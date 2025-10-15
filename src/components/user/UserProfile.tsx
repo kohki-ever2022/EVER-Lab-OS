@@ -5,9 +5,11 @@ import { useToast } from '../../contexts/ToastContext';
 import { useUserActions } from '../../hooks/useUserActions';
 // FIX: import from barrel file
 import { User } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const UserProfile: React.FC = () => {
-    const { currentUser, isJapanese } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t, isJapanese } = useTranslation();
     const { companies } = useCompanyContext();
     const { showToast } = useToast();
     const { updateUser } = useUserActions();
@@ -23,7 +25,7 @@ const UserProfile: React.FC = () => {
     const handleSave = async (e: FormEvent) => {
         e.preventDefault();
         if (name.trim().length < 2) {
-            showToast(isJapanese ? '名前は2文字以上で入力してください。' : 'Name must be at least 2 characters.', 'error');
+            showToast(t('nameMinLength'), 'error');
             return;
         }
         const result = await updateUser({ ...currentUser, name: name.trim() });
@@ -35,23 +37,23 @@ const UserProfile: React.FC = () => {
     };
 
     const infoFields = [
-        { labelJP: 'メールアドレス', labelEN: 'Email', value: currentUser.email },
-        { labelJP: '所属企業', labelEN: 'Company', value: company ? (isJapanese ? company.nameJP : company.nameEN) : '' },
-        { labelJP: '役割', labelEN: 'Role', value: currentUser.role },
-    ];
+        { labelKey: 'emailAddress', value: currentUser.email },
+        { labelKey: 'company', value: company ? (isJapanese ? company.nameJP : company.nameEN) : '' },
+        { labelKey: 'role', value: currentUser.role },
+    ] as const;
 
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-ever-black">
-                    {isJapanese ? 'プロフィール' : 'Profile'}
+                    {t('profile')}
                 </h2>
                 {!isEditing && (
                     <button
                         onClick={() => setIsEditing(true)}
                         className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded shadow text-sm"
                     >
-                        {isJapanese ? '編集' : 'Edit'}
+                        {t('edit')}
                     </button>
                 )}
             </div>
@@ -85,8 +87,8 @@ const UserProfile: React.FC = () => {
                 <div className="border-t pt-6">
                     <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                         {infoFields.map((field) => (
-                            <div key={field.labelEN} className="sm:col-span-1">
-                                <dt className="text-sm font-medium text-gray-500">{isJapanese ? field.labelJP : field.labelEN}</dt>
+                            <div key={field.labelKey} className="sm:col-span-1">
+                                <dt className="text-sm font-medium text-gray-500">{t(field.labelKey)}</dt>
                                 <dd className="mt-1 text-sm text-gray-900 break-words">{field.value}</dd>
                             </div>
                         ))}
@@ -99,13 +101,13 @@ const UserProfile: React.FC = () => {
                             onClick={() => { setIsEditing(false); setName(currentUser.name); }}
                             className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg"
                         >
-                            {isJapanese ? 'キャンセル' : 'Cancel'}
+                            {t('cancel')}
                         </button>
                         <button
                             onClick={handleSave}
                             className="bg-ever-blue text-white font-bold py-2 px-4 rounded-lg"
                         >
-                            {isJapanese ? '保存' : 'Save'}
+                            {t('save')}
                         </button>
                     </div>
                 )}

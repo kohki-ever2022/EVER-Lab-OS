@@ -5,6 +5,7 @@ import { useUserContext } from '../../contexts/UserContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useEquipmentActions } from '../../hooks/useEquipmentActions';
 import { useNotifications } from '../../hooks/useNotifications';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface Props {
     equipment: Equipment;
@@ -12,7 +13,8 @@ interface Props {
 }
 
 const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t } = useTranslation();
     const { users } = useUserContext();
     const { showToast } = useToast();
     const { addNotification } = useNotifications();
@@ -26,7 +28,8 @@ const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
 
         const updateResult = await updateEquipment({ ...equipment, status: EquipmentStatus.Maintenance });
         if (updateResult.success === false) {
-            showToast(isJapanese ? `機器ステータスの更新に失敗しました: ${updateResult.error.message}` : `Failed to update equipment status: ${updateResult.error.message}`, 'error');
+            // FIX: Use 'updateFailed' translation key which has been added to translations.ts.
+            showToast(`${t('updateFailed')}: ${updateResult.error.message}`, 'error');
             return;
         }
     
@@ -36,7 +39,8 @@ const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
         });
 
         if (logResult.success === false) {
-            showToast(isJapanese ? `メンテナンスログの追加に失敗しました: ${logResult.error.message}` : `Failed to add maintenance log: ${logResult.error.message}`, 'error');
+            // FIX: Use 'addFailed' translation key which has been added to translations.ts.
+            showToast(`${t('addFailed')}: ${logResult.error.message}`, 'error');
             return;
         }
 
@@ -50,22 +54,22 @@ const ReportIssueModal: React.FC<Props> = ({ equipment, onClose }) => {
             })
         });
 
-        showToast(isJapanese ? '不具合を報告しました。' : 'Issue reported successfully.', 'success');
+        showToast(t('issueReported'), 'success');
         onClose();
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 modal-backdrop">
             <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md modal-content">
-                <h3 className="text-2xl font-bold mb-6 text-ever-black">{isJapanese ? '不具合を報告' : 'Report Issue'}</h3>
+                <h3 className="text-2xl font-bold mb-6 text-ever-black">{t('reportIssue')}</h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">{isJapanese ? '問題の詳細' : 'Details of the issue'}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('detailsOfIssue')}</label>
                         <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={5} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
                     </div>
                     <div className="mt-8 flex justify-end space-x-3">
-                        <button type="button" onClick={onClose} className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-                        <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">{isJapanese ? '報告する' : 'Report'}</button>
+                        <button type="button" onClick={onClose} className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg">{t('cancel')}</button>
+                        <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">{t('report')}</button>
                     </div>
                 </form>
             </div>

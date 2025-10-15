@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { ConsumableNotification } from '../../types';
-import { Language } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useLabStateContext } from '../../contexts/AppProviders';
 import { useToast } from '../../contexts/ToastContext';
 import { useAdminActions } from '../../hooks/useAdminActions';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export const FacilityConsumableNotification: React.FC = () => {
-  const { currentUser, isFacilityStaff, isJapanese } = useSessionContext();
+  const { currentUser, isFacilityStaff } = useSessionContext();
+  const { t, isJapanese } = useTranslation();
   const { consumableNotifications } = useLabStateContext();
   const { showToast } = useToast();
   const { addConsumableNotification, updateConsumableNotificationStatus } = useAdminActions();
@@ -31,21 +32,21 @@ export const FacilityConsumableNotification: React.FC = () => {
 
   // Priority and Status configurations
   const priorityConfig = {
-    LOW: { labelJP: '低', labelEN: 'Low', color: 'bg-gray-100 text-gray-700', icon: '📋' },
-    MEDIUM: { labelJP: '中', labelEN: 'Medium', color: 'bg-blue-100 text-blue-700', icon: '📌' },
-    HIGH: { labelJP: '高', labelEN: 'High', color: 'bg-orange-100 text-orange-700', icon: '⚠️' },
-    URGENT: { labelJP: '緊急', labelEN: 'Urgent', color: 'bg-red-100 text-red-700', icon: '🚨' }
-  };
+    LOW: { labelKey: 'priorityLow', color: 'bg-gray-100 text-gray-700', icon: '📋' },
+    MEDIUM: { labelKey: 'priorityMedium', color: 'bg-blue-100 text-blue-700', icon: '📌' },
+    HIGH: { labelKey: 'priorityHigh', color: 'bg-orange-100 text-orange-700', icon: '⚠️' },
+    URGENT: { labelKey: 'priorityUrgent', color: 'bg-red-100 text-red-700', icon: '🚨' }
+  } as const;
   const statusConfig = {
-    REPORTED: { labelJP: '報告済み', labelEN: 'Reported', color: 'bg-yellow-100 text-yellow-700' },
-    ACKNOWLEDGED: { labelJP: '確認済み', labelEN: 'Acknowledged', color: 'bg-blue-100 text-blue-700' },
-    RESTOCKING: { labelJP: '補充中', labelEN: 'Restocking', color: 'bg-purple-100 text-purple-700' },
-    COMPLETED: { labelJP: '完了', labelEN: 'Completed', color: 'bg-green-100 text-green-700' }
-  };
+    REPORTED: { labelKey: 'statusReported', color: 'bg-yellow-100 text-yellow-700' },
+    ACKNOWLEDGED: { labelKey: 'statusAcknowledged', color: 'bg-blue-100 text-blue-700' },
+    RESTOCKING: { labelKey: 'statusRestocking', color: 'bg-purple-100 text-purple-700' },
+    COMPLETED: { labelKey: 'statusCompleted', color: 'bg-green-100 text-green-700' }
+  } as const;
 
   const handleSubmitReport = () => {
     if (!formData.consumableId || !formData.location || !currentUser) {
-      showToast(isJapanese ? '消耗品名と設置場所を選択してください' : 'Please select a consumable and location', 'error');
+      showToast(t('selectConsumableAndLocation'), 'error');
       return;
     }
     const consumableInfo = facilityConsumables.find(c => c.id === formData.consumableId);
@@ -59,7 +60,7 @@ export const FacilityConsumableNotification: React.FC = () => {
       location: formData.location,
       currentStock: 0,
       minimumStock: 0,
-      unit: isJapanese ? '個' : 'units',
+      unit: t('unitItems'),
       priority: formData.priority,
       notes: formData.notes,
       reportedBy: currentUser.id,
@@ -77,36 +78,36 @@ export const FacilityConsumableNotification: React.FC = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">{isJapanese ? '施設消耗品 不足通知' : 'Facility Consumables Shortage Notification'}</h2>
+        <h2 className="text-2xl font-bold">{t('facilityConsumablesShortageNotification')}</h2>
         {!isFacilityStaff && (
           <button onClick={() => setShowReportForm(true)} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 flex items-center gap-2">
-            <span>🚨</span><span>{isJapanese ? '不足を報告' : 'Report Shortage'}</span>
+            <span>🚨</span><span>{t('reportShortage')}</span>
           </button>
         )}
       </div>
 
       {showReportForm && (
         <div className="bg-white p-6 rounded-lg shadow mb-6 border-2 border-red-200">
-          <h3 className="text-lg font-bold mb-4 text-red-700">{isJapanese ? '消耗品不足の報告' : 'Report Consumable Shortage'}</h3>
+          <h3 className="text-lg font-bold mb-4 text-red-700">{t('reportConsumableShortage')}</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">{isJapanese ? '消耗品' : 'Consumable'} *</label>
+              <label className="block text-sm font-medium mb-2">{t('consumable')} *</label>
               <select value={formData.consumableId} onChange={(e) => setFormData({...formData, consumableId: e.target.value, location: ''})} className="w-full border rounded p-2">
-                <option value="">{isJapanese ? '選択してください' : 'Select'}</option>
+                <option value="">{t('select')}</option>
                 {facilityConsumables.map(item => <option key={item.id} value={item.id}>{isJapanese ? item.nameJP : item.nameEN}</option>)}
               </select>
             </div>
             {formData.consumableId && (
               <div>
-                <label className="block text-sm font-medium mb-2">{isJapanese ? '設置場所' : 'Location'} *</label>
+                <label className="block text-sm font-medium mb-2">{t('location')} *</label>
                 <select value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} className="w-full border rounded p-2">
-                  <option value="">{isJapanese ? '選択してください' : 'Select'}</option>
+                  <option value="">{t('select')}</option>
                   {facilityConsumables.find(c => c.id === formData.consumableId)?.locations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
                 </select>
               </div>
             )}
             <div>
-                <label className="block text-sm font-medium mb-2">{isJapanese ? '緊急度' : 'Priority'}</label>
+                <label className="block text-sm font-medium mb-2">{t('priorityLevel')}</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {(Object.keys(priorityConfig) as Array<keyof typeof priorityConfig>).map(priority => {
                         const config = priorityConfig[priority];
@@ -114,28 +115,28 @@ export const FacilityConsumableNotification: React.FC = () => {
                             <button key={priority} type="button" onClick={() => setFormData({...formData, priority})}
                                 className={`p-3 rounded border-2 transition-all ${formData.priority === priority ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
                                 <div className="text-2xl mb-1">{config.icon}</div>
-                                <div className="text-sm font-medium">{isJapanese ? config.labelJP : config.labelEN}</div>
+                                <div className="text-sm font-medium">{t(config.labelKey)}</div>
                             </button>
                         );
                     })}
                 </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">{isJapanese ? '備考' : 'Notes'}</label>
-              <textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="w-full border rounded p-2" rows={2} placeholder={isJapanese ? '詳細情報があれば記入してください' : 'Optional additional details'}/>
+              <label className="block text-sm font-medium mb-2">{t('notes')}</label>
+              <textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="w-full border rounded p-2" rows={2} placeholder={t('notesPlaceholder')}/>
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
-            <button type="button" onClick={() => setShowReportForm(false)} className="px-4 py-2 border rounded hover:bg-gray-50">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-            <button type="button" onClick={handleSubmitReport} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">{isJapanese ? '報告する' : 'Submit Report'}</button>
+            <button type="button" onClick={() => setShowReportForm(false)} className="px-4 py-2 border rounded hover:bg-gray-50">{t('cancel')}</button>
+            <button type="button" onClick={handleSubmitReport} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">{t('submitReport')}</button>
           </div>
         </div>
       )}
 
       <div className="bg-white rounded-lg shadow mb-6">
-        <div className="p-4 border-b bg-gray-50"><h3 className="font-bold">{isJapanese ? '対応中の通知' : 'Active Notifications'}</h3></div>
+        <div className="p-4 border-b bg-gray-50"><h3 className="font-bold">{t('activeNotifications')}</h3></div>
         <div className="divide-y">
-          {activeNotifications.length === 0 ? (<div className="p-6 text-center text-gray-500">{isJapanese ? '対応中の通知はありません' : 'No active notifications'}</div>) : (
+          {activeNotifications.length === 0 ? (<div className="p-6 text-center text-gray-500">{t('noActiveNotifications')}</div>) : (
             activeNotifications.map(notif => {
               const priority = priorityConfig[notif.priority];
               const status = statusConfig[notif.status];
@@ -146,19 +147,19 @@ export const FacilityConsumableNotification: React.FC = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xl">{priority.icon}</span>
                         <span className="font-bold text-lg">{isJapanese ? notif.consumableNameJP : notif.consumableNameEN}</span>
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${priority.color}`}>{isJapanese ? priority.labelJP : priority.labelEN}</span>
+                        <span className={`px-2 py-1 text-xs font-medium rounded ${priority.color}`}>{t(priority.labelKey)}</span>
                       </div>
-                      <div className="text-sm text-gray-600 mb-2"><span className="font-medium">{isJapanese ? '場所：' : 'Location: '}</span>{notif.location}</div>
-                      <div className="text-sm text-gray-600 mb-2"><span className="font-medium">{isJapanese ? '報告日時：' : 'Reported: '}</span>{new Date(notif.reportedDate).toLocaleString(isJapanese ? 'ja-JP' : 'en-US')}</div>
+                      <div className="text-sm text-gray-600 mb-2"><span className="font-medium">{t('location')}: </span>{notif.location}</div>
+                      <div className="text-sm text-gray-600 mb-2"><span className="font-medium">{t('reportDate')}: </span>{new Date(notif.reportedDate).toLocaleString(isJapanese ? 'ja-JP' : 'en-US')}</div>
                       {notif.notes && <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded mt-2">{notif.notes}</div>}
                     </div>
-                    <div className="ml-4"><span className={`px-3 py-1 text-sm font-medium rounded ${status.color}`}>{isJapanese ? status.labelJP : status.labelEN}</span></div>
+                    <div className="ml-4"><span className={`px-3 py-1 text-sm font-medium rounded ${status.color}`}>{t(status.labelKey)}</span></div>
                   </div>
                   {isFacilityStaff && (
                     <div className="flex gap-2 mt-3">
-                      {notif.status === 'REPORTED' && <button onClick={() => updateConsumableNotificationStatus(notif.id, 'ACKNOWLEDGED')} className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">{isJapanese ? '確認する' : 'Acknowledge'}</button>}
-                      {notif.status === 'ACKNOWLEDGED' && <button onClick={() => updateConsumableNotificationStatus(notif.id, 'RESTOCKING')} className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700">{isJapanese ? '補充開始' : 'Start Restocking'}</button>}
-                      {notif.status === 'RESTOCKING' && <button onClick={() => updateConsumableNotificationStatus(notif.id, 'COMPLETED')} className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">{isJapanese ? '補充完了' : 'Complete'}</button>}
+                      {notif.status === 'REPORTED' && <button onClick={() => updateConsumableNotificationStatus(notif.id, 'ACKNOWLEDGED')} className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">{t('acknowledge')}</button>}
+                      {notif.status === 'ACKNOWLEDGED' && <button onClick={() => updateConsumableNotificationStatus(notif.id, 'RESTOCKING')} className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700">{t('startRestocking')}</button>}
+                      {notif.status === 'RESTOCKING' && <button onClick={() => updateConsumableNotificationStatus(notif.id, 'COMPLETED')} className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">{t('complete')}</button>}
                     </div>
                   )}
                 </div>
@@ -170,7 +171,7 @@ export const FacilityConsumableNotification: React.FC = () => {
       
       {completedNotifications.length > 0 && (
         <details className="bg-white rounded-lg shadow">
-          <summary className="p-4 cursor-pointer hover:bg-gray-50 font-bold">{isJapanese ? '完了済み通知履歴' : 'Completed Notifications History'} <span className="ml-2 text-gray-500">({completedNotifications.length})</span></summary>
+          <summary className="p-4 cursor-pointer hover:bg-gray-50 font-bold">{t('completedNotificationsHistory')} <span className="ml-2 text-gray-500">({completedNotifications.length})</span></summary>
           <div className="divide-y border-t">
             {completedNotifications.map(notif => (
               <div key={notif.id} className="p-4 text-sm"><div className="flex justify-between"><span className="font-medium">{isJapanese ? notif.consumableNameJP : notif.consumableNameEN}</span><span className="text-gray-500">{notif.restockedDate?.toLocaleDateString()}</span></div><div className="text-gray-600 text-xs mt-1">{notif.location}</div></div>

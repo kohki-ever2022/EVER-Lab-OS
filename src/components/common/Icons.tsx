@@ -1,5 +1,6 @@
 // src/components/common/Icons.tsx
 import React from 'react';
+import { ManualType } from '../../types';
 
 const iconProps = {
   strokeWidth: 1.5,
@@ -43,11 +44,20 @@ export const CogIcon: React.FC<{ className?: string }> = (props) => <svg xmlns="
 export const PencilIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L14.732 3.732z" /></svg>;
 
 // Icons from Equipment.tsx & modals/EquipmentManualsModal.tsx
-export const YoutubeIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2ZM17.2,9.47,14.8,11.2,12,9.36,9.2,11.2,6.8,9.47l-2,5.85,5.4,3.21,5.4,3.21Z" opacity=".3"/><path d="M12,22A10,10,0,1,1,22,12,10,10,0,0,1,12,22ZM12,4a8,8,0,1,0,8,8A8,8,0,0,0,12,4Z"/><path d="M12,15.64,6.6,18.85l2-5.85L4,9.47,10,9,2-6,2,6,6,0-4.59,3.53,2,5.85Z"/></svg>;
-export const PdfIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M20,2H8A2,2,0,0,0,6,4V16a2,2,0,0,0,2,2H20a2,2,0,0,0,2-2V4A2,2,0,0,0,20,2ZM12,16a2,2,0,1,1,2-2A2,2,0,0,1,12,16Zm6-7H16V7h2Z"/><path d="M4,6H2V20a2,2,0,0,0,2,2H16V20H4Z"/></svg>;
-export const LinkIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M17,12a1,1,0,0,0-1,1v5a1,1,0,0,1-1,1H7a1,1,0,0,1-1-1V10a1,1,0,0,1,1-1h5a1,1,0,0,0,0-2H7A3,3,0,0,0,4,10V18a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V13A1,1,0,0,0,17,12Z"/><path d="M20,2.93a1,1,0,0,0,0,1.41L15.41,9H18a1,1,0,0,0,0-2H12a1,1,0,0,0-1,1v6a1,1,0,0,0,2,0V8.41l4.29-4.3a1,1,0,0,0-1.41-1.41Z"/></svg>;
+export const YoutubeIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M10,15L15.19,12L10,9V15M21.56,7.17C21.69,7.64 21.78,8.27 21.84,9.07C21.91,9.87 21.94,10.56 21.94,11.16L22,12C22,14.19 21.84,15.8 21.56,16.83C21.31,17.73 20.73,18.31 19.83,18.56C19.36,18.69 18.73,18.78 17.93,18.84C17.13,18.91 16.44,18.94 15.84,18.94L15,19C12.81,19 11.2,18.84 10.17,18.56C9.27,18.31 8.69,17.73 8.44,16.83C8.31,16.36 8.22,15.73 8.16,14.93C8.09,14.13 8.06,13.44 8.06,12.84L8,12C8,9.81 8.16,8.2 8.44,7.17C8.69,6.27 9.27,5.69 10.17,5.44C11.2,5.16 12.81,5 15,5L15.84,5.06C16.44,5.06 17.13,5.09 17.93,5.16C18.73,5.22 19.36,5.31 19.83,5.44C20.73,5.69 21.31,6.27 21.56,7.17Z" /></svg>;
+export const PdfIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-red-800" fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M19,20H5V4H13.29L19,9.71V20M13,9V4H5A2,2 0 0,0 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V9H13M10.5,18H13.5V17H10.5V18M10.5,15H15.5V14H10.5V15M8.5,12H15.5V11H8.5V12Z" /></svg>;
+export const LinkIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M10.59,13.41C10.21,13.79 10,14.3 10,15C10,16.1 10.9,17 12,17H13A1,1 0 0,0 14,16C14,15.45 13.55,15 13,15H12C11.72,15 11.5,14.78 11.5,14.5C11.5,14.22 11.72,14 12,14H15V12H12C10.9,12 10,12.9 10,14C10,14.3 10.1,14.58 10.26,14.83L8.85,16.24C8.66,16.43 8.34,16.5 8,16.5C7.5,16.5 7.07,16.32 6.75,16L5,14.25L6.75,12.5C7.07,12.18 7.5,12 8,12C8.34,12 8.66,12.07 8.85,12.26L10.59,13.41M18,6.75C17.68,6.43 17.25,6.25 16.75,6.25C16.41,6.25 16.09,6.32 15.9,6.5L14.59,7.59C14.79,7.85 14.93,8.13 14.93,8.43C14.93,9.54 14.04,10.43 12.93,10.43H12V12.43H12.93C15.14,12.43 16.93,10.64 16.93,8.43C16.93,8.13 16.85,7.85 16.71,7.59L18.12,6.18C18.31,5.97 18.5,5.66 18.5,5.25C18.5,4.75 18.32,4.32 18,4L19.75,2.25L18,0.5L12,6.5L10.25,4.75L12,3L18,6.75Z" /></svg>;
 export const ArrowRightIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>;
 export const WarningIcon: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" {...props}><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.21 3.001-1.742 3.001H4.42c-1.532 0-2.492-1.667-1.742-3.001l5.58-9.92zM10 13a1 1 0 110-2 1 1 0 010 2zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>;
+
+export const getManualIcon = (type: ManualType) => {
+    switch (type) {
+        case ManualType.YouTube: return <YoutubeIcon />;
+        case ManualType.PDF: return <PdfIcon />;
+        case ManualType.ExternalLink: return <LinkIcon />;
+    }
+};
+
 
 // Icon from FavoriteConsumablesList.tsx
 export const HeartIconFill: React.FC<{className?: string}> = (props) => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24" {...props}><path d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" /></svg>;

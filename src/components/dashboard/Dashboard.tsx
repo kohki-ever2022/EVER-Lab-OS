@@ -5,6 +5,7 @@ import { useReservationContext } from '../../contexts/ReservationContext';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { Reservation, ReservationStatus, View, Announcement } from '../../types';
 import { CalendarIcon, PencilIcon, BeakerIcon, ArrowRightIcon } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const DashboardCard: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode, onViewAll?: () => void, viewAllText?: string}> = ({ title, icon, children, onViewAll, viewAllText }) => (
     <div className="bg-white p-6 rounded-lg shadow flex flex-col">
@@ -20,7 +21,8 @@ const DashboardCard: React.FC<{title: string, icon: React.ReactNode, children: R
 );
 
 const Dashboard: React.FC = () => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t, isJapanese } = useTranslation();
     const { announcements } = useAnnouncementContext();
     const { reservations } = useReservationContext();
     const { equipment } = useEquipmentContext();
@@ -46,17 +48,17 @@ const Dashboard: React.FC = () => {
     return (
         <div>
             <h1 className="text-3xl font-bold mb-6">
-                {isJapanese ? `ようこそ、${currentUser?.name}さん` : `Welcome, ${currentUser?.name}`}
+                {t('welcome')}{currentUser?.name}
             </h1>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Upcoming Reservations */}
                 <div className="lg:col-span-2">
                     <DashboardCard 
-                        title={isJapanese ? "今後の予約" : "Upcoming Reservations"}
+                        title={t('upcomingReservations')}
                         icon={<CalendarIcon className="h-6 w-6 text-ever-blue" />}
                         onViewAll={() => handleNavigate('reservations')}
-                        viewAllText={isJapanese ? 'すべて表示' : 'View All'}
+                        viewAllText={t('viewAll')}
                     >
                         {upcomingReservations.length > 0 ? (
                             <ul className="space-y-3">
@@ -75,7 +77,7 @@ const Dashboard: React.FC = () => {
                             </ul>
                         ) : (
                             <div className="text-center py-8 text-gray-500">
-                                <p>{isJapanese ? '今後の予約はありません。' : 'No upcoming reservations.'}</p>
+                                <p>{t('noUpcomingReservations')}</p>
                             </div>
                         )}
                     </DashboardCard>
@@ -84,18 +86,18 @@ const Dashboard: React.FC = () => {
                 {/* Quick Actions */}
                 <div>
                     <DashboardCard 
-                        title={isJapanese ? "クイックアクション" : "Quick Actions"}
+                        title={t('quickActions')}
                         icon={<BeakerIcon className="h-6 w-6 text-ever-blue" />}
                     >
                         <div className="space-y-3">
                             <button onClick={() => handleNavigate('equipment')} className="w-full text-left p-3 bg-ever-blue-light hover:bg-ever-blue-light/80 rounded-md font-semibold text-ever-blue-dark transition-colors">
-                                {isJapanese ? '機器を予約する' : 'Book Equipment'}
+                                {t('bookEquipment')}
                             </button>
                             <button onClick={() => handleNavigate('projects')} className="w-full text-left p-3 bg-ever-purple-light hover:bg-ever-purple-light/80 rounded-md font-semibold text-ever-purple-dark transition-colors">
-                                {isJapanese ? 'プロジェクトを見る' : 'View Projects'}
+                                {t('viewProjects')}
                             </button>
                              <button onClick={() => handleNavigate('consumablesStore')} className="w-full text-left p-3 bg-green-100 hover:bg-green-200/80 rounded-md font-semibold text-green-800 transition-colors">
-                                {isJapanese ? '消耗品ストア' : 'Consumables Store'}
+                                {t('consumablesStore')}
                             </button>
                         </div>
                     </DashboardCard>
@@ -104,10 +106,10 @@ const Dashboard: React.FC = () => {
                 {/* Announcements */}
                 <div className="lg:col-span-3">
                     <DashboardCard 
-                        title={isJapanese ? "お知らせ" : "Announcements"}
+                        title={t('announcements')}
                         icon={<PencilIcon className="h-6 w-6 text-ever-blue" />}
                         onViewAll={() => handleNavigate('announcements')}
-                        viewAllText={isJapanese ? 'すべて表示' : 'View All'}
+                        viewAllText={t('viewAll')}
                     >
                         {latestAnnouncements.length > 0 ? (
                              <ul className="space-y-3">
@@ -120,7 +122,7 @@ const Dashboard: React.FC = () => {
                             </ul>
                         ) : (
                              <div className="text-center py-8 text-gray-500">
-                                <p>{isJapanese ? '新しいお知らせはありません。' : 'No new announcements.'}</p>
+                                <p>{t('noAnnouncements')}</p>
                             </div>
                         )}
                     </DashboardCard>

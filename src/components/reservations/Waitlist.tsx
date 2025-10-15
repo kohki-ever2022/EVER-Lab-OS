@@ -3,9 +3,11 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useLabStateContext } from '../../contexts/AppProviders';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useReservationActions } from '../../hooks/useReservationActions';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const Waitlist: React.FC = () => {
-  const { isJapanese, currentUser } = useSessionContext();
+  const { currentUser } = useSessionContext();
+  const { t, isJapanese } = useTranslation();
   const { waitlist } = useLabStateContext();
   const { equipment } = useEquipmentContext();
   const { removeFromWaitlist } = useReservationActions();
@@ -13,9 +15,9 @@ const Waitlist: React.FC = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="font-bold text-lg mb-4">{isJapanese ? '待機リスト' : 'Waitlist'}</h3>
+      <h3 className="font-bold text-lg mb-4">{t('waitlist')}</h3>
       {userWaitlistEntries.length === 0 ? (
-        <p className="text-gray-500">{isJapanese ? '待機中の予約はありません。' : 'You are not on any waitlists.'}</p>
+        <p className="text-gray-500">{t('noWaitlists')}</p>
       ) : (
         <ul className="space-y-4">
           {userWaitlistEntries.map(entry => {
@@ -24,13 +26,13 @@ const Waitlist: React.FC = () => {
               <li key={entry.id} className="border-b pb-2">
                 <p className="font-semibold">{isJapanese ? eq?.nameJP : eq?.nameEN}</p>
                 <p className="text-sm text-gray-600">
-                  {isJapanese ? '希望時間:' : 'Requested:'} {new Date(entry.requestedStartTime).toLocaleString()}
+                  {t('requestedTime')} {new Date(entry.requestedStartTime).toLocaleString()}
                 </p>
                 <button 
                   onClick={() => removeFromWaitlist(entry.id)} 
                   className="text-red-500 text-xs mt-1"
                 >
-                  {isJapanese ? 'キャンセル' : 'Cancel'}
+                  {t('cancel')}
                 </button>
               </li>
             );

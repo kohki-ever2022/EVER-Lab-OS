@@ -5,6 +5,7 @@ import { useReservationContext } from '../../contexts/ReservationContext';
 import { useUserContext } from '../../contexts/UserContext';
 // FIX: import from barrel file
 import { Equipment, ReservationStatus } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface ScheduleEquipmentModalProps {
     equipment: Equipment;
@@ -12,7 +13,8 @@ interface ScheduleEquipmentModalProps {
 }
 
 const ScheduleEquipmentModal: React.FC<ScheduleEquipmentModalProps> = ({ equipment, onClose }) => {
-    const { isJapanese } = useSessionContext();
+    // FIX: Destructured isJapanese from useTranslation hook, where it is provided.
+    const { t, isJapanese } = useTranslation();
     const { reservations } = useReservationContext();
     const { users } = useUserContext();
 
@@ -36,7 +38,7 @@ const ScheduleEquipmentModal: React.FC<ScheduleEquipmentModalProps> = ({ equipme
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 modal-backdrop">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl modal-content max-h-[90vh] flex flex-col">
-                <h3 className="text-xl font-bold mb-4 text-gray-800">{isJapanese ? `${equipment.nameJP} のスケジュール` : `Schedule for ${equipment.nameEN}`}</h3>
+                <h3 className="text-xl font-bold mb-4 text-gray-800">{t('scheduleFor')} {isJapanese ? equipment.nameJP : equipment.nameEN}</h3>
                 
                 <div className="flex-grow overflow-y-auto pr-2">
                     {upcomingReservations.length > 0 ? (
@@ -51,7 +53,7 @@ const ScheduleEquipmentModal: React.FC<ScheduleEquipmentModalProps> = ({ equipme
                                     </p>
                                     {res.status === ReservationStatus.CheckedIn && (
                                          <span className="mt-1 inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                                             {isJapanese ? '使用中' : 'In Use'}
+                                             {t('statusInUse')}
                                          </span>
                                     )}
                                 </div>
@@ -59,14 +61,14 @@ const ScheduleEquipmentModal: React.FC<ScheduleEquipmentModalProps> = ({ equipme
                         </div>
                     ) : (
                         <div className="text-center py-12 text-gray-500">
-                            <p>{isJapanese ? '今後7日間に予約はありません。' : 'No reservations in the next 7 days.'}</p>
+                            <p>{t('noReservationsNext7Days')}</p>
                         </div>
                     )}
                 </div>
 
                 <div className="flex justify-end mt-6 pt-4 border-t">
                     <button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
-                        {isJapanese ? '閉じる' : 'Close'}
+                        {t('close')}
                     </button>
                 </div>
             </div>

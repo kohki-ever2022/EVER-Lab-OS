@@ -1,20 +1,19 @@
 import React from 'react';
-import { useSessionContext } from '../../contexts/SessionContext';
 import { useAnnouncementContext } from '../../contexts/AnnouncementContext';
-
+import { useTranslation } from '../../hooks/useTranslation';
 // FIX: import from barrel file
 import { Announcement } from '../../types';
 
 const Announcements: React.FC = () => {
     const { announcements } = useAnnouncementContext();
-    const { isJapanese } = useSessionContext();
+    const { t, isJapanese } = useTranslation();
 
     const sortedAnnouncements = [...announcements].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
     return (
         <div>
             <h2 className="text-3xl font-bold mb-6 text-ever-black">
-                {isJapanese ? 'お知らせ' : 'Announcements'}
+                {t('announcements')}
             </h2>
             <div className="space-y-4">
                 {sortedAnnouncements.length > 0 ? (
@@ -32,7 +31,7 @@ const Announcements: React.FC = () => {
                         </div>
                     ))
                 ) : (
-                    <p className="text-gray-500">{isJapanese ? 'お知らせはありません。' : 'No announcements.'}</p>
+                    <p className="text-gray-500">{t('noAnnouncements')}</p>
                 )}
             </div>
         </div>

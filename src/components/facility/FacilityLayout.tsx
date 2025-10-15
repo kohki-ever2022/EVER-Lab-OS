@@ -1,9 +1,9 @@
 import React from 'react';
 import { BenchAssignment } from '../../types';
 import { useModalContext } from '../../contexts/ModalContext';
-import { useSessionContext } from '../../contexts/SessionContext';
 import { useAdminContext } from '../../contexts/AppProviders';
 import { useCompanyContext } from '../../contexts/CompanyContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface BenchItem {
   id: string;
@@ -33,11 +33,11 @@ const layoutData: BenchGroup[] = [
 
 interface BenchProps {
     item: BenchItem | null;
-    isJapanese: boolean;
 }
 
-const Bench: React.FC<BenchProps> = ({ item, isJapanese }) => {
+const Bench: React.FC<BenchProps> = ({ item }) => {
   const { benchAssignments } = useAdminContext();
+  const { t } = useTranslation();
   const { companies } = useCompanyContext();
   const { openModal } = useModalContext();
 
@@ -52,7 +52,7 @@ const Bench: React.FC<BenchProps> = ({ item, isJapanese }) => {
   const assignedClasses = "bg-teal-500 border border-teal-600 text-white focus:ring-teal-400";
   const unassignedClasses = "bg-white border-2 border-dashed border-gray-300 text-gray-400 hover:border-teal-400 hover:text-teal-600 focus:ring-teal-300";
   
-  const statusText = company ? (isJapanese ? '契約済' : 'Assigned') : (isJapanese ? '空き' : 'Available');
+  const statusText = company ? t('assigned') : t('available');
 
   return (
     <button 
@@ -66,12 +66,12 @@ const Bench: React.FC<BenchProps> = ({ item, isJapanese }) => {
 };
 
 export const FacilityLayout:React.FC = () => {
-  const { isJapanese } = useSessionContext();
+  const { t } = useTranslation();
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-          <h2 className="text-3xl font-bold text-lab-blue-dark">{isJapanese ? '施設レイアウト' : 'Facility Layout'}</h2>
+          <h2 className="text-3xl font-bold text-lab-blue-dark">{t('facilityLayout')}</h2>
       </div>
       <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg">
         <div className="overflow-x-auto">
@@ -86,7 +86,7 @@ export const FacilityLayout:React.FC = () => {
             }}>
                 {/* AREA P1 ラベル（陰圧式P1実験室） */}
                 <div className="z-10 text-slate-400 font-bold tracking-widest text-[clamp(0.75rem,2vw,1.125rem)]" style={{ gridArea: '2 / 2 / 3 / 5', alignSelf: 'end', justifySelf: 'center' }}>
-                  {isJapanese ? '陰圧式P1実験室' : 'AREA P1'}
+                  {t('areaP1')}
                 </div>
                 
                 <div className="z-10 text-slate-400 font-bold tracking-widest text-[clamp(0.75rem,2vw,1.125rem)]" style={{ gridArea: '8 / 2 / 9 / 5', alignSelf: 'end', justifySelf: 'center' }}>AREA A</div>
@@ -105,7 +105,6 @@ export const FacilityLayout:React.FC = () => {
                             <Bench 
                                 key={item ? item.id : `${group.id}-empty-${index}`} 
                                 item={item} 
-                                isJapanese={isJapanese}
                             />
                             ))}
                         </div>
@@ -115,11 +114,11 @@ export const FacilityLayout:React.FC = () => {
             <div className="mt-6 flex items-center justify-end space-x-4 text-sm text-gray-600">
                 <div className="flex items-center">
                    <span className="w-3 h-3 rounded-full bg-teal-500 mr-2"></span>
-                    <span>{isJapanese ? '契約済' : 'Assigned'}</span>
+                    <span>{t('assigned')}</span>
                 </div>
                 <div className="flex items-center">
                     <span className="w-3 h-3 rounded-full border-2 border-dashed border-gray-400 mr-2"></span>
-                    <span>{isJapanese ? '空き' : 'Available'}</span>
+                    <span>{t('available')}</span>
                 </div>
             </div>
         </div>

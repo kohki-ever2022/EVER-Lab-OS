@@ -3,9 +3,11 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useDataAdapter } from '../../contexts/DataAdapterContext';
 // FIX: import from barrel file
 import { User } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const Login: React.FC = () => {
-    const { login, isJapanese } = useSessionContext();
+    const { login } = useSessionContext();
+    const { t } = useTranslation();
     const adapter = useDataAdapter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -21,7 +23,7 @@ const Login: React.FC = () => {
             const result = await adapter.getUsers();
             
             if (!result.success) {
-              setError(isJapanese ? 'ユーザー情報の取得に失敗しました。' : 'Failed to retrieve user data.');
+              setError(t('loginErrorUserNotFound'));
               setIsLoading(false);
               return;
             }
@@ -31,14 +33,14 @@ const Login: React.FC = () => {
             if (userToLogin && userToLogin.password === password) {
                 const success = login(userToLogin);
                 if (!success) {
-                    setError(isJapanese ? 'ログインセッションの開始に失敗しました。' : 'Failed to start login session.');
+                    setError(t('loginErrorSessionFailed'));
                 }
                 // On successful login, AppShell handles redirection.
             } else {
-                setError(isJapanese ? 'メールアドレスまたはパスワードが正しくありません。' : 'Invalid email address or password.');
+                setError(t('loginErrorInvalidCredentials'));
             }
         } catch (err) {
-            setError(isJapanese ? 'ログイン処理中にエラーが発生しました。' : 'An error occurred during login.');
+            setError(t('loginErrorGeneral'));
             console.error('Login error:', err);
         } finally {
             setIsLoading(false);
@@ -57,7 +59,7 @@ const Login: React.FC = () => {
                     EVER-Lab OS
                 </h2>
                 <p className="mt-2 text-center text-sm text-gray-600">
-                    {isJapanese ? 'アカウントにサインイン' : 'Sign in to your account'}
+                    {t('signInToAccount')}
                 </p>
             </div>
 
@@ -66,7 +68,7 @@ const Login: React.FC = () => {
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                {isJapanese ? 'メールアドレス' : 'Email address'}
+                                {t('emailAddress')}
                             </label>
                             <div className="mt-1">
                                 <input
@@ -84,7 +86,7 @@ const Login: React.FC = () => {
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                {isJapanese ? 'パスワード' : 'Password'}
+                                {t('password')}
                             </label>
                             <div className="mt-1">
                                 <input
@@ -121,7 +123,7 @@ const Login: React.FC = () => {
                                 disabled={isLoading}
                                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-ever-blue hover:bg-ever-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ever-purple disabled:bg-gray-400"
                             >
-                                {isLoading ? (isJapanese ? 'サインイン中...' : 'Signing in...') : (isJapanese ? 'サインイン' : 'Sign in')}
+                                {isLoading ? t('signingIn') : t('signIn')}
                             </button>
                         </div>
                     </form>

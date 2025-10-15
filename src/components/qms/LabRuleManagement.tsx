@@ -9,9 +9,11 @@ import { useQmsContext } from '../../contexts/AppProviders';
 import { useToast } from '../../contexts/ToastContext';
 import { useComplianceActions } from '../../hooks/useComplianceActions';
 import { CaretDownIcon } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export const LabRuleManagement: React.FC = () => {
-  const { currentUser, isFacilityStaff, isJapanese } = useSessionContext();
+  const { currentUser, isFacilityStaff } = useSessionContext();
+  const { t, isJapanese } = useTranslation();
   const { labRules } = useQmsContext();
   const { showToast } = useToast();
   const { acknowledgeRule } = useComplianceActions();
@@ -36,10 +38,10 @@ export const LabRuleManagement: React.FC = () => {
   };
 
   const importanceLabels = {
-    [RuleImportance.Mandatory]: { jp: '必須遵守', en: 'Mandatory', color: 'bg-red-100 text-red-800' },
-    [RuleImportance.Recommended]: { jp: '推奨', en: 'Recommended', color: 'bg-yellow-100 text-yellow-800' },
-    [RuleImportance.Optional]: { jp: '任意', en: 'Optional', color: 'bg-blue-100 text-blue-800' },
-  };
+    [RuleImportance.Mandatory]: { key: 'importanceMandatory', color: 'bg-red-100 text-red-800' },
+    [RuleImportance.Recommended]: { key: 'importanceRecommended', color: 'bg-yellow-100 text-yellow-800' },
+    [RuleImportance.Optional]: { key: 'importanceOptional', color: 'bg-blue-100 text-blue-800' },
+  } as const;
 
   const visibleRules = useMemo(() => {
     if (!currentUser) return [];
@@ -72,7 +74,7 @@ export const LabRuleManagement: React.FC = () => {
   const handleAcknowledge = async (ruleId: string) => {
       const result = await acknowledgeRule(ruleId);
       if (result.success === false) {
-          showToast(isJapanese ? `確認に失敗しました: ${result.error.message}` : `Acknowledgement failed: ${result.error.message}`, 'error');
+          showToast(`${t('ackFailed')}: ${result.error.message}`, 'error');
       }
   };
   
@@ -84,28 +86,28 @@ export const LabRuleManagement: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">{isJapanese ? 'ラボルール' : 'Lab Rules'}</h2>
+      <h2 className="text-2xl font-bold mb-4">{t('labRules')}</h2>
 
       {unacknowledgedRules.length > 0 && (
         <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-          <p className="font-bold">{isJapanese ? '未確認の必須ルールがあります' : 'Unacknowledged Mandatory Rules'}</p>
-          <p>{isJapanese ? `${unacknowledgedRules.length}件の必須ルールを確認してください。` : `You have ${unacknowledgedRules.length} mandatory rules to acknowledge.`}</p>
+          <p className="font-bold">{t('unacknowledgedMandatory')}</p>
+          <p>{`${unacknowledgedRules.length}${t('unacknowledgedCount')}`}</p>
         </div>
       )}
       
       <div className="bg-white p-4 rounded-lg shadow mb-6 space-y-4">
         <div className="flex flex-wrap gap-4 items-center">
           <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value as any)} className="border rounded p-2 text-sm">
-            <option value="ALL">{isJapanese ? '全カテゴリ' : 'All Categories'}</option>
+            <option value="ALL">{t('allCategories')}</option>
             {Object.entries(categoryLabels).map(([key, val]) => <option key={key} value={key}>{isJapanese ? val.jp : val.en}</option>)}
           </select>
           <select value={importanceFilter} onChange={e => setImportanceFilter(e.target.value as any)} className="border rounded p-2 text-sm">
-            <option value="ALL">{isJapanese ? '全重要度' : 'All Importances'}</option>
-            {Object.entries(importanceLabels).map(([key, val]) => <option key={key} value={key}>{isJapanese ? val.jp : val.en}</option>)}
+            <option value="ALL">{t('allImportances')}</option>
+            {Object.entries(importanceLabels).map(([key, val]) => <option key={key} value={key as RuleImportance}>{t(val.key)}</option>)}
           </select>
           <label className="flex items-center text-sm">
             <input type="checkbox" checked={showUnacknowledgedOnly} onChange={e => setShowUnacknowledgedOnly(e.target.checked)} className="h-4 w-4 mr-2" />
-            {isJapanese ? '未確認のみ表示' : 'Show unacknowledged only'}
+            {t('showUnacknowledgedOnly')}
           </label>
         </div>
       </div>
@@ -121,7 +123,38 @@ export const LabRuleManagement: React.FC = () => {
                     <button onClick={() => toggleExpand(rule.id)} className="w-full flex items-center justify-between p-4 text-left bg-gray-50 hover:bg-gray-100">
                         <div className="flex-1">
                             <div className="flex items-center gap-2">
-                                {isMandatoryUnacked && <span className="text-red-500" title={isJapanese ? "確認が必要です" : "Acknowledgement required"}>●</span>}
+                                {isMandatoryUnacked && <span className="text-red-500" title={t('ackRequired')}>●</span>}
                                 <span className="font-bold">{rule.ruleNumber}: {isJapanese ? rule.titleJP : rule.titleEN}</span>
                             </div>
                             <p className="text-sm text-gray-600">{isJapanese ? rule.descriptionJP : rule.descriptionEN}</p>
+                        </div>
+                        <div className="flex items-center gap-4 ml-4">
+                            <span className={`px-2 py-1 text-xs font-medium rounded ${importance.color}`}>{t(importance.key)}</span>
+                            <CaretDownIcon className={expandedRuleId === rule.id ? 'transform rotate-180' : ''} />
+                        </div>
+                    </button>
+                    {expandedRuleId === rule.id && (
+                        <div className="p-4 bg-white">
+                            <div className="prose max-w-none">
+                                <MarkdownRenderer markdown={isJapanese ? rule.details ?? '' : rule.details ?? ''} />
+                            </div>
+                            {rule.importance === RuleImportance.Mandatory && (
+                                <div className="mt-4 pt-4 border-t">
+                                    {isAcknowledged ? (
+                                        // FIX: Use a valid translation key.
+                                        <div className="text-green-600 font-medium text-sm">{t('acknowledged')}</div>
+                                    ) : (
+                                        // FIX: Use a valid translation key.
+                                        <button onClick={() => handleAcknowledge(rule.id)} className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">{t('acknowledgeRule')}</button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )
+        })}
+      </div>
+    </div>
+  );
+};

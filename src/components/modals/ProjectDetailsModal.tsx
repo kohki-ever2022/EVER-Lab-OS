@@ -6,6 +6,7 @@ import { useUserContext } from '../../contexts/UserContext';
 import { useProjectActions } from '../../hooks/useProjectActions';
 // FIX: import from barrel file
 import { Project } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface ModalProps {
     onClose: () => void;
@@ -13,7 +14,8 @@ interface ModalProps {
 }
 
 const ProjectDetailsModal: React.FC<ModalProps> = ({ onClose, project }) => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t } = useTranslation();
     const { users } = useUserContext();
     const { addProject, updateProject } = useProjectActions();
     const [name, setName] = useState(project?.name || '');
@@ -50,18 +52,18 @@ const ProjectDetailsModal: React.FC<ModalProps> = ({ onClose, project }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
-                <h3 className="text-xl font-bold mb-4">{project ? (isJapanese ? 'プロジェクト編集' : 'Edit Project') : (isJapanese ? '新規プロジェクト' : 'New Project')}</h3>
+                <h3 className="text-xl font-bold mb-4">{project ? t('editProject') : t('newProject')}</h3>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'プロジェクト名' : 'Project Name'}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('projectName')}</label>
                         <input type="text" value={name} onChange={e => setName(e.target.value)} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
                     </div>
                      <div>
-                        <label className="block text-sm font-medium text-gray-700">{isJapanese ? '説明' : 'Description'}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('description')}</label>
                         <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">{isJapanese ? 'メンバー' : 'Members'}</label>
+                        <label className="block text-sm font-medium text-gray-700">{t('members')}</label>
                         <div className="mt-2 space-y-2">
                             {companyMembers.map(member => (
                                 <div key={member.id} className="flex items-center">
@@ -73,8 +75,8 @@ const ProjectDetailsModal: React.FC<ModalProps> = ({ onClose, project }) => {
                     </div>
                 </div>
                 <div className="mt-6 flex justify-end space-x-2">
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{isJapanese ? 'キャンセル' : 'Cancel'}</button>
-                    <button onClick={handleSubmit} className="px-4 py-2 bg-ever-blue text-white rounded-md hover:bg-ever-blue-dark">{isJapanese ? '保存' : 'Save'}</button>
+                    <button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{t('cancel')}</button>
+                    <button onClick={handleSubmit} className="px-4 py-2 bg-ever-blue text-white rounded-md hover:bg-ever-blue-dark">{t('save')}</button>
                 </div>
             </div>
         </div>

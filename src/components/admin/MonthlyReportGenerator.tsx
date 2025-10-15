@@ -5,7 +5,6 @@ import { generateMonthlyReport } from '../../services/geminiReportService';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 // FIX: import from barrel file
 import { MonthlyReport } from '../../types';
-import { useSessionContext } from '../../contexts/SessionContext';
 import { useReservationContext } from '../../contexts/ReservationContext';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useConsumableContext } from '../../contexts/ConsumableContext';
@@ -16,10 +15,13 @@ import { useAdminContext } from '../../contexts/AppProviders';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useBillingContext } from '../../contexts/AppProviders';
 import { useCertificates } from '../../contexts/CertificateContext';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 
 const MonthlyReportGenerator: React.FC = () => {
-  const { isJapanese, language, currentUser } = useSessionContext();
+  const { currentUser } = useSessionContext();
+  const { t, isJapanese, language } = useTranslation();
   const { monthlyReports } = useAdminContext();
   const { sds, ehsIncidents } = useQmsContext();
   const { invoices } = useBillingContext();
@@ -70,14 +72,14 @@ const MonthlyReportGenerator: React.FC = () => {
       });
 
       if (result.success === false) {
-        showToast(isJapanese ? 'レポートの保存に失敗しました。' : 'Failed to save the report.', 'error');
+        showToast(t('reportSaveFailed'), 'error');
       }
 
     } catch (err) {
       console.error(err);
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
-      setError(isJapanese ? `レポート生成中にエラーが発生しました: ${errorMessage}` : `Error generating report: ${errorMessage}`);
-      showToast(isJapanese ? 'レポート生成エラー' : 'Report Generation Error', 'error');
+      setError(`${t('reportGenerateErrorMsg')}: ${errorMessage}`);
+      showToast(t('reportGenerateError'), 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -88,10 +90,7 @@ const MonthlyReportGenerator: React.FC = () => {
   };
 
   const handleSendEmail = () => {
-      showToast(
-          isJapanese ? '現在の環境ではメール共有機能はサポートされていません。' : 'Email sharing is not supported in this environment.',
-          'warning'
-      );
+      showToast(t('emailNotSupported'),'warning');
   };
   
   const handleViewReport = (report: MonthlyReport) => {
@@ -108,12 +107,12 @@ const MonthlyReportGenerator: React.FC = () => {
 
   return (
     <div>
-        <h2 className="text-3xl font-bold mb-6 text-ever-black no-print">{isJapanese ? '月次運営レポート' : 'Monthly Operations Report'}</h2>
+        <h2 className="text-3xl font-bold mb-6 text-ever-black no-print">{t('monthlyOperationsReport')}</h2>
         
         <div className="flex flex-col md:flex-row gap-8">
             <aside className="md:w-1/4 no-print">
                 <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h3 className="text-lg font-bold mb-4">{isJapanese ? '新規レポート生成' : 'Generate New Report'}</h3>
+                    <h3 className="text-lg font-bold mb-4">{t('generateNewReport')}</h3>
                     <div className="flex flex-col gap-4">
                         <select value={selectedYear} onChange={e => setSelectedYear(parseInt(e.target.value))} className="p-2 border rounded-md">
                             {years.map(y => <option key={y} value={y}>{y}</option>)}
@@ -122,13 +121,13 @@ const MonthlyReportGenerator: React.FC = () => {
                             {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                         </select>
                         <button onClick={handleGenerateReport} disabled={isGenerating} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg disabled:bg-gray-400">
-                            {isGenerating ? (isJapanese ? '生成中...' : 'Generating...') : (isJapanese ? 'レポート生成' : 'Generate Report')}
+                            {isGenerating ? t('generating') : t('generateReport')}
                         </button>
                     </div>
-                    {isGenerating && <p className="text-sm text-gray-600 mt-4">{isJapanese ? 'AIがレポートを生成しています... (約30秒)' : 'AI is generating the report... (approx. 30 seconds)'}</p>}
+                    {isGenerating && <p className="text-sm text-gray-600 mt-4">{t('generatingWait')}</p>}
                 </div>
                  <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h3 className="text-lg font-bold mb-4">{isJapanese ? 'レポート履歴' : 'Report History'}</h3>
+                    <h3 className="text-lg font-bold mb-4">{t('reportHistory')}</h3>
                     <ul className="space-y-2 max-h-96 overflow-y-auto">
                         {monthlyReports.map(report => (
                             <li key={report.id}>
@@ -138,7 +137,7 @@ const MonthlyReportGenerator: React.FC = () => {
                                 </button>
                             </li>
                         ))}
-                         {monthlyReports.length === 0 && <p className="text-sm text-gray-500 text-center py-4">{isJapanese ? '履歴はありません' : 'No history'}</p>}
+                         {monthlyReports.length === 0 && <p className="text-sm text-gray-500 text-center py-4">{t('noHistory')}</p>}
                     </ul>
                 </div>
             </aside>
@@ -149,10 +148,10 @@ const MonthlyReportGenerator: React.FC = () => {
                 {reportMarkdown ? (
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex justify-between items-center mb-4 border-b pb-4 no-print">
-                            <h3 className="text-2xl font-bold">{isJapanese ? `レポート: ${currentReportPeriod}` : `Report: ${currentReportPeriod}`}</h3>
+                            <h3 className="text-2xl font-bold">{t('report')}: {currentReportPeriod}</h3>
                             <div className="flex gap-2">
-                                <button onClick={handleDownloadPdf} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-1 px-3 border border-gray-300 rounded shadow text-sm">{isJapanese ? 'PDFダウンロード' : 'Download PDF'}</button>
-                                <button onClick={handleSendEmail} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-1 px-3 border border-gray-300 rounded shadow text-sm">{isJapanese ? 'メールで共有' : 'Share via Email'}</button>
+                                <button onClick={handleDownloadPdf} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-1 px-3 border border-gray-300 rounded shadow text-sm">{t('downloadPdf')}</button>
+                                <button onClick={handleSendEmail} className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-1 px-3 border border-gray-300 rounded shadow text-sm">{t('shareViaEmail')}</button>
                             </div>
                         </div>
                         <div id="report-preview" className="printable-area">
@@ -161,7 +160,7 @@ const MonthlyReportGenerator: React.FC = () => {
                     </div>
                 ) : !isGenerating && (
                     <div className="bg-white p-12 rounded-lg shadow-md text-center">
-                        <p className="text-gray-500">{isJapanese ? '左のメニューからレポートを生成するか、履歴を選択してください。' : 'Generate a new report or select one from the history.'}</p>
+                        <p className="text-gray-500">{t('selectReportPrompt')}</p>
                     </div>
                 )}
             </main>

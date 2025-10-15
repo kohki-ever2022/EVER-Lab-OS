@@ -7,6 +7,7 @@ import {
   ShoppingCartIcon, StarIcon, ArchiveIcon, FileTextIcon, ShieldIcon, SettingsIcon,
   UsersIcon, MessageSquareIcon, CloseIcon
 } from '../common/Icons';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -14,51 +15,47 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
-    const { isJapanese } = useSessionContext();
+    const { t } = useTranslation();
     const { hasPermission } = usePermissions();
 
     const navItems = useMemo(() => ([
         {
-            titleJP: "メイン",
-            titleEN: "Main",
+            title: t('main'),
             items: [
-                { path: 'dashboard', labelJP: 'ダッシュボード', labelEN: 'Dashboard', icon: <HomeIcon />, permission: true },
-                { path: 'equipment', labelJP: '機器予約', labelEN: 'Equipment Booking', icon: <BeakerIcon />, permission: hasPermission('equipment', 'read') },
-                { path: 'reservations', labelJP: '予約管理', labelEN: 'My Reservations', icon: <CalendarIcon />, permission: hasPermission('reservation', 'read') },
-                { path: 'projects', labelJP: 'プロジェクト', labelEN: 'Projects', icon: <FolderIcon />, permission: hasPermission('projects', 'read') },
-                { path: 'chat', labelJP: 'チャット', labelEN: 'Chat', icon: <MessageSquareIcon />, permission: true },
+                { path: 'dashboard', label: t('dashboard'), icon: <HomeIcon />, permission: true },
+                { path: 'equipment', label: t('equipmentBooking'), icon: <BeakerIcon />, permission: hasPermission('equipment', 'read') },
+                { path: 'reservations', label: t('myReservations'), icon: <CalendarIcon />, permission: hasPermission('reservation', 'read') },
+                { path: 'projects', label: t('projects'), icon: <FolderIcon />, permission: hasPermission('projects', 'read') },
+                { path: 'chat', label: t('chat'), icon: <MessageSquareIcon />, permission: true },
             ]
         },
         {
-            titleJP: "在庫・購買",
-            titleEN: "Inventory & Purchasing",
+            title: t('inventoryPurchasing'),
             items: [
-                { path: 'favoriteConsumables', labelJP: 'お気に入り', labelEN: 'Favorites', icon: <StarIcon />, permission: true },
-                { path: 'reorderSuggestions', labelJP: '再発注推奨', labelEN: 'Reorder', icon: <ShoppingCartIcon />, permission: true },
+                { path: 'favoriteConsumables', label: t('favorites'), icon: <StarIcon />, permission: true },
+                { path: 'reorderSuggestions', label: t('reorder'), icon: <ShoppingCartIcon />, permission: true },
             ]
         },
         {
-            titleJP: "品質・安全",
-            titleEN: "Quality & Safety",
+            title: t('qualitySafety'),
             items: [
-                { path: 'manuals', labelJP: 'マニュアル', labelEN: 'Manuals', icon: <BookOpenIcon />, permission: hasPermission('manuals', 'read') },
-                { path: 'rules', labelJP: 'ラボルール', labelEN: 'Lab Rules', icon: <CheckSquareIcon />, permission: true },
-                { path: 'certificateManagement', labelJP: '資格・証明書', labelEN: 'Certificates', icon: <ShieldIcon />, permission: true },
+                { path: 'manuals', label: t('manuals'), icon: <BookOpenIcon />, permission: hasPermission('manuals', 'read') },
+                { path: 'rules', label: t('labRules'), icon: <CheckSquareIcon />, permission: true },
+                { path: 'certificateManagement', label: t('certificates'), icon: <ShieldIcon />, permission: true },
             ]
         },
         {
-            titleJP: "施設管理",
-            titleEN: "Facility Management",
+            title: t('facilityManagement'),
             items: [
-                { path: 'adminDashboard', labelJP: '管理ダッシュボード', labelEN: 'Admin Dashboard', icon: <HomeIcon />, permission: hasPermission('settings', 'read') },
-                { path: 'userManagement', labelJP: 'ユーザー管理', labelEN: 'User Management', icon: <UsersIcon />, permission: hasPermission('users', 'read') },
-                { path: 'equipmentManagement', labelJP: '機器マスタ管理', labelEN: 'Equipment Master', icon: <BeakerIcon />, permission: hasPermission('equipment', 'manage') },
-                { path: 'inventoryLockManager', labelJP: '在庫ロック管理', labelEN: 'Inventory Lock', icon: <ArchiveIcon />, permission: hasPermission('inventory', 'manage') },
-                { path: 'monthlyReportGenerator', labelJP: '月次レポート', labelEN: 'Monthly Reports', icon: <FileTextIcon />, permission: hasPermission('settings', 'read') },
-                { path: 'settings', labelJP: 'システム設定', labelEN: 'System Settings', icon: <SettingsIcon />, permission: hasPermission('settings', 'read') },
+                { path: 'adminDashboard', label: t('adminDashboard'), icon: <HomeIcon />, permission: hasPermission('settings', 'read') },
+                { path: 'userManagement', label: t('userManagement'), icon: <UsersIcon />, permission: hasPermission('users', 'read') },
+                { path: 'equipmentManagement', label: t('equipmentMaster'), icon: <BeakerIcon />, permission: hasPermission('equipment', 'manage') },
+                { path: 'inventoryLockManager', label: t('inventoryLock'), icon: <ArchiveIcon />, permission: hasPermission('inventory', 'manage') },
+                { path: 'monthlyReportGenerator', label: t('monthlyReports'), icon: <FileTextIcon />, permission: hasPermission('settings', 'read') },
+                { path: 'settings', label: t('systemSettings'), icon: <SettingsIcon />, permission: hasPermission('settings', 'read') },
             ]
         }
-    ]), [isJapanese, hasPermission]);
+    ]), [t, hasPermission]);
     
     return (
         <>
@@ -77,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 
                          return (
                             <div key={index} className="mb-4">
-                                <h2 className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">{isJapanese ? section.titleJP : section.titleEN}</h2>
+                                <h2 className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">{section.title}</h2>
                                 {visibleItems.map(item => (
                                     <NavLink
                                         key={item.path}
@@ -86,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                                         className={({ isActive }) => `w-full flex items-center p-2 my-1 text-sm rounded-md transition-colors ${isActive ? 'bg-ever-blue text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
                                     >
                                         {item.icon}
-                                        <span className="ml-3">{isJapanese ? item.labelJP : item.labelEN}</span>
+                                        <span className="ml-3">{item.label}</span>
                                     </NavLink>
                                 ))}
                             </div>

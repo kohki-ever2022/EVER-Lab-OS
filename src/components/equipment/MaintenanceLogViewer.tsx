@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { useSessionContext } from '../../contexts/SessionContext';
 import { useMaintenanceLogContext } from '../../contexts/MaintenanceLogContext';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useUserContext } from '../../contexts/UserContext';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useTranslation } from '../../hooks/useTranslation';
 
 // FIX: import from barrel file
 import { MaintenanceLog, MaintenanceLogStatus } from '../../types';
@@ -12,7 +12,7 @@ export const MaintenanceLogViewer: React.FC = () => {
     const { maintenanceLogs } = useMaintenanceLogContext();
     const { equipment } = useEquipmentContext();
     const { users } = useUserContext();
-    const { isJapanese } = useSessionContext();
+    const { t, isJapanese } = useTranslation();
     const { hasPermission } = usePermissions();
 
     const logsWithDetails = useMemo(() => {
@@ -35,24 +35,25 @@ export const MaintenanceLogViewer: React.FC = () => {
     }
 
     if (!canManage) {
-        return <div className="p-6">{isJapanese ? 'アクセス権がありません。' : 'Permission Denied.'}</div>;
+        return <div className="p-6">{t('permissionDenied')}</div>;
     }
 
     return (
         <div>
             <h2 className="text-3xl font-bold mb-6 text-ever-black">
-                {isJapanese ? 'メンテナンスログ' : 'Maintenance Log'}
+                {t('maintenanceLog')}
             </h2>
             <div className="bg-white rounded-lg shadow overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '機器' : 'Equipment'}</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '報告日' : 'Report Date'}</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '報告者' : 'Reporter'}</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '内容' : 'Notes'}</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? 'ステータス' : 'Status'}</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{isJapanese ? '操作' : 'Actions'}</th>
+                            {/* FIX: Use a valid translation key. 'equipment' has been added to translations.ts. */}
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('equipment')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reportDate')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporter')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('notes')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status')}</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -68,12 +69,12 @@ export const MaintenanceLogViewer: React.FC = () => {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button className="text-indigo-600 hover:text-indigo-900">{isJapanese ? '詳細' : 'Details'}</button>
+                                    <button className="text-indigo-600 hover:text-indigo-900">{t('details')}</button>
                                 </td>
                             </tr>
                         ))}
                          {logsWithDetails.length === 0 && (
-                             <tr><td colSpan={6} className="text-center py-8 text-gray-500">{isJapanese ? 'メンテナンスログはありません。' : 'No maintenance logs found.'}</td></tr>
+                             <tr><td colSpan={6} className="text-center py-8 text-gray-500">{t('noMaintenanceLogs')}</td></tr>
                          )}
                     </tbody>
                 </table>

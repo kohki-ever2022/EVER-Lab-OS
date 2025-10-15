@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react';
-import { useSessionContext } from '../../contexts/SessionContext';
 import { useMaintenanceLogContext } from '../../contexts/MaintenanceLogContext';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useUserContext } from '../../contexts/UserContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 // FIX: import from barrel file
 import { EquipmentStatus, MaintenanceLogStatus } from '../../types';
 
 const MaintenanceStatus: React.FC = () => {
-    const { isJapanese } = useSessionContext();
+    const { t, isJapanese } = useTranslation();
     const { maintenanceLogs } = useMaintenanceLogContext();
     const { equipment } = useEquipmentContext();
     const { users } = useUserContext();
@@ -34,7 +34,7 @@ const MaintenanceStatus: React.FC = () => {
     return (
         <div>
             <h2 className="text-3xl font-bold mb-6 text-ever-black">
-                {isJapanese ? 'メンテナンス状況' : 'Maintenance Status'}
+                {t('maintenanceStatus')}
             </h2>
             
             {maintenanceEquipment.length > 0 ? (
@@ -46,21 +46,21 @@ const MaintenanceStatus: React.FC = () => {
                             
                             {item.latestLog ? (
                                 <div className="bg-yellow-50 p-4 rounded-md">
-                                    <p className="text-sm text-yellow-800 font-semibold">{isJapanese ? '最新の報告' : 'Latest Report'}</p>
+                                    <p className="text-sm text-yellow-800 font-semibold">{t('latestReport')}</p>
                                     <p className="text-sm text-yellow-700 mt-1 italic">"{item.latestLog.notes}"</p>
                                     <p className="text-xs text-yellow-600 mt-2">
-                                        {isJapanese ? '報告者:' : 'By:'} {item.reporterName || 'N/A'} - {new Date(item.latestLog.reportDate).toLocaleDateString()}
+                                        {t('by')} {item.reporterName || 'N/A'} - {new Date(item.latestLog.reportDate).toLocaleDateString()}
                                     </p>
                                 </div>
                             ) : (
-                                <p className="text-sm text-gray-600">{isJapanese ? '詳細な報告はありません。' : 'No detailed report available.'}</p>
+                                <p className="text-sm text-gray-600">{t('noDetailedReport')}</p>
                             )}
                         </div>
                     ))}
                 </div>
             ) : (
                 <div className="text-center py-12 bg-white rounded-lg shadow">
-                    <p className="text-gray-500">{isJapanese ? '現在メンテナンス中の機器はありません。' : 'No equipment is currently under maintenance.'}</p>
+                    <p className="text-gray-500">{t('noMaintenanceEquipment')}</p>
                 </div>
             )}
         </div>

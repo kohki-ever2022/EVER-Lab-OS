@@ -7,6 +7,7 @@ import { useLabStateContext } from '../../contexts/AppProviders';
 import { useEquipmentContext } from '../../contexts/EquipmentContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useEquipmentActions } from '../../hooks/useEquipmentActions';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export const CO2IncubatorManagement: React.FC = () => {
   const { language, currentUser } = useSessionContext();
@@ -14,7 +15,7 @@ export const CO2IncubatorManagement: React.FC = () => {
   const { equipment } = useEquipmentContext();
   const { showToast } = useToast();
   const { updateCO2IncubatorTracking } = useEquipmentActions();
-  const isJapanese = language === Language.JA;
+  const { t, isJapanese } = useTranslation();
   
   const [selectedIncubator, setSelectedIncubator] = useState<string | null>(null);
   const [showRecordForm, setShowRecordForm] = useState(false);

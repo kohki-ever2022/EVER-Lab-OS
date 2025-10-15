@@ -2,6 +2,7 @@
 import { Language } from '../types';
 import { MonthlyReportData } from './reportAggregator';
 import { geminiService } from './geminiService';
+import { translate } from '../i18n/translations';
 
 /**
  * 月次レポートを生成（Gemini API）
@@ -10,11 +11,8 @@ export const generateMonthlyReport = async (
   data: MonthlyReportData,
   language: Language
 ): Promise<string> => {
-  const isJapanese = language === Language.JA;
-  const lang = isJapanese ? '日本語' : '英語';
-  const errorMsg = isJapanese 
-      ? 'レポートの生成に失敗しました。時間をおいて再度お試しください。' 
-      : 'Failed to generate the report. Please try again later.';
+  const lang = translate('langNameForPrompt', language);
+  const errorMsg = translate('reportGenerationFailed', language);
   
   const prompt = `
 あなたはBSL-2対応の共同利用型研究施設の運営コンサルタントです。

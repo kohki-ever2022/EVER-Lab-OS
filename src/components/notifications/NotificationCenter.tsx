@@ -3,6 +3,7 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useNotificationsContext } from '../../contexts/NotificationContext';
 import { useNotifications } from '../../hooks/useNotifications';
 import { Notification, NotificationType } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface NotificationCenterProps {
     onClose: () => void;
@@ -26,7 +27,8 @@ const NotificationIcon: React.FC<{ type: NotificationType }> = ({ type }) => {
 };
 
 const NotificationCenter: React.FC<NotificationCenterProps> = ({ onClose }) => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t, isJapanese } = useTranslation();
     const { notifications } = useNotificationsContext();
     const { markNotificationAsRead, markAllNotificationsAsRead } = useNotifications();
 
@@ -52,10 +54,10 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ onClose }) => {
     return (
         <div className="absolute top-16 right-4 w-full max-w-sm bg-white rounded-lg shadow-2xl border border-gray-200 z-30 flex flex-col max-h-[80vh]">
             <div className="p-4 border-b flex justify-between items-center">
-                <h3 className="font-bold text-lg">{isJapanese ? '通知' : 'Notifications'}</h3>
+                <h3 className="font-bold text-lg">{t('notifications')}</h3>
                 {unreadCount > 0 && (
                     <button onClick={handleMarkAllAsRead} className="text-sm text-blue-600 hover:underline">
-                        {isJapanese ? 'すべて既読にする' : 'Mark all as read'}
+                        {t('markAllAsRead')}
                     </button>
                 )}
             </div>
@@ -78,7 +80,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ onClose }) => {
                     ))
                 ) : (
                     <div className="p-8 text-center text-gray-500">
-                        <p>{isJapanese ? '通知はありません。' : 'No new notifications.'}</p>
+                        <p>{t('noNewNotifications')}</p>
                     </div>
                 )}
             </div>

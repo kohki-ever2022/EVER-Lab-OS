@@ -7,9 +7,11 @@ import { useProjectActions } from '../../hooks/useProjectActions';
 // FIX: import from barrel file
 import { LabNotebookEntry } from '../../types';
 import MarkdownRenderer from '../common/MarkdownRenderer';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const ElectronicLabNotebook: React.FC = () => {
-    const { isJapanese, currentUser } = useSessionContext();
+    const { currentUser } = useSessionContext();
+    const { t } = useTranslation();
     const { projects, labNotebookEntries } = useProjectContext();
     const { addLabNotebookEntry, updateLabNotebookEntry, deleteLabNotebookEntry } = useProjectActions();
     const { showToast } = useToast();
@@ -58,14 +60,14 @@ const ElectronicLabNotebook: React.FC = () => {
 
     const handleDelete = async () => {
         if (!selectedEntry) return;
-        if (window.confirm(isJapanese ? 'この実験ノートを削除しますか？' : 'Are you sure you want to delete this entry?')) {
+        if (window.confirm(t('deleteEntryConfirm'))) {
             const result = await deleteLabNotebookEntry(selectedEntry.id);
             if (result.success) {
-                showToast(isJapanese ? 'エントリーを削除しました。' : 'Entry deleted.', 'success');
+                showToast(t('entryDeleted'), 'success');
                 setSelectedEntryId(null);
                 setIsEditing(false);
             } else {
-                showToast(isJapanese ? '削除に失敗しました。' : 'Failed to delete entry.', 'error');
+                showToast(t('deleteFailed'), 'error');
             }
         }
     };
@@ -80,7 +82,7 @@ const ElectronicLabNotebook: React.FC = () => {
 
         const handleSave = async () => {
             if (!title) {
-                showToast(isJapanese ? 'タイトルは必須です。' : 'Title is required.', 'error');
+                showToast(t('titleRequired'), 'error');
                 return;
             }
 
@@ -100,47 +102,49 @@ const ElectronicLabNotebook: React.FC = () => {
                 : await addLabNotebookEntry(entryData);
 
             if (result.success) {
-                showToast(isJapanese ? '保存しました。' : 'Saved successfully.', 'success');
+                // FIX: Use 'saveSuccess' translation key which has been added to translations.ts.
+                showToast(t('saveSuccess'), 'success');
                 setSelectedEntryId(result.data.id);
                 setIsEditing(false);
             } else {
-                showToast(isJapanese ? '保存に失敗しました。' : 'Failed to save.', 'error');
+                // FIX: Use 'saveFailed' translation key which has been added to translations.ts.
+                showToast(t('saveFailed'), 'error');
             }
         };
 
         return (
             <div className="p-4 sm:p-6 space-y-4">
-                <input type="text" placeholder={isJapanese ? "エントリーのタイトル" : "Entry Title"} value={title} onChange={e => setTitle(e.target.value)} className="w-full text-2xl font-bold border-b-2 pb-2 focus:outline-none focus:border-ever-blue" />
+                <input type="text" placeholder={t('entryTitle')} value={title} onChange={e => setTitle(e.target.value)} className="w-full text-2xl font-bold border-b-2 pb-2 focus:outline-none focus:border-ever-blue" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-500">{isJapanese ? "実験日" : "Experiment Date"}</label>
+                        <label className="block text-sm font-medium text-gray-500">{t('experimentDate')}</label>
                         <input type="date" value={experimentDate} onChange={e => setExperimentDate(e.target.value)} className="mt-1 w-full border rounded-md p-2" />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-500">{isJapanese ? "関連プロジェクト" : "Related Project"}</label>
+                        <label className="block text-sm font-medium text-gray-500">{t('relatedProject')}</label>
                         <select value={projectId} onChange={e => setProjectId(e.target.value)} className="mt-1 w-full border rounded-md p-2">
-                            <option value="">{isJapanese ? "なし" : "None"}</option>
+                            <option value="">{t('none')}</option>
                             {myProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-500">{isJapanese ? "タグ (カンマ区切り)" : "Tags (comma-separated)"}</label>
+                    <label className="block text-sm font-medium text-gray-500">{t('tagsCommaSeparated')}</label>
                     <input type="text" value={tags} onChange={e => setTags(e.target.value)} className="mt-1 w-full border rounded-md p-2" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-500">{isJapanese ? "内容 (Markdown対応)" : "Content (Markdown supported)"}</label>
+                    <label className="block text-sm font-medium text-gray-500">{t('contentMarkdown')}</label>
                     <textarea value={content} onChange={e => setContent(e.target.value)} rows={15} className="mt-1 w-full border rounded-md p-2 font-mono text-sm"></textarea>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-500">{isJapanese ? "添付ファイル" : "Attachments"}</label>
+                    <label className="block text-sm font-medium text-gray-500">{t('attachments')}</label>
                     <div className="mt-1 p-2 border rounded-md bg-gray-50 text-center">
-                        <p className="text-sm text-gray-500">{isJapanese ? "ファイル添付機能は開発中です。" : "File attachment is under development."}</p>
+                        <p className="text-sm text-gray-500">{t('fileAttachmentWip')}</p>
                     </div>
                 </div>
                 <div className="flex justify-end gap-2">
-                    <button onClick={() => setIsEditing(false)} className="px-4 py-2 border rounded-md">{isJapanese ? "キャンセル" : "Cancel"}</button>
-                    <button onClick={handleSave} className="px-4 py-2 bg-ever-blue text-white rounded-md">{isJapanese ? "保存" : "Save"}</button>
+                    <button onClick={() => setIsEditing(false)} className="px-4 py-2 border rounded-md">{t('cancel')}</button>
+                    <button onClick={handleSave} className="px-4 py-2 bg-ever-blue text-white rounded-md">{t('save')}</button>
                 </div>
             </div>
         );
@@ -153,12 +157,13 @@ const ElectronicLabNotebook: React.FC = () => {
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <h2 className="text-2xl font-bold">{entry.title}</h2>
-                        <p className="text-sm text-gray-500">{isJapanese ? "実験日:" : "Date:"} {new Date(entry.experimentDate).toLocaleDateString()}</p>
-                        {project && <p className="text-sm text-gray-500">{isJapanese ? "プロジェクト:" : "Project:"} {project.name}</p>}
+                        <p className="text-sm text-gray-500">{t('experimentDate')}: {new Date(entry.experimentDate).toLocaleDateString()}</p>
+                        {/* FIX: Use 'project' translation key which has been added to translations.ts. */}
+                        {project && <p className="text-sm text-gray-500">{t('project')}: {project.name}</p>}
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={() => setIsEditing(true)} className="px-3 py-1 border rounded-md text-sm">{isJapanese ? "編集" : "Edit"}</button>
-                        <button onClick={handleDelete} className="px-3 py-1 bg-red-500 text-white rounded-md text-sm">{isJapanese ? "削除" : "Delete"}</button>
+                        <button onClick={() => setIsEditing(true)} className="px-3 py-1 border rounded-md text-sm">{t('edit')}</button>
+                        <button onClick={handleDelete} className="px-3 py-1 bg-red-500 text-white rounded-md text-sm">{t('delete')}</button>
                     </div>
                 </div>
                 {entry.tags.length > 0 && (
@@ -176,17 +181,17 @@ const ElectronicLabNotebook: React.FC = () => {
     return (
         <div>
             <h2 className="text-3xl font-bold mb-6 text-ever-black">
-                {isJapanese ? '電子実験ノート' : 'Electronic Lab Notebook'}
+                {t('electronicLabNotebook')}
             </h2>
             <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-12rem)]">
                 {/* Left Panel: Entry List */}
                 <div className="w-full md:w-1/3 bg-white rounded-lg shadow-md flex flex-col">
                     <div className="p-4 border-b">
                         <div className="flex gap-2 mb-2">
-                            <input type="text" placeholder={isJapanese ? "検索..." : "Search..."} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full border rounded-md p-2 text-sm" />
+                            <input type="text" placeholder={t('search')} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full border rounded-md p-2 text-sm" />
                             <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} className="border rounded-md p-2 text-sm" />
                         </div>
-                        <button onClick={handleNewEntry} className="w-full bg-ever-blue text-white font-bold py-2 px-4 rounded-lg text-sm">{isJapanese ? "新規エントリー" : "New Entry"}</button>
+                        <button onClick={handleNewEntry} className="w-full bg-ever-blue text-white font-bold py-2 px-4 rounded-lg text-sm">{t('newEntry')}</button>
                     </div>
                     <div className="overflow-y-auto">
                         {filteredEntries.map(entry => (
@@ -206,7 +211,7 @@ const ElectronicLabNotebook: React.FC = () => {
                         <EntryViewer entry={selectedEntry} />
                     ) : (
                         <div className="flex items-center justify-center h-full text-gray-500">
-                            <p>{isJapanese ? "エントリーを選択するか、新規作成してください。" : "Select an entry or create a new one."}</p>
+                            <p>{t('selectOrCreateEntry')}</p>
                         </div>
                     )}
                 </div>
