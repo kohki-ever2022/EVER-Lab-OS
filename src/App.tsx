@@ -22,7 +22,7 @@ const Tasks = lazy(() => import('./components/project/Tasks'));
 const Reservations = lazy(() => import('./components/reservations/Reservations'));
 const FavoriteConsumablesList = lazy(() => import('./components/inventory/FavoriteConsumablesList'));
 const ElectronicLabNotebook = lazy(() => import('./components/project/ElectronicLabNotebook'));
-const ProjectProgressDashboard = lazy(() => import('./components/dashboard/ProjectProgressDashboard'));
+const ProjectProgressDashboard = lazy(() => import('./components/project/ProjectProgressDashboard'));
 const SupplierDashboard = lazy(() => import('./components/supplier/SupplierDashboard'));
 const ReorderSuggestions = lazy(() => import('./components/inventory/ReorderSuggestions'));
 const CertificateManagement = lazy(() => import('./components/certificates/CertificateManagement'));

@@ -42,11 +42,15 @@ const ErrorFallback: React.FC<{ error: Error | null; errorInfo: ErrorInfo | null
 
 
 class ErrorBoundary extends Component<Props, State> {
-  state: State = {
-    hasError: false,
-    error: null,
-    errorInfo: null,
-  };
+  // FIX: Moved state initialization to the constructor to resolve potential tooling issues with class properties.
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+    };
+  }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };

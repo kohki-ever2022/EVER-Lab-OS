@@ -143,7 +143,6 @@ export const translations = {
   expiryDate: { ja: '有効期限', en: 'Expiry Date' },
   viewRenew: { ja: '詳細・更新', en: 'View/Renew' },
   noCertsToDisplay: { ja: '表示する証明書はありません。', en: 'No certificates to display.' },
-  expired: { ja: '期限切れ', en: 'Expired' },
   overdue: { ja: '期限超過', en: 'Overdue' },
   expiringSoon: { ja: '期限間近', en: 'Expiring Soon' },
   valid: { ja: '有効', en: 'Valid' },
@@ -494,6 +493,8 @@ export const translations = {
   statusSubmitted: { ja: '提出済', en: 'Submitted' },
   statusApproved: { ja: '承認済', en: 'Approved' },
   statusRejected: { ja: '差戻し', en: 'Rejected' },
+  // FIX: Resolve duplicate key error by renaming `statusExpired` to `expired` and removing the other `expired` key.
+  expired: { ja: '期限切れ', en: 'Expired' },
   insuranceManagement: { ja: '保険加入状況', en: 'Insurance Management' },
   uploadInsuranceCert: { ja: '保険証券アップロード', en: 'Upload Insurance Certificate' },
   insuranceType: { ja: '保険種類', en: 'Insurance Type' },
