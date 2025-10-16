@@ -3,9 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useLabStateContext } from '../contexts/AppProviders';
 import { useSessionContext } from '../contexts/SessionContext';
-// FIX: import from barrel file
 import { Reservation, ReservationStatus, Usage, WaitlistEntry, WaitlistStatus } from '../types';
-// FIX: import from barrel file
 import { Result } from '../types';
 import { useReservations } from '../contexts/ReservationContext';
 import { validateDateRange } from '../utils/validation';

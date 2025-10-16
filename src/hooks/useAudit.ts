@@ -2,7 +2,6 @@
 import { useCallback } from 'react';
 import { useAdminContext } from '../contexts/AppProviders';
 import { useSessionContext } from '../contexts/SessionContext';
-// FIX: import from barrel file
 import { AuditLog } from '../types';
 
 const simpleUUID = () => `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

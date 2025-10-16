@@ -2,9 +2,7 @@
 import { useCallback } from 'react';
 import { useNotificationsContext } from '../contexts/NotificationContext';
 import { useSessionContext } from '../contexts/SessionContext';
-// FIX: import from barrel file
 import { Notification } from '../types';
-// FIX: import from barrel file
 import { Result } from '../types';
 
 export const useNotifications = () => {

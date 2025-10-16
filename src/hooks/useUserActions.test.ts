@@ -1,21 +1,12 @@
 // src/hooks/useUserActions.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import React, { ReactNode } from 'react';
 
 import { useUserActions } from './useUserActions';
-import { createWrapper } from '../services/reportAggregator.test'; // Import shared wrapper
-import { IDataAdapter } from '../adapters/IDataAdapter';
+import { createWrapper, mockAdapter } from '../test-utils'; // Import shared wrapper
 import { SessionContextType } from '../contexts/SessionContext';
 
 import { Role, RoleCategory, User, Language, Consumable, Reservation, Notification } from '../types';
-
-// Mock Data Adapter
-const mockAdapter: IDataAdapter = {
-  createUser: vi.fn(),
-  updateUser: vi.fn(),
-  deleteUser: vi.fn(),
-} as any; // Cast to any to avoid implementing all methods
 
 // Mock Data
 const mockUsers: User[] = [

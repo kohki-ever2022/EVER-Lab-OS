@@ -8,9 +8,7 @@ export interface UserContextValue {
   loading: boolean;
 }
 
-// FIX: Export context for use in tests.
 export const UsersDataContext = createContext<User[]>([]);
-// FIX: Export context for use in tests.
 export const UsersLoadingContext = createContext<boolean>(true);
 
 export const UserContext = createContext<UserContextValue | null>(null);

@@ -1,21 +1,12 @@
 // src/hooks/useInventoryActions.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import React, { ReactNode } from 'react';
 
 import { useInventoryActions } from './useInventoryActions';
-import { IDataAdapter } from '../adapters/IDataAdapter';
-import { createWrapper } from '../services/reportAggregator.test'; // Import shared wrapper
+import { createWrapper, mockAdapter } from '../test-utils'; // Import shared wrapper
 import { Role, RoleCategory, User, Language, Consumable, OrderStatus, Notification } from '../types';
 
 // Mock Dependencies
-const mockAdapter: IDataAdapter = {
-  updateConsumable: vi.fn(),
-  createConsumable: vi.fn(),
-  deleteConsumable: vi.fn(),
-  createOrder: vi.fn(),
-} as any;
-
 const mockAddAuditLog = vi.fn();
 const mockAddNotification = vi.fn();
 

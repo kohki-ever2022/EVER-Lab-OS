@@ -1,6 +1,7 @@
 
 
 
+
 interface ImportMetaEnv {
   readonly VITE_USE_MOCK_DATA: string;
   readonly VITE_USE_MOCK_GEMINI: string;
@@ -12,6 +13,8 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_APP_ID: string;
   readonly VITE_GEMINI_API_KEY: string;
   readonly VITE_USE_MOCK_GOOGLE_CALENDAR: string;
+  // FIX: Add MODE to the interface to type Vite's built-in environment variable.
+  readonly MODE: string;
 }
 
 interface ImportMeta {

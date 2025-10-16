@@ -5,9 +5,7 @@ import { useProjectContext } from '../contexts/ProjectContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
 import { sanitizeObject } from '../utils/sanitization';
-// FIX: import from barrel file
 import { Result } from '../types';
-// FIX: import from barrel file
 import { Project, LabNotebookEntry, Task } from '../types';
 
 export const useProjectActions = () => {

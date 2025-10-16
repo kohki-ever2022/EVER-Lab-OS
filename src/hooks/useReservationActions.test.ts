@@ -1,20 +1,12 @@
 // src/hooks/useReservationActions.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import React, { ReactNode } from 'react';
 
 import { useReservationActions } from './useReservationActions';
-import { IDataAdapter } from '../adapters/IDataAdapter';
-import { createWrapper } from '../services/reportAggregator.test'; // Import shared wrapper
+import { createWrapper, mockAdapter } from '../test-utils'; // Import shared wrapper
 import { Role, RoleCategory, User, Language, Reservation, ReservationStatus, WaitlistEntry } from '../types';
 
 // Mock Dependencies
-const mockAdapter: IDataAdapter = {
-  createReservation: vi.fn(),
-  updateReservation: vi.fn(),
-  createUsage: vi.fn(),
-} as any;
-
 const mockSetWaitlist = vi.fn();
 
 const mockCurrentUser: User = { id: 'user-1', name: 'Test User', email: 'test@test.com', companyId: 'company-a', role: Role.Researcher, roleCategory: RoleCategory.Tenant };

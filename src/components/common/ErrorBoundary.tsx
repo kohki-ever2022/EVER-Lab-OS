@@ -42,14 +42,15 @@ const ErrorFallback: React.FC<{ error: Error | null; errorInfo: ErrorInfo | null
 
 
 class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    };
-  }
+  // FIX: Initialize state as a class property instead of in the constructor.
+  // This is a more modern syntax and resolves issues with certain TypeScript
+  // compiler options regarding class field initialization (e.g., `useDefineForClassFields`).
+  // This fixes the errors about `state`, `setState`, and `props` not existing on the component instance.
+  state: State = {
+    hasError: false,
+    error: null,
+    errorInfo: null,
+  };
 
   static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };

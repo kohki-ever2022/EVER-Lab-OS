@@ -1,6 +1,5 @@
 // src/hooks/useInventorySnapshots.ts
 import { useCallback } from 'react';
-// FIX: import from barrel file
 import { Consumable, InventorySnapshot, AuditLog } from '../types';
 import { useAdminContext } from '../contexts/AppProviders';
 

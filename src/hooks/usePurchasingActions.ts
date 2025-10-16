@@ -2,9 +2,7 @@
 import { useCallback, useMemo } from 'react';
 import { usePurchasingContext } from '../contexts/AppProviders';
 import { useSessionContext } from '../contexts/SessionContext';
-// FIX: import from barrel file
 import { Result } from '../types';
-// FIX: import from barrel file
 import { QuotationStatus, QuotationResponse } from '../types';
 
 export const usePurchasingActions = () => {
