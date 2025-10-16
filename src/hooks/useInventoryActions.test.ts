@@ -5,7 +5,7 @@ import React, { ReactNode } from 'react';
 
 import { useInventoryActions } from './useInventoryActions';
 import { IDataAdapter } from '../adapters/IDataAdapter';
-import { createWrapper } from './useUserActions.test'; // Import shared wrapper
+import { createWrapper } from '../services/reportAggregator.test'; // Import shared wrapper
 import { Role, RoleCategory, User, Language, Consumable, OrderStatus, Notification } from '../types';
 
 // Mock Dependencies

@@ -200,8 +200,6 @@ export class MockAdapter implements IDataAdapter {
   async createReservation(data: Omit<Reservation, 'id'>): Promise<Result<Reservation>> {
      try {
         validateDateRange(data.startTime, data.endTime);
-        const overlapping = this.reservations.some(r => r.equipmentId === data.equipmentId && r.status !== ReservationStatus.Cancelled && ((data.startTime >= r.startTime && data.startTime < r.endTime) || (data.endTime > r.startTime && data.endTime <= r.endTime) || (data.startTime <= r.startTime && data.endTime >= r.endTime)));
-        if (overlapping) throw new Error('OVERLAP_ERROR');
         const newReservation: Reservation = { ...data, id: simpleUUID() };
         this.reservations.push(newReservation);
         this.notifySubscribers('reservations', this.reservations);
@@ -250,11 +248,8 @@ export class MockAdapter implements IDataAdapter {
   
   // --- Order Creation (custom logic with side effect) ---
   async createOrder(data: Omit<Order, 'id'>): Promise<Result<Order>> {
-    const consumable = this.consumables.find(c => c.id === data.consumableId);
-    if (!consumable) return { success: false, error: new Error("Consumable not found.") };
-    if (consumable.stock < data.quantity) return { success: false, error: new Error("Insufficient stock.") };
-    if (consumable.isLocked) return { success: false, error: new Error("Inventory is locked.") };
-    
+    // This logic simulates a transaction.
+    // The validation (stock check, lock check) is now expected to be done in the action hook.
     this.consumables = this.consumables.map(c => c.id === data.consumableId ? { ...c, stock: c.stock - data.quantity } : c);
     this.notifySubscribers('consumables', this.consumables);
     

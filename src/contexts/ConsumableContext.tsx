@@ -8,8 +8,10 @@ interface ConsumableContextValue {
   loading: boolean;
 }
 
-const ConsumablesDataContext = createContext<Consumable[]>([]);
-const ConsumablesLoadingContext = createContext<boolean>(true);
+// FIX: Export context for use in tests.
+export const ConsumablesDataContext = createContext<Consumable[]>([]);
+// FIX: Export context for use in tests.
+export const ConsumablesLoadingContext = createContext<boolean>(true);
 
 // Keep original context export for test setup compatibility if needed, though ideally tests should be updated.
 export const ConsumableContext = createContext<ConsumableContextValue | null>(null);

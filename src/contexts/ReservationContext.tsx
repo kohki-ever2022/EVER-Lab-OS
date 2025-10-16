@@ -8,8 +8,10 @@ interface ReservationContextValue {
   loading: boolean;
 }
 
-const ReservationsDataContext = createContext<Reservation[]>([]);
-const ReservationsLoadingContext = createContext<boolean>(true);
+// FIX: Export context for use in tests.
+export const ReservationsDataContext = createContext<Reservation[]>([]);
+// FIX: Export context for use in tests.
+export const ReservationsLoadingContext = createContext<boolean>(true);
 
 export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();

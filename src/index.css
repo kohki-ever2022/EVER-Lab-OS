@@ -1,3 +1,110 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Noto Sans JP', -apple-system, sans-serif;
+    letter-spacing: 0.05em;
+    word-break: break-word;
+    line-break: strict;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 300;
+    color: #0A0A0A; /* ever-black */
+    text-wrap: balance;
+  }
+}
+
+.break-anywhere {
+  /* For long URLs or tokens that must wrap */
+  overflow-wrap: anywhere;
+  word-break: break-all; /* Fallback */
+}
+
+/* Fluid Typography - overriding Tailwind classes */
+.text-3xl { font-size: clamp(1.6rem, 1.2vw + 1rem, 1.875rem) !important; }
+.text-2xl { font-size: clamp(1.3rem, 1vw + 0.9rem, 1.5rem) !important; }
+.text-xl { font-size: clamp(1.1rem, 0.8vw + 0.8rem, 1.25rem) !important; }
+.text-lg { font-size: clamp(1rem, 0.6vw + 0.75rem, 1.125rem) !important; }
+
+/* Improved Focus Visibility */
+:focus-visible {
+  outline: 3px solid #60a5fa; /* A lighter blue for better visibility */
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Subtle button press animation */
+button {
+  transition: all 0.15s ease-out;
+}
+button:active, .button-active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* Modal animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-backdrop {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+.modal-content {
+  animation: scaleUp 0.2s ease-out forwards;
+}
+
+/* Improved Toast animation */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes fadeOutToast {
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+.toast-animation {
+  animation: slideInRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
+             fadeOutToast 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) 4.5s forwards;
+}
+
+/* Print-specific styles for Invoice and Reports */
+@page {
+  margin: 15mm 10mm;
+  size: A4 portrait;
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-area, .printable-area * {
+    visibility: visible;
+  }
+  .printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

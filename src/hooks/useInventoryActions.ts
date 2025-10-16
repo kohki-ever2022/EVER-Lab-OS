@@ -79,6 +79,11 @@ export const useInventoryActions = () => {
   }, [consumables, t, adapter]);
 
   const addOrder = useCallback(async (order: Omit<Order, 'id' | 'totalPrice' | 'orderDate' | 'status'>): Promise<Result<Order, Error>> => {
+    const consumable = consumables.find(c => c.id === order.consumableId);
+    if (!consumable) return { success: false, error: new Error("Consumable not found.") };
+    if (consumable.stock < order.quantity) return { success: false, error: new Error("Insufficient stock.") };
+    if (consumable.isLocked) return { success: false, error: new Error("Inventory is locked.") };
+
     const orderData = {
         ...order,
         totalPrice: order.quantity * order.unitPrice,
@@ -91,7 +96,7 @@ export const useInventoryActions = () => {
         addAuditLog('ORDER_CREATE', `User ${order.userId} ordered ${order.quantity} of consumable ${order.consumableId}.`);
     }
     return result;
-  }, [adapter, addAuditLog]);
+  }, [adapter, addAuditLog, consumables]);
 
   return useMemo(() => ({
       updateConsumable,

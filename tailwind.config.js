@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Noto Sans JP', '-apple-system', 'sans-serif'],
+      },
       colors: {
         'ever-blue': '#5AC8E5',
         'ever-purple': '#A593CC',
