@@ -1,14 +1,10 @@
 // src/contexts/AnnouncementContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Announcement } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-interface AnnouncementContextValue {
-  announcements: Announcement[];
-  loading: boolean;
-}
-
-const AnnouncementContext = createContext<AnnouncementContextValue | null>(null);
+export const AnnouncementsDataContext = createContext<Announcement[]>([]);
+export const AnnouncementsLoadingContext = createContext<boolean>(true);
 
 export const AnnouncementProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -17,22 +13,34 @@ export const AnnouncementProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   useEffect(() => {
     setLoading(true);
-    adapter.getAnnouncements().then(result => {
-        if (result.success) {
-            setAnnouncements(result.data);
-        }
-    }).finally(() => {
+    const unsubscribe = adapter.subscribeToAnnouncements((data) => {
+        setAnnouncements(data);
         setLoading(false);
     });
+    return () => unsubscribe();
   }, [adapter]);
   
-  const value = useMemo(() => ({ announcements, loading }), [announcements, loading]);
-
-  return <AnnouncementContext.Provider value={value}>{children}</AnnouncementContext.Provider>;
+  return (
+    <AnnouncementsDataContext.Provider value={announcements}>
+      <AnnouncementsLoadingContext.Provider value={loading}>
+        {children}
+      </AnnouncementsLoadingContext.Provider>
+    </AnnouncementsDataContext.Provider>
+  );
 };
 
-export const useAnnouncementContext = () => {
-  const context = useContext(AnnouncementContext);
-  if (!context) throw new Error('useAnnouncementContext must be used within an AnnouncementProvider');
+export const useAnnouncements = () => {
+  const context = useContext(AnnouncementsDataContext);
+  if (context === undefined) {
+    throw new Error('useAnnouncements must be used within an AnnouncementProvider');
+  }
+  return context;
+};
+
+export const useAnnouncementsLoading = () => {
+  const context = useContext(AnnouncementsLoadingContext);
+  if (context === undefined) {
+    throw new Error('useAnnouncementsLoading must be used within an AnnouncementProvider');
+  }
   return context;
 };

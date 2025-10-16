@@ -1,11 +1,10 @@
 import React from 'react';
-import { useAnnouncementContext } from '../../contexts/AnnouncementContext';
+import { useAnnouncements } from '../../contexts/AnnouncementContext';
 import { useTranslation } from '../../hooks/useTranslation';
-// FIX: import from barrel file
 import { Announcement } from '../../types';
 
 const Announcements: React.FC = () => {
-    const { announcements } = useAnnouncementContext();
+    const announcements = useAnnouncements();
     const { t, isJapanese } = useTranslation();
 
     const sortedAnnouncements = [...announcements].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());

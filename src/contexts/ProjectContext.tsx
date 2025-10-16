@@ -1,59 +1,85 @@
 // src/contexts/ProjectContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { Project, Task, LabNotebookEntry, Protocol } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-interface ProjectContextValue {
-  projects: Project[];
-  tasks: Task[];
-  labNotebookEntries: LabNotebookEntry[];
-  protocols: Protocol[];
-  loading: boolean;
-}
-
-const ProjectContext = createContext<ProjectContextValue | null>(null);
+export const ProjectsDataContext = createContext<Project[]>([]);
+export const TasksDataContext = createContext<Task[]>([]);
+export const LabNotebookEntriesDataContext = createContext<LabNotebookEntry[]>([]);
+export const ProtocolsDataContext = createContext<Protocol[]>([]);
+export const ProjectLoadingContext = createContext<boolean>(true);
 
 export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [labNotebookEntries, setLabNotebookEntries] = useState<LabNotebookEntry[]>([]);
-  // @ts-ignore
-  const [protocols, setProtocols] = useState<Protocol[]>([]);
+  const [protocols, setProtocols] = useState<Protocol[]>([]); // Keep for compatibility
   const [loading, setLoading] = useState(true);
+
+  const loadedFlags = useRef({ projects: false, tasks: false, entries: false });
 
   useEffect(() => {
     setLoading(true);
-    const fetchData = async () => {
-        const [
-            projectsResult,
-            tasksResult,
-            entriesResult,
-        ] = await Promise.all([
-            adapter.getProjects(),
-            adapter.getTasks(),
-            adapter.getLabNotebookEntries(),
-        ]);
-        
-        if (projectsResult.success) setProjects(projectsResult.data);
-        if (tasksResult.success) setTasks(tasksResult.data);
-        if (entriesResult.success) setLabNotebookEntries(entriesResult.data);
-        
-        // Protocols are not fetched yet, but this follows the original structure.
-        
-        setLoading(false);
+    
+    const checkAllLoaded = () => {
+        if (loadedFlags.current.projects && loadedFlags.current.tasks && loadedFlags.current.entries) {
+            setLoading(false);
+        }
     };
 
-    fetchData();
+    const unsubProjects = adapter.subscribeToProjects(data => {
+        setProjects(data);
+        if (!loadedFlags.current.projects) {
+            loadedFlags.current.projects = true;
+            checkAllLoaded();
+        }
+    });
+    const unsubTasks = adapter.subscribeToTasks(data => {
+        setTasks(data);
+        if (!loadedFlags.current.tasks) {
+            loadedFlags.current.tasks = true;
+            checkAllLoaded();
+        }
+    });
+    const unsubEntries = adapter.subscribeToLabNotebookEntries(data => {
+        setLabNotebookEntries(data);
+        if (!loadedFlags.current.entries) {
+            loadedFlags.current.entries = true;
+            checkAllLoaded();
+        }
+    });
+
+    return () => {
+      unsubProjects();
+      unsubTasks();
+      unsubEntries();
+    };
   }, [adapter]);
-
-  const value = useMemo(() => ({ projects, tasks, loading, labNotebookEntries, protocols }), [projects, tasks, loading, labNotebookEntries, protocols]);
-
-  return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
+  
+  return (
+    <ProjectsDataContext.Provider value={projects}>
+      <TasksDataContext.Provider value={tasks}>
+        <LabNotebookEntriesDataContext.Provider value={labNotebookEntries}>
+          <ProtocolsDataContext.Provider value={protocols}>
+            <ProjectLoadingContext.Provider value={loading}>
+              {children}
+            </ProjectLoadingContext.Provider>
+          </ProtocolsDataContext.Provider>
+        </LabNotebookEntriesDataContext.Provider>
+      </TasksDataContext.Provider>
+    </ProjectsDataContext.Provider>
+  );
 };
 
 export const useProjectContext = () => {
-  const context = useContext(ProjectContext);
-  if (!context) throw new Error('useProjectContext must be used within ProjectProvider');
-  return context;
+  const projects = useContext(ProjectsDataContext);
+  const tasks = useContext(TasksDataContext);
+  const labNotebookEntries = useContext(LabNotebookEntriesDataContext);
+  const protocols = useContext(ProtocolsDataContext);
+  const loading = useContext(ProjectLoadingContext);
+  if (projects === undefined || tasks === undefined || labNotebookEntries === undefined || protocols === undefined || loading === undefined) {
+    throw new Error('useProjectContext must be used within ProjectProvider');
+  }
+  return { projects, tasks, labNotebookEntries, protocols, loading };
 };

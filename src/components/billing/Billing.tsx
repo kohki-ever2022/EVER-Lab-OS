@@ -1,5 +1,4 @@
 import React from 'react';
-// FIX: import from barrel file
 import { Invoice } from '../../types';
 import InvoiceCard from './InvoiceCard';
 import { useSessionContext } from '../../contexts/SessionContext';

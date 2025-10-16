@@ -1,14 +1,10 @@
 // src/contexts/OrderContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Order } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-interface OrderContextValue {
-  orders: Order[];
-  loading: boolean;
-}
-
-const OrderContext = createContext<OrderContextValue | null>(null);
+export const OrdersDataContext = createContext<Order[]>([]);
+export const OrdersLoadingContext = createContext<boolean>(true);
 
 export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -17,22 +13,34 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   useEffect(() => {
     setLoading(true);
-    adapter.getOrders().then(result => {
-        if (result.success) {
-            setOrders(result.data);
-        }
-    }).finally(() => {
+    const unsubscribe = adapter.subscribeToOrders((data) => {
+        setOrders(data);
         setLoading(false);
     });
+    return () => unsubscribe();
   }, [adapter]);
   
-  const value = useMemo(() => ({ orders, loading }), [orders, loading]);
-
-  return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
+  return (
+    <OrdersDataContext.Provider value={orders}>
+      <OrdersLoadingContext.Provider value={loading}>
+        {children}
+      </OrdersLoadingContext.Provider>
+    </OrdersDataContext.Provider>
+  );
 };
 
-export const useOrderContext = () => {
-  const context = useContext(OrderContext);
-  if (!context) throw new Error('useOrderContext must be used within an OrderProvider');
+export const useOrders = () => {
+  const context = useContext(OrdersDataContext);
+  if (context === undefined) {
+    throw new Error('useOrders must be used within an OrderProvider');
+  }
+  return context;
+};
+
+export const useOrdersLoading = () => {
+  const context = useContext(OrdersLoadingContext);
+  if (context === undefined) {
+    throw new Error('useOrdersLoading must be used within an OrderProvider');
+  }
   return context;
 };

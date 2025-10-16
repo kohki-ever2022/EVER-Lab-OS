@@ -1,14 +1,10 @@
 // src/contexts/CompanyContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Company } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-interface CompanyContextValue {
-  companies: Company[];
-  loading: boolean;
-}
-
-const CompanyContext = createContext<CompanyContextValue | null>(null);
+export const CompaniesDataContext = createContext<Company[]>([]);
+export const CompaniesLoadingContext = createContext<boolean>(true);
 
 export const CompanyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -24,13 +20,20 @@ export const CompanyProvider: React.FC<{ children: ReactNode }> = ({ children })
     return () => unsubscribe();
   }, [adapter]);
 
-  const value = useMemo(() => ({ companies, loading }), [companies, loading]);
-
-  return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>;
+  return (
+    <CompaniesDataContext.Provider value={companies}>
+      <CompaniesLoadingContext.Provider value={loading}>
+        {children}
+      </CompaniesLoadingContext.Provider>
+    </CompaniesDataContext.Provider>
+  );
 };
 
 export const useCompanyContext = () => {
-  const context = useContext(CompanyContext);
-  if (!context) throw new Error('useCompanyContext must be used within CompanyProvider');
-  return context;
+  const companies = useContext(CompaniesDataContext);
+  const loading = useContext(CompaniesLoadingContext);
+  if (companies === undefined || loading === undefined) {
+    throw new Error('useCompanyContext must be used within CompanyProvider');
+  }
+  return { companies, loading };
 };

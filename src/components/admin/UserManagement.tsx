@@ -6,9 +6,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import { useUserActions } from '../../hooks/useUserActions';
 import { useTranslation } from '../../hooks/useTranslation';
 
-// FIX: import from barrel file
 import { User } from '../../types';
-// FIX: import from barrel file
 import { Role, RoleCategory, Result } from '../../types';
 
 export const UserManagement: React.FC = () => {

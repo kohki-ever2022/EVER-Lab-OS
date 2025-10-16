@@ -1,38 +1,46 @@
 // src/contexts/UsageContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Usage } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-interface UsageContextValue {
-  usage: Usage[];
-  loading: boolean;
-}
-
-const UsageContext = createContext<UsageContextValue | null>(null);
+export const UsagesDataContext = createContext<Usage[]>([]);
+export const UsagesLoadingContext = createContext<boolean>(true);
 
 export const UsageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
-  const [usage, setUsage] = useState<Usage[]>([]);
+  const [usages, setUsages] = useState<Usage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    adapter.getUsages().then(result => {
-        if (result.success) {
-            setUsage(result.data);
-        }
-    }).finally(() => {
+    const unsubscribe = adapter.subscribeToUsages((data) => {
+        setUsages(data);
         setLoading(false);
     });
+    return () => unsubscribe();
   }, [adapter]);
   
-  const value = useMemo(() => ({ usage, loading }), [usage, loading]);
-
-  return <UsageContext.Provider value={value}>{children}</UsageContext.Provider>;
+  return (
+    <UsagesDataContext.Provider value={usages}>
+      <UsagesLoadingContext.Provider value={loading}>
+        {children}
+      </UsagesLoadingContext.Provider>
+    </UsagesDataContext.Provider>
+  );
 };
 
-export const useUsageContext = () => {
-  const context = useContext(UsageContext);
-  if (!context) throw new Error('useUsageContext must be used within a UsageProvider');
+export const useUsages = () => {
+  const context = useContext(UsagesDataContext);
+  if (context === undefined) {
+    throw new Error('useUsages must be used within a UsageProvider');
+  }
+  return context;
+};
+
+export const useUsagesLoading = () => {
+  const context = useContext(UsagesLoadingContext);
+  if (context === undefined) {
+    throw new Error('useUsagesLoading must be used within a UsageProvider');
+  }
   return context;
 };

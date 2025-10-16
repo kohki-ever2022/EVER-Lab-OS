@@ -1,6 +1,6 @@
 // src/components/dashboard/ProjectProgressDashboard.tsx
 import React, { useMemo } from 'react';
-import { useUsageContext } from '../../contexts/UsageContext';
+import { useUsages } from '../../contexts/UsageContext';
 import { useProjectContext } from '../../contexts/ProjectContext';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { Project, Task, TaskStatus, Milestone, MilestoneStatus } from '../../types';
@@ -8,7 +8,7 @@ import { Usage } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const ProjectProgressDashboard: React.FC = () => {
-  const { usage } = useUsageContext();
+  const usage = useUsages();
   const { projects, tasks } = useProjectContext();
   const { t } = useTranslation();
 

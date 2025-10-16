@@ -4,7 +4,6 @@ import { useToast } from '../../contexts/ToastContext';
 import { useReservationActions } from '../../hooks/useReservationActions';
 import { useReservations } from '../../contexts/ReservationContext';
 import { useEquipment } from '../../contexts/EquipmentContext';
-// FIX: import from barrel file
 import { Language, Result, Reservation, ReservationStatus, Usage } from '../../types';
 import Waitlist from './Waitlist';
 import { useTranslation } from '../../hooks/useTranslation';

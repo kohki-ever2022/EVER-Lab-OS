@@ -1,14 +1,10 @@
 // src/contexts/MaintenanceLogContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { MaintenanceLog } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-interface MaintenanceLogContextValue {
-  maintenanceLogs: MaintenanceLog[];
-  loading: boolean;
-}
-
-const MaintenanceLogContext = createContext<MaintenanceLogContextValue | null>(null);
+export const MaintenanceLogsDataContext = createContext<MaintenanceLog[]>([]);
+export const MaintenanceLogsLoadingContext = createContext<boolean>(true);
 
 export const MaintenanceLogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -17,22 +13,34 @@ export const MaintenanceLogProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   useEffect(() => {
     setLoading(true);
-    adapter.getMaintenanceLogs().then(result => {
-        if (result.success) {
-            setMaintenanceLogs(result.data);
-        }
-    }).finally(() => {
+    const unsubscribe = adapter.subscribeToMaintenanceLogs((data) => {
+        setMaintenanceLogs(data);
         setLoading(false);
     });
+    return () => unsubscribe();
   }, [adapter]);
   
-  const value = useMemo(() => ({ maintenanceLogs, loading }), [maintenanceLogs, loading]);
-
-  return <MaintenanceLogContext.Provider value={value}>{children}</MaintenanceLogContext.Provider>;
+  return (
+    <MaintenanceLogsDataContext.Provider value={maintenanceLogs}>
+      <MaintenanceLogsLoadingContext.Provider value={loading}>
+        {children}
+      </MaintenanceLogsLoadingContext.Provider>
+    </MaintenanceLogsDataContext.Provider>
+  );
 };
 
-export const useMaintenanceLogContext = () => {
-  const context = useContext(MaintenanceLogContext);
-  if (!context) throw new Error('useMaintenanceLogContext must be used within a MaintenanceLogProvider');
+export const useMaintenanceLogs = () => {
+  const context = useContext(MaintenanceLogsDataContext);
+  if (context === undefined) {
+    throw new Error('useMaintenanceLogs must be used within a MaintenanceLogProvider');
+  }
+  return context;
+};
+
+export const useMaintenanceLogsLoading = () => {
+  const context = useContext(MaintenanceLogsLoadingContext);
+  if (context === undefined) {
+    throw new Error('useMaintenanceLogsLoading must be used within a MaintenanceLogProvider');
+  }
   return context;
 };

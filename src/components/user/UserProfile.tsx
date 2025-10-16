@@ -3,7 +3,6 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useUserActions } from '../../hooks/useUserActions';
-// FIX: import from barrel file
 import { User } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 

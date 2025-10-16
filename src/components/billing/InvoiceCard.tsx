@@ -1,5 +1,4 @@
 import React from 'react';
-// FIX: import from barrel file
 import { Invoice } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 

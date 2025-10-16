@@ -8,7 +8,7 @@ import {
 } from '../types';
 import { IDataAdapter } from './IDataAdapter';
 import { getMockData } from '../data/mockData';
-import { ValidationError, validateDateRange } from '../utils/validation';
+import { ValidationError } from '../utils/validation';
 import { simpleUUID } from '../utils/uuid';
 
 // Generic CRUD factory
@@ -198,15 +198,11 @@ export class MockAdapter implements IDataAdapter {
   async getReservations(): Promise<Result<Reservation[]>> { return { success: true, data: [...this.reservations] }; }
   async getReservationById(id: string): Promise<Result<Reservation | null>> { return { success: true, data: this.reservations.find(r => r.id === id) || null }; }
   async createReservation(data: Omit<Reservation, 'id'>): Promise<Result<Reservation>> {
-     try {
-        validateDateRange(data.startTime, data.endTime);
-        const newReservation: Reservation = { ...data, id: simpleUUID() };
-        this.reservations.push(newReservation);
-        this.notifySubscribers('reservations', this.reservations);
-        return { success: true, data: newReservation };
-    } catch (e) {
-        return { success: false, error: e as Error };
-    }
+    // Validation is handled in the useReservationActions hook.
+    const newReservation: Reservation = { ...data, id: simpleUUID() };
+    this.reservations.push(newReservation);
+    this.notifySubscribers('reservations', this.reservations);
+    return { success: true, data: newReservation };
   }
   async updateReservation(reservation: Reservation): Promise<Result<Reservation>> {
     const i = this.reservations.findIndex(r => r.id === reservation.id);

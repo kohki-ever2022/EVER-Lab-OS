@@ -8,6 +8,7 @@ import { Reservation, ReservationStatus, Usage, WaitlistEntry, WaitlistStatus } 
 // FIX: import from barrel file
 import { Result } from '../types';
 import { useReservations } from '../contexts/ReservationContext';
+import { validateDateRange } from '../utils/validation';
 
 export const useReservationActions = () => {
     const adapter = useDataAdapter();
@@ -16,19 +17,25 @@ export const useReservationActions = () => {
     const { currentUser } = useSessionContext();
 
     const addReservation = useCallback(async (reservation: Omit<Reservation, 'id'>): Promise<Result<Reservation, Error>> => {
-        const overlapping = reservations.some(r => 
-            r.equipmentId === reservation.equipmentId && 
-            r.status !== ReservationStatus.Cancelled && 
-            (
-                (new Date(reservation.startTime) >= new Date(r.startTime) && new Date(reservation.startTime) < new Date(r.endTime)) || 
-                (new Date(reservation.endTime) > new Date(r.startTime) && new Date(reservation.endTime) <= new Date(r.endTime)) || 
-                (new Date(reservation.startTime) <= new Date(r.startTime) && new Date(reservation.endTime) >= new Date(r.endTime))
-            )
-        );
-        if (overlapping) {
-            return { success: false, error: new Error('OVERLAP_ERROR') };
+        try {
+            validateDateRange(reservation.startTime, reservation.endTime);
+
+            const overlapping = reservations.some(r => 
+                r.equipmentId === reservation.equipmentId && 
+                r.status !== ReservationStatus.Cancelled && 
+                (
+                    (new Date(reservation.startTime) >= new Date(r.startTime) && new Date(reservation.startTime) < new Date(r.endTime)) || 
+                    (new Date(reservation.endTime) > new Date(r.startTime) && new Date(reservation.endTime) <= new Date(r.endTime)) || 
+                    (new Date(reservation.startTime) <= new Date(r.startTime) && new Date(reservation.endTime) >= new Date(r.endTime))
+                )
+            );
+            if (overlapping) {
+                return { success: false, error: new Error('OVERLAP_ERROR') };
+            }
+            return adapter.createReservation(reservation);
+        } catch (e) {
+            return { success: false, error: e instanceof Error ? e : new Error(String(e)) };
         }
-        return adapter.createReservation(reservation);
     }, [adapter, reservations]);
 
     const updateReservation = useCallback(async (reservation: Reservation): Promise<Result<Reservation, Error>> => {

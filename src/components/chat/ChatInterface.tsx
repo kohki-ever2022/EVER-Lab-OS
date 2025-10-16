@@ -4,7 +4,6 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useUsers } from '../../contexts/UserContext';
 import { useDataAdapter } from '../../contexts/DataAdapterContext';
 import { useToast } from '../../contexts/ToastContext';
-// FIX: import from barrel file
 import { ChatRoom, ChatMessage } from '../../types';
 import { SendIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';

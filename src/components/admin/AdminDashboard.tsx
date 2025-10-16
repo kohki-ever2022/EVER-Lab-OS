@@ -9,8 +9,8 @@ import { useUsers } from '../../contexts/UserContext';
 import { useToast } from '../../contexts/ToastContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useEquipmentActions } from '../../hooks/useEquipmentActions';
-import { useUsageContext } from '../../contexts/UsageContext';
-import { useMaintenanceLogContext } from '../../contexts/MaintenanceLogContext';
+import { useUsages } from '../../contexts/UsageContext';
+import { useMaintenanceLogs } from '../../contexts/MaintenanceLogContext';
 import { ClockIcon, CalendarIcon, MailIcon, ExclamationCircleIcon, CogIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -58,8 +58,8 @@ export const AdminDashboard: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t, isJapanese } = useTranslation();
     const { memos } = useLabStateContext();
-    const { usage } = useUsageContext();
-    const { maintenanceLogs } = useMaintenanceLogContext();
+    const usage = useUsages();
+    const maintenanceLogs = useMaintenanceLogs();
     const reservations = useReservations();
     const equipment = useEquipment();
     const users = useUsers();

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useAnnouncementContext } from '../../contexts/AnnouncementContext';
+import { useAnnouncements } from '../../contexts/AnnouncementContext';
 import { useReservations } from '../../contexts/ReservationContext';
 import { useEquipment } from '../../contexts/EquipmentContext';
 import { Reservation, ReservationStatus, View, Announcement } from '../../types';
@@ -23,7 +23,7 @@ const DashboardCard: React.FC<{title: string, icon: React.ReactNode, children: R
 const Dashboard: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t, isJapanese } = useTranslation();
-    const { announcements } = useAnnouncementContext();
+    const announcements = useAnnouncements();
     const reservations = useReservations();
     const equipment = useEquipment();
 

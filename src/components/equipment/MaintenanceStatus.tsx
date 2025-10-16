@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useMaintenanceLogContext } from '../../contexts/MaintenanceLogContext';
+import { useMaintenanceLogs } from '../../contexts/MaintenanceLogContext';
 import { useEquipment } from '../../contexts/EquipmentContext';
 import { useUsers } from '../../contexts/UserContext';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -8,7 +8,7 @@ import { EquipmentStatus, MaintenanceLogStatus } from '../../types';
 
 const MaintenanceStatus: React.FC = () => {
     const { t, isJapanese } = useTranslation();
-    const { maintenanceLogs } = useMaintenanceLogContext();
+    const maintenanceLogs = useMaintenanceLogs();
     const equipment = useEquipment();
     const users = useUsers();
     

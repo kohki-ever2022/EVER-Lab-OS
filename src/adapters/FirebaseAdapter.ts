@@ -149,17 +149,9 @@ export class FirebaseAdapter implements IDataAdapter {
   subscribeToReservations = (cb: (d: Reservation[]) => void) => this.subscribeToGenericCollection<Reservation>(COLLECTIONS.RESERVATIONS, cb);
 
   async createReservation(data: Omit<Reservation, 'id'>): Promise<Result<Reservation>> {
-    if (!db) return { success: false, error: new Error("Firebase not configured.") };
-    try {
-      const q = query(collection(db, COLLECTIONS.RESERVATIONS), where("equipmentId", "==", data.equipmentId), where("status", "!=", ReservationStatus.Cancelled));
-      const reservations = this.fromSnapshot<Reservation>(await getDocs(q));
-      const overlapping = reservations.some(r => ((data.startTime >= r.startTime && data.startTime < r.endTime) || (data.endTime > r.startTime && data.endTime <= r.endTime) || (data.startTime <= r.startTime && data.endTime >= r.endTime)));
-      if (overlapping) return { success: false, error: new Error('Overlapping reservation exists.') };
-      return this.createGenericDoc<Reservation>(COLLECTIONS.RESERVATIONS, data);
-    } catch (e) {
-      console.error('Error creating reservation:', e);
-      return { success: false, error: e as Error };
-    }
+    // Overlap validation is now handled in useReservationActions hook to ensure consistency.
+    // This method is now just for data persistence. Firebase security rules should provide the definitive server-side validation.
+    return this.createGenericDoc<Reservation>(COLLECTIONS.RESERVATIONS, data);
   }
 
   // --- Order Operations (custom logic for transaction) ---

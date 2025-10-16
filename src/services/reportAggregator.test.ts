@@ -14,7 +14,6 @@ import { NotificationContext } from '../contexts/NotificationContext';
 import { Role, RoleCategory, User, SystemSettings, Plan, EquipmentManual, MonthlyReport, BenchAssignment, InventorySnapshot, AuditLog, Consumable, Reservation, WaitlistEntry, Notification } from '../types';
 
 // Statically import contexts
-// FIX: Correctly import the data and loading contexts which are now exported, and remove unused aliases.
 import { UsersDataContext, UsersLoadingContext } from '../contexts/UserContext';
 import { ConsumablesDataContext, ConsumablesLoadingContext } from '../contexts/ConsumableContext';
 import { ReservationsDataContext, ReservationsLoadingContext } from '../contexts/ReservationContext';
