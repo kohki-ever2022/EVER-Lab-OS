@@ -42,15 +42,18 @@ const ErrorFallback: React.FC<{ error: Error | null; errorInfo: ErrorInfo | null
 
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Initialize state as a class property instead of in the constructor.
-  // This is a more modern syntax and resolves issues with certain TypeScript
-  // compiler options regarding class field initialization (e.g., `useDefineForClassFields`).
-  // This fixes the errors about `state`, `setState`, and `props` not existing on the component instance.
-  state: State = {
-    hasError: false,
-    error: null,
-    errorInfo: null,
-  };
+  // FIX: Switched to constructor-based state initialization.
+  // The class property initialization was causing type errors where `this.props` and
+  // `this.setState` were not found, likely due to a specific build configuration.
+  // The constructor is the standard, most reliable way to initialize state in React class components.
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+    };
+  }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };
