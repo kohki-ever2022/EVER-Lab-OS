@@ -9,7 +9,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { User } from '../../types';
 import { Role, RoleCategory, Result } from '../../types';
 
-export const UserManagement: React.FC = () => {
+const UserManagement: React.FC = () => {
     const users = useUsers();
     const { companies } = useCompanyContext();
     const { t, isJapanese } = useTranslation();

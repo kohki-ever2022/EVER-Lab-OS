@@ -9,7 +9,7 @@ import { useComplianceActions } from '../../hooks/useComplianceActions';
 import { CaretDownIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
 
-export const LabRuleManagement: React.FC = () => {
+const LabRuleManagement: React.FC = () => {
   const { currentUser, isFacilityStaff } = useSessionContext();
   const { t, isJapanese } = useTranslation();
   const { labRules } = useQmsContext();
@@ -154,3 +154,5 @@ export const LabRuleManagement: React.FC = () => {
     </div>
   );
 };
+
+export default LabRuleManagement;

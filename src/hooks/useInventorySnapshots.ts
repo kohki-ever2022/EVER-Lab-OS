@@ -1,14 +1,15 @@
 // src/hooks/useInventorySnapshots.ts
 import { useCallback } from 'react';
 import { Consumable, InventorySnapshot, AuditLog } from '../types';
-import { useAdminContext } from '../contexts/AppProviders';
+import { useAdminContext, useAuditContext } from '../contexts/AppProviders';
 
 const generateId = (): string => {
   return `snapshot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
 export const useInventorySnapshots = () => {
-  const { inventorySnapshots: snapshots, setInventorySnapshots: setSnapshots, setAuditLogs } = useAdminContext();
+  const { inventorySnapshots: snapshots, setInventorySnapshots: setSnapshots } = useAdminContext();
+  const { setAuditLogs } = useAuditContext();
 
   const createMonthlySnapshot = useCallback((
     year: number,

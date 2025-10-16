@@ -36,7 +36,7 @@ export const QmsProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     useEffect(() => {
         const fetchData = async () => {
             const [sdsResult, reqsResult, insResult] = await Promise.all([
-                adapter.getSdsList(),
+                adapter.getSds(),
                 adapter.getRegulatoryRequirements(),
                 adapter.getInsuranceCertificates(),
             ]);

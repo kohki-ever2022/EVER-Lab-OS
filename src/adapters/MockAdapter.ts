@@ -71,7 +71,7 @@ export class MockAdapter implements IDataAdapter {
   private maintenanceLogs: MaintenanceLog[];
   private announcements: Announcement[];
   private certificates: Certificate[];
-  private sdsList: SDS[];
+  private sds: SDS[];
   private monthlyReports: MonthlyReport[];
   private tickets: Ticket[];
   private regulatoryRequirements: RegulatoryRequirement[];
@@ -105,7 +105,7 @@ export class MockAdapter implements IDataAdapter {
     this.reservations = d.reservations; this.usages = d.usage; this.consumables = d.consumables;
     this.orders = d.orders; this.projects = d.projects; this.tasks = d.tasks;
     this.labNotebookEntries = d.labNotebookEntries; this.maintenanceLogs = d.maintenanceLogs;
-    this.announcements = d.announcements; this.certificates = d.certificates; this.sdsList = d.sds;
+    this.announcements = d.announcements; this.certificates = d.certificates; this.sds = d.sds;
     this.monthlyReports = []; this.tickets = []; this.regulatoryRequirements = d.regulatoryRequirements;
     this.insuranceCertificates = d.insuranceCertificates; this.chatRooms = d.chatRooms;
     this.chatMessages = d.chatMessages; this.invoices = d.invoices;
@@ -121,7 +121,7 @@ export class MockAdapter implements IDataAdapter {
     this.maintenanceLogCrud = createGenericCrud(this.maintenanceLogs, 'maintenanceLogs', this);
     this.announcementCrud = createGenericCrud(this.announcements, 'announcements', this);
     this.certificateCrud = createGenericCrud(this.certificates, 'certificates', this);
-    this.sdsCrud = createGenericCrud(this.sdsList, 'sdsList', this);
+    this.sdsCrud = createGenericCrud(this.sds, 'sds', this);
     this.monthlyReportCrud = createGenericCrud(this.monthlyReports, 'monthlyReports', this);
     this.ticketCrud = createGenericCrud(this.tickets, 'tickets', this);
     this.regulatoryRequirementCrud = createGenericCrud(this.regulatoryRequirements, 'regulatoryRequirements', this);
@@ -137,7 +137,7 @@ export class MockAdapter implements IDataAdapter {
     this.getMaintenanceLogs = this.maintenanceLogCrud.getAll; this.getMaintenanceLogById = this.maintenanceLogCrud.getById; this.createMaintenanceLog = this.maintenanceLogCrud.create; this.updateMaintenanceLog = this.maintenanceLogCrud.update; this.deleteMaintenanceLog = this.maintenanceLogCrud.delete; this.subscribeToMaintenanceLogs = this.maintenanceLogCrud.subscribe;
     this.getAnnouncements = this.announcementCrud.getAll; this.getAnnouncementById = this.announcementCrud.getById; this.createAnnouncement = this.announcementCrud.create; this.updateAnnouncement = this.announcementCrud.update; this.deleteAnnouncement = this.announcementCrud.delete; this.subscribeToAnnouncements = this.announcementCrud.subscribe;
     this.getCertificates = this.certificateCrud.getAll; this.getCertificateById = this.certificateCrud.getById; this.createCertificate = this.certificateCrud.create; this.updateCertificate = this.certificateCrud.update; this.deleteCertificate = this.certificateCrud.delete; this.subscribeToCertificates = this.certificateCrud.subscribe;
-    this.getSdsList = this.sdsCrud.getAll; this.getSdsById = this.sdsCrud.getById; this.createSds = this.sdsCrud.create; this.updateSds = this.sdsCrud.update; this.deleteSds = this.sdsCrud.delete; this.subscribeToSds = this.sdsCrud.subscribe;
+    this.getSds = this.sdsCrud.getAll; this.getSdsById = this.sdsCrud.getById; this.createSds = this.sdsCrud.create; this.updateSds = this.sdsCrud.update; this.deleteSds = this.sdsCrud.delete; this.subscribeToSds = this.sdsCrud.subscribe;
     this.getMonthlyReports = this.monthlyReportCrud.getAll; this.createMonthlyReport = this.monthlyReportCrud.create; this.subscribeToMonthlyReports = this.monthlyReportCrud.subscribe;
     this.getTickets = this.ticketCrud.getAll; this.getTicketById = this.ticketCrud.getById; this.createTicket = this.ticketCrud.create; this.updateTicket = this.ticketCrud.update; this.deleteTicket = this.ticketCrud.delete; this.subscribeToTickets = this.ticketCrud.subscribe;
     this.getRegulatoryRequirements = this.regulatoryRequirementCrud.getAll; this.getRegulatoryRequirementById = this.regulatoryRequirementCrud.getById; this.createRegulatoryRequirement = this.regulatoryRequirementCrud.create; this.updateRegulatoryRequirement = this.regulatoryRequirementCrud.update; this.deleteRegulatoryRequirement = this.regulatoryRequirementCrud.delete; this.subscribeToRegulatoryRequirements = this.regulatoryRequirementCrud.subscribe;
@@ -266,7 +266,7 @@ export class MockAdapter implements IDataAdapter {
   getMaintenanceLogs; getMaintenanceLogById; createMaintenanceLog; updateMaintenanceLog; deleteMaintenanceLog; subscribeToMaintenanceLogs;
   getAnnouncements; getAnnouncementById; createAnnouncement; updateAnnouncement; deleteAnnouncement; subscribeToAnnouncements;
   getCertificates; getCertificateById; createCertificate; updateCertificate; deleteCertificate; subscribeToCertificates;
-  getSdsList; getSdsById; createSds; updateSds; deleteSds; subscribeToSds;
+  getSds; getSdsById; createSds; updateSds; deleteSds; subscribeToSds;
   getMonthlyReports; createMonthlyReport; subscribeToMonthlyReports;
   getTickets; getTicketById; createTicket; updateTicket; deleteTicket; subscribeToTickets;
   getRegulatoryRequirements; getRegulatoryRequirementById; createRegulatoryRequirement; updateRegulatoryRequirement; deleteRegulatoryRequirement; subscribeToRegulatoryRequirements;

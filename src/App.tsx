@@ -8,9 +8,7 @@ import Toast from './components/common/Toast';
 import ModalRenderer from './components/common/ModalRenderer';
 import { useTranslation } from './hooks/useTranslation';
 
-// --- Lazy-loaded View Components ---
-
-// Default Exports
+// --- Lazy-loaded View Components (Standardized to default exports) ---
 const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
 const Equipment = lazy(() => import('./components/equipment/Equipment'));
 const Announcements = lazy(() => import('./components/dashboard/Announcements'));
@@ -26,28 +24,27 @@ const SupplierDashboard = lazy(() => import('./components/supplier/SupplierDashb
 const ReorderSuggestions = lazy(() => import('./components/inventory/ReorderSuggestions'));
 const CertificateManagement = lazy(() => import('./components/certificates/CertificateManagement'));
 const Settings = lazy(() => import('./components/admin/Settings'));
-
-// Named Exports
-const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
-const EquipmentManagement = lazy(() => import('./components/admin/EquipmentManagement').then(m => ({ default: m.EquipmentManagement })));
-const UserManagement = lazy(() => import('./components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
+const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard'));
+const EquipmentManagement = lazy(() => import('./components/admin/EquipmentManagement'));
+const UserManagement = lazy(() => import('./components/admin/UserManagement'));
 const AuditLog = lazy(() => import('./components/admin/AuditLog'));
-const MaintenanceLogViewer = lazy(() => import('./components/equipment/MaintenanceLogViewer').then(m => ({ default: m.MaintenanceLogViewer })));
+const MaintenanceLogViewer = lazy(() => import('./components/equipment/MaintenanceLogViewer'));
 const MaintenanceStatus = lazy(() => import('./components/equipment/MaintenanceStatus'));
-const MemberManagement = lazy(() => import('./components/user/MemberManagement').then(m => ({ default: m.MemberManagement })));
-const ManualManagement = lazy(() => import('./components/qms/ManualManagement').then(m => ({ default: m.ManualManagement })));
-const LabRuleManagement = lazy(() => import('./components/qms/LabRuleManagement').then(m => ({ default: m.LabRuleManagement })));
-const FacilityConsumableNotification = lazy(() => import('./components/facility/FacilityConsumableNotification').then(m => ({ default: m.FacilityConsumableNotification })));
-const ChatInterface = lazy(() => import('./components/chat/ChatInterface').then(m => ({ default: m.ChatInterface })));
+const MemberManagement = lazy(() => import('./components/user/MemberManagement'));
+const ManualManagement = lazy(() => import('./components/qms/ManualManagement'));
+const LabRuleManagement = lazy(() => import('./components/qms/LabRuleManagement'));
+const FacilityConsumableNotification = lazy(() => import('./components/facility/FacilityConsumableNotification'));
+const ChatInterface = lazy(() => import('./components/chat/ChatInterface'));
 const InventoryLockManager = lazy(() => import('./components/admin/InventoryLockManager'));
 const MonthlyReportGenerator = lazy(() => import('./components/admin/MonthlyReportGenerator'));
-const HazardousMaterialsDashboard = lazy(() => import('./components/inventory/HazardousMaterialsDashboard').then(m => ({ default: m.HazardousMaterialsDashboard })));
-const RegulatoryCompliance = lazy(() => import('./components/compliance/RegulatoryCompliance').then(m => ({ default: m.RegulatoryCompliance })));
-const FacilityLayout = lazy(() => import('./components/facility/FacilityLayout').then(m => ({ default: m.FacilityLayout })));
-const InsuranceManagement = lazy(() => import('./components/compliance/InsuranceManagement').then(m => ({ default: m.InsuranceManagement })));
-const CO2IncubatorManagement = lazy(() => import('./components/equipment/CO2IncubatorManagement').then(m => ({ default: m.CO2IncubatorManagement })));
-const ProjectGanttChart = lazy(() => import('./components/project/ProjectGanttChart').then(m => ({ default: m.ProjectGanttChart })));
+const HazardousMaterialsDashboard = lazy(() => import('./components/inventory/HazardousMaterialsDashboard'));
+const RegulatoryCompliance = lazy(() => import('./components/compliance/RegulatoryCompliance'));
+const FacilityLayout = lazy(() => import('./components/facility/FacilityLayout'));
+const InsuranceManagement = lazy(() => import('./components/compliance/InsuranceManagement'));
+const CO2IncubatorManagement = lazy(() => import('./components/equipment/CO2IncubatorManagement'));
+const ProjectGanttChart = lazy(() => import('./components/project/ProjectGanttChart'));
 const NotificationCenter = lazy(() => import('./components/notifications/NotificationCenter'));
+
 
 const AppLayout: React.FC = () => {
     const { t } = useTranslation();

@@ -54,7 +54,7 @@ const ResultModal: React.FC<ResultModalProps> = ({ title, results, onClose }) =>
 )};
 
 
-export const AdminDashboard: React.FC = () => {
+const AdminDashboard: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t, isJapanese } = useTranslation();
     const { memos } = useLabStateContext();

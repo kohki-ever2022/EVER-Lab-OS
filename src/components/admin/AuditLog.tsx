@@ -1,10 +1,10 @@
 import React from 'react';
-import { useAdminContext } from '../../contexts/AppProviders';
+import { useAuditContext } from '../../contexts/AppProviders';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const AuditLog: React.FC = () => {
-    const { auditLogs } = useAdminContext();
+    const { auditLogs } = useAuditContext();
     const { t, isJapanese } = useTranslation();
     const { hasPermission } = usePermissions();
 

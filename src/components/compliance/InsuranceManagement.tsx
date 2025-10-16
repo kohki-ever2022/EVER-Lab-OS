@@ -11,7 +11,7 @@ import { googleCalendarService, createCalendarEventFromSchedule } from '../../se
 import { useCompanyContext } from '../../contexts/CompanyContext';
 import { useTranslation } from '../../hooks/useTranslation';
 
-export const InsuranceManagement: React.FC = () => {
+const InsuranceManagement: React.FC = () => {
   const { language, currentUser, isFacilityStaff } = useSessionContext();
   const { insuranceCertificates } = useQmsContext();
   const { companies } = useCompanyContext();
@@ -313,3 +313,5 @@ export const InsuranceManagement: React.FC = () => {
     </div>
   );
 };
+
+export default InsuranceManagement;

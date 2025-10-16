@@ -6,7 +6,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { useAdminActions } from '../../hooks/useAdminActions';
 import { useTranslation } from '../../hooks/useTranslation';
 
-export const FacilityConsumableNotification: React.FC = () => {
+const FacilityConsumableNotification: React.FC = () => {
   const { currentUser, isFacilityStaff } = useSessionContext();
   const { t, isJapanese } = useTranslation();
   const { consumableNotifications } = useLabStateContext();

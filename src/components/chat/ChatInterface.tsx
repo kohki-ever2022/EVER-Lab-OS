@@ -7,8 +7,9 @@ import { useToast } from '../../contexts/ToastContext';
 import { ChatRoom, ChatMessage } from '../../types';
 import { SendIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
+import { escapeHtml } from '../../utils/sanitization';
 
-export const ChatInterface: React.FC = () => {
+const ChatInterface: React.FC = () => {
   const { currentUser } = useSessionContext();
   const { t, isJapanese } = useTranslation();
   const users = useUsers();
@@ -64,7 +65,7 @@ export const ChatInterface: React.FC = () => {
     const result = await adapter.sendChatMessage({
       roomId: selectedRoomId,
       senderId: currentUser.id,
-      content: newMessage,
+      content: escapeHtml(newMessage),
       createdAt: new Date(), // Pass client time; Firebase will overwrite with server time
     });
 
@@ -179,3 +180,5 @@ export const ChatInterface: React.FC = () => {
     </div>
   );
 };
+
+export default ChatInterface;

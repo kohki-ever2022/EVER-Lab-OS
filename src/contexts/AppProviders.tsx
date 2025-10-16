@@ -41,6 +41,7 @@ import { UsageProvider } from './UsageContext';
 
 // Import providers that were previously defined in this file
 import { AdminProvider, useAdminContext } from './app/AdminContext';
+import { AuditProvider, useAuditContext } from './app/AuditContext';
 import { QmsProvider, useQmsContext } from './app/QmsContext';
 import { BillingProvider, useBillingContext } from './app/BillingContext';
 import { PurchasingProvider, usePurchasingContext } from './app/PurchasingContext';
@@ -49,6 +50,7 @@ import { LabStateProvider, useLabStateContext } from './app/LabStateContext';
 // Re-export hooks for convenience
 export {
   useAdminContext,
+  useAuditContext,
   useQmsContext,
   useBillingContext,
   usePurchasingContext,
@@ -61,6 +63,7 @@ export {
  */
 const providers = [
   AdminProvider,
+  AuditProvider,
   BillingProvider,
   PurchasingProvider,
   QmsProvider,

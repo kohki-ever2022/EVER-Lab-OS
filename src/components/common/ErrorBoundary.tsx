@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -41,11 +41,11 @@ const ErrorFallback: React.FC<{ error: Error | null; errorInfo: ErrorInfo | null
 };
 
 
-class ErrorBoundary extends Component<Props, State> {
-  // FIX: Switched to constructor-based state initialization.
-  // The class property initialization was causing type errors where `this.props` and
-  // `this.setState` were not found, likely due to a specific build configuration.
-  // The constructor is the standard, most reliable way to initialize state in React class components.
+class ErrorBoundary extends React.Component<Props, State> {
+  // FIX: Switched from class property initialization to a constructor. The previous approach
+  // was causing typing issues in the environment, preventing access to `this.props`, `this.state`,
+  // and `this.setState`. Using a constructor with `super(props)` is the standard and more compatible way
+  // to initialize a React class component.
   constructor(props: Props) {
     super(props);
     this.state = {

@@ -3,9 +3,11 @@ import { useSessionContext } from '../../contexts/SessionContext';
 import { useAnnouncements } from '../../contexts/AnnouncementContext';
 import { useReservations } from '../../contexts/ReservationContext';
 import { useEquipment } from '../../contexts/EquipmentContext';
-import { Reservation, ReservationStatus, View, Announcement } from '../../types';
-import { CalendarIcon, PencilIcon, BeakerIcon, ArrowRightIcon } from '../common/Icons';
+import { Reservation, ReservationStatus, View, Announcement, Equipment as EquipmentType } from '../../types';
+import { CalendarIcon, PencilIcon, BeakerIcon, ArrowRightIcon, StarIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useEquipmentFavorites } from '../../hooks/useEquipmentFavorites';
+import { useModalContext } from '../../contexts/ModalContext';
 
 const DashboardCard: React.FC<{title: string, icon: React.ReactNode, children: React.ReactNode, onViewAll?: () => void, viewAllText?: string}> = ({ title, icon, children, onViewAll, viewAllText }) => (
     <div className="bg-white p-6 rounded-lg shadow flex flex-col">
@@ -26,6 +28,8 @@ const Dashboard: React.FC = () => {
     const announcements = useAnnouncements();
     const reservations = useReservations();
     const equipment = useEquipment();
+    const { getFavorites } = useEquipmentFavorites();
+    const { openModal } = useModalContext();
 
     const upcomingReservations = React.useMemo(() => {
         const now = new Date();
@@ -40,6 +44,17 @@ const Dashboard: React.FC = () => {
             .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
             .slice(0, 3);
     }, [announcements]);
+
+    const favoriteEquipmentIds = currentUser ? getFavorites(currentUser.id) : [];
+    const favoriteEquipment = React.useMemo(() => {
+        return equipment
+            .filter(e => favoriteEquipmentIds.includes(e.id))
+            .slice(0, 5); // Limit for dashboard view
+    }, [equipment, favoriteEquipmentIds]);
+
+    const handleFavoriteClick = (equipment: EquipmentType) => {
+        openModal({ type: 'bookEquipment', props: { equipment } });
+    };
     
     const handleNavigate = (view: View) => {
         window.location.hash = view;
@@ -102,9 +117,9 @@ const Dashboard: React.FC = () => {
                         </div>
                     </DashboardCard>
                 </div>
-
+                
                 {/* Announcements */}
-                <div className="lg:col-span-3">
+                <div className="lg:col-span-2">
                     <DashboardCard 
                         title={t('announcements')}
                         icon={<PencilIcon className="h-6 w-6 text-ever-blue" />}
@@ -123,6 +138,34 @@ const Dashboard: React.FC = () => {
                         ) : (
                              <div className="text-center py-8 text-gray-500">
                                 <p>{t('noAnnouncements')}</p>
+                            </div>
+                        )}
+                    </DashboardCard>
+                </div>
+
+                {/* Favorite Equipment */}
+                <div className="lg:col-span-1">
+                    <DashboardCard 
+                        title={t('favoriteEquipment')}
+                        icon={<StarIcon className="h-6 w-6 text-ever-blue" />}
+                        onViewAll={() => handleNavigate('equipment')}
+                        viewAllText={t('viewAll')}
+                    >
+                        {favoriteEquipment.length > 0 ? (
+                            <ul className="space-y-3">
+                                {favoriteEquipment.map(eq => (
+                                    <li key={eq.id} className="p-3 bg-gray-50 rounded-md flex justify-between items-center hover:bg-gray-100 cursor-pointer" onClick={() => handleFavoriteClick(eq)}>
+                                        <div>
+                                            <p className="font-semibold text-gray-800">{isJapanese ? eq.nameJP : eq.nameEN}</p>
+                                            <p className="text-sm text-gray-600">{eq.status}</p>
+                                        </div>
+                                        <ArrowRightIcon className="w-5 h-5 text-gray-400" />
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">
+                                <p>{t('noFavoriteEquipment')}</p>
                             </div>
                         )}
                     </DashboardCard>

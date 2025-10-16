@@ -6,7 +6,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 
 import { Equipment, EquipmentStatus } from '../../types';
 
-export const EquipmentManagement: React.FC = () => {
+const EquipmentManagement: React.FC = () => {
     const equipment = useEquipment();
     const { t, isJapanese } = useTranslation();
     const { showToast } = useToast();
@@ -192,3 +192,5 @@ export const EquipmentManagement: React.FC = () => {
         </div>
     );
 };
+
+export default EquipmentManagement;

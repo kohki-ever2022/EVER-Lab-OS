@@ -14,7 +14,7 @@ import { useQmsContext } from '../../contexts/AppProviders';
 import { usePermissions } from '../../hooks/usePermissions';
 import { useTranslation } from '../../hooks/useTranslation';
 
-export const ManualManagement: React.FC = () => {
+const ManualManagement: React.FC = () => {
   const { currentUser, isFacilityStaff } = useSessionContext();
   const { t, isJapanese } = useTranslation();
   const { manuals } = useQmsContext();

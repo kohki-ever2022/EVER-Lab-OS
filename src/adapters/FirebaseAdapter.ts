@@ -304,7 +304,7 @@ export class FirebaseAdapter implements IDataAdapter {
   deleteCertificate = (id: string) => this.deleteGenericDoc(COLLECTIONS.CERTIFICATES, id);
   subscribeToCertificates = (cb: (d: Certificate[]) => void) => this.subscribeToGenericCollection<Certificate>(COLLECTIONS.CERTIFICATES, cb);
   
-  getSdsList = () => this.getGenericCollection<SDS>(COLLECTIONS.SDS);
+  getSds = () => this.getGenericCollection<SDS>(COLLECTIONS.SDS);
   getSdsById = (id: string) => this.getGenericDocById<SDS>(COLLECTIONS.SDS, id);
   createSds = (data: Omit<SDS, 'id'>) => this.createGenericDoc<SDS>(COLLECTIONS.SDS, data);
   updateSds = (item: SDS) => this.updateGenericDoc<SDS>(COLLECTIONS.SDS, item);

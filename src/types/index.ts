@@ -1002,6 +1002,7 @@ export interface User {
   statusMessage?: string;
   qualificationIds?: string[];
   favoriteConsumableIds?: string[];
+  favoriteEquipmentIds?: string[];
 }
 
 export type CurrentUser = Omit<User, 'password'>;

@@ -36,7 +36,8 @@ describe('useInventoryActions', () => {
   const wrapper = createWrapper({
     adapter: mockAdapter,
     sessionContextValue: { currentUser: mockCurrentUser, isFacilityStaff: true },
-    adminContextValue: { setAuditLogs: vi.fn() as any },
+    // FIX: Moved setAuditLogs to the correct context value.
+    auditContextValue: { setAuditLogs: vi.fn() as any },
     notificationContextValue: { addNotification: mockAddNotification as any },
     users: mockUsers,
     consumables: mockConsumables,

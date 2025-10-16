@@ -11,7 +11,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import NewRequirementModal from '../modals/NewRequirementModal';
 import { useTranslation } from '../../hooks/useTranslation';
 
-export const RegulatoryCompliance: React.FC = () => {
+const RegulatoryCompliance: React.FC = () => {
   const { currentUser, isFacilityStaff } = useSessionContext();
   const { regulatoryRequirements } = useQmsContext();
   const { hasPermission } = usePermissions();
@@ -205,3 +205,5 @@ export const RegulatoryCompliance: React.FC = () => {
     </div>
   );
 };
+
+export default RegulatoryCompliance;

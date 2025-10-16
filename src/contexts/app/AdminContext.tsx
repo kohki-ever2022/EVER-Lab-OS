@@ -1,6 +1,6 @@
 // src/contexts/app/AdminContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
-import { MonthlyReport, BenchAssignment, InventorySnapshot, AuditLog, SystemSettings, Plan, EquipmentManual } from '../../types';
+import { MonthlyReport, BenchAssignment, InventorySnapshot, SystemSettings, Plan, EquipmentManual } from '../../types';
 import { useDataAdapter } from '../DataAdapterContext';
 import { getMockData } from '../../data/mockData';
 
@@ -9,8 +9,6 @@ export interface AdminContextValue {
   benchAssignments: BenchAssignment[];
   inventorySnapshots: InventorySnapshot[];
   setInventorySnapshots: React.Dispatch<React.SetStateAction<InventorySnapshot[]>>;
-  auditLogs: AuditLog[];
-  setAuditLogs: React.Dispatch<React.SetStateAction<AuditLog[]>>;
   systemSettings: SystemSettings;
   setSystemSettings: React.Dispatch<React.SetStateAction<SystemSettings>>;
   plans: Plan[];
@@ -27,7 +25,6 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [monthlyReports, setMonthlyReports] = useState<MonthlyReport[]>([]);
   const [benchAssignments, setBenchAssignments] = useState<BenchAssignment[]>(initialData.benchAssignments);
   const [inventorySnapshots, setInventorySnapshots] = useState<InventorySnapshot[]>(initialData.inventorySnapshots);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(initialData.auditLogs);
   const [systemSettings, setSystemSettings] = useState<SystemSettings>(initialData.systemSettings);
   const [plans, setPlans] = useState<Plan[]>(initialData.plans);
   const [equipmentManuals, setEquipmentManuals] = useState<EquipmentManual[]>(initialData.equipmentManuals);
@@ -42,9 +39,9 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   
   const value = useMemo(() => ({
     monthlyReports, benchAssignments, inventorySnapshots, setInventorySnapshots,
-    auditLogs, setAuditLogs, systemSettings, setSystemSettings, plans, setPlans,
+    systemSettings, setSystemSettings, plans, setPlans,
     equipmentManuals
-  }), [monthlyReports, benchAssignments, inventorySnapshots, auditLogs, systemSettings, plans, equipmentManuals]);
+  }), [monthlyReports, benchAssignments, inventorySnapshots, systemSettings, plans, equipmentManuals]);
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
 };

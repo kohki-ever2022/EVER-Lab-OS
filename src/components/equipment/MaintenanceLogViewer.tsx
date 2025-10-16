@@ -7,7 +7,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 
 import { MaintenanceLog, MaintenanceLogStatus } from '../../types';
 
-export const MaintenanceLogViewer: React.FC = () => {
+const MaintenanceLogViewer: React.FC = () => {
     const maintenanceLogs = useMaintenanceLogs();
     const equipment = useEquipment();
     const users = useUsers();

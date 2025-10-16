@@ -6,7 +6,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import { Role } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 
-export const MemberManagement: React.FC = () => {
+const MemberManagement: React.FC = () => {
     const { currentUser } = useSessionContext();
     const { t, isJapanese } = useTranslation();
     const users = useUsers();
@@ -63,3 +63,5 @@ export const MemberManagement: React.FC = () => {
         </div>
     );
 };
+
+export default MemberManagement;

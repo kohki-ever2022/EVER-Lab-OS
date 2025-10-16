@@ -7,8 +7,9 @@ import { useEquipment } from '../../contexts/EquipmentContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useAdminContext } from '../../contexts/AppProviders';
-import { YoutubeIcon, PdfIcon, LinkIcon, ArrowRightIcon, WarningIcon, getManualIcon } from '../common/Icons';
+import { YoutubeIcon, PdfIcon, LinkIcon, ArrowRightIcon, WarningIcon, getManualIcon, StarIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useEquipmentFavorites } from '../../hooks/useEquipmentFavorites';
 
 
 const StatusBadge: React.FC<{ status: EquipmentStatus }> = ({ status }) => {
@@ -53,7 +54,17 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
     const { qualifications, userCertifications } = useQmsContext();
     const users = useUsers();
     const { openModal } = useModalContext();
+    const { isFavorite, toggleFavorite } = useEquipmentFavorites();
     
+    const isThisFavorite = currentUser ? isFavorite(currentUser.id, equipment.id) : false;
+
+    const handleToggleFavorite = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (currentUser) {
+            toggleFavorite(currentUser.id, equipment.id);
+        }
+    };
+
     const requiredQualId = equipment.requiredQualificationId;
     const userCertification = userCertifications.find(cert => 
         cert.userId === currentUser?.id &&
@@ -89,7 +100,15 @@ const EquipmentCard: React.FC<{ equipment: EquipmentType }> = ({ equipment }) =>
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative">
+             <button
+                onClick={handleToggleFavorite}
+                className="absolute top-2 right-2 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors z-10"
+                title={isThisFavorite ? t('removeFromFavorites') : t('addToFavorites')}
+                aria-label={isThisFavorite ? t('removeFromFavorites') : t('addToFavorites')}
+            >
+                <StarIcon className={`w-6 h-6 ${isThisFavorite ? 'fill-yellow-400 stroke-yellow-500' : 'fill-transparent stroke-white'}`} />
+            </button>
             <img src={equipment.imageUrl} alt={equipmentName} className="w-full h-48 object-cover" />
             <div className="p-4 flex flex-col flex-grow">
                 <StatusBadge status={equipment.status} />

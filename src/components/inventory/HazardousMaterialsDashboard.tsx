@@ -8,7 +8,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { View } from '../../types';
 import { Consumable } from '../../types';
 
-export const HazardousMaterialsDashboard: React.FC = () => {
+const HazardousMaterialsDashboard: React.FC = () => {
   const { t, isJapanese } = useTranslation();
   const consumables = useConsumables();
   const { companies } = useCompanyContext();
@@ -127,3 +127,5 @@ export const HazardousMaterialsDashboard: React.FC = () => {
     </div>
   );
 };
+
+export default HazardousMaterialsDashboard;

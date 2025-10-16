@@ -1,5 +1,6 @@
 // src/components/common/MarkdownRenderer.tsx
 import React, { useMemo, Fragment } from 'react';
+import { escapeHtml } from '../../utils/sanitization';
 
 interface Props {
   markdown: string;
@@ -14,12 +15,12 @@ const renderInlines = (text: string) => {
   
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={index}>{part.slice(2, -2)}</strong>;
+      return <strong key={index}>{escapeHtml(part.slice(2, -2))}</strong>;
     }
     if (part.startsWith('*') && part.endsWith('*')) {
-      return <em key={index}>{part.slice(1, -1)}</em>;
+      return <em key={index}>{escapeHtml(part.slice(1, -1))}</em>;
     }
-    return part; // Return plain text parts as is
+    return escapeHtml(part); // Sanitize plain text parts
   });
 };
 

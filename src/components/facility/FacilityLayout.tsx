@@ -65,7 +65,7 @@ const Bench: React.FC<BenchProps> = ({ item }) => {
   );
 };
 
-export const FacilityLayout:React.FC = () => {
+const FacilityLayout:React.FC = () => {
   const { t } = useTranslation();
 
   return (
@@ -125,3 +125,5 @@ export const FacilityLayout:React.FC = () => {
     </div>
   );
 };
+
+export default FacilityLayout;

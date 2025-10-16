@@ -139,7 +139,7 @@ export interface IDataAdapter {
   subscribeToCertificates(callback: (data: Certificate[]) => void): () => void;
 
   // --- SDS Operations ---
-  getSdsList(): Promise<Result<SDS[]>>;
+  getSds(): Promise<Result<SDS[]>>;
   getSdsById(id: string): Promise<Result<SDS | null>>;
   createSds(data: Omit<SDS, 'id'>): Promise<Result<SDS>>;
   updateSds(sds: SDS): Promise<Result<SDS>>;

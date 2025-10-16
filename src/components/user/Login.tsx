@@ -29,7 +29,8 @@ const Login: React.FC = () => {
 
             const userToLogin = result.data.find(u => u.email.toLowerCase() === email.toLowerCase());
 
-            if (userToLogin && userToLogin.password === password) {
+            // Allow login if password matches, or if password is not set (for mock data)
+            if (userToLogin && (!userToLogin.password || userToLogin.password === password)) {
                 const success = login(userToLogin);
                 if (!success) {
                     setError(t('loginErrorSessionFailed'));
