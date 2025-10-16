@@ -5,7 +5,7 @@ import { useModalContext } from '../../contexts/ModalContext';
 import ProjectDetailsModal from '../modals/ProjectDetailsModal';
 import ConfirmModal from './ConfirmModal';
 import PromptModal from './PromptModal';
-import PlaceholderModal from '../modals/PlaceholderModal';
+import PlaceholderModal, { BenchDetailsModal } from '../modals/PlaceholderModal';
 import EquipmentManualsModal from '../modals/EquipmentManualsModal';
 import UploadCertificateModal from '../modals/UploadCertificateModal';
 import ScheduleEquipmentModal from '../modals/ScheduleEquipmentModal';
@@ -32,10 +32,10 @@ const ModalRenderer: React.FC = () => {
         case 'reportIssue': return <ReportIssueModal equipment={activeModal.props.equipment} onClose={closeModal} />;
         case 'editTask': return <EditTaskModal {...activeModal.props} onClose={closeModal} />;
         case 'sdsDetails': return <SdsDetailsModal sds={activeModal.props.sds} onClose={closeModal} />;
+        case 'benchDetails': return <BenchDetailsModal {...activeModal.props} onClose={closeModal} />;
 
         // Handle other modals with a placeholder to prevent silent failures
         case 'qrScanner': return <PlaceholderModal title="QR Code Scanner" onClose={closeModal} />;
-        case 'benchDetails': return <PlaceholderModal title="Bench Details" onClose={closeModal} />;
         
         // Default case for any other unhandled or future modal types
         default:

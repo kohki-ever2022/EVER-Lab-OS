@@ -5,23 +5,8 @@ import React, { ReactNode } from 'react';
 
 import { useReservationActions } from './useReservationActions';
 import { IDataAdapter } from '../adapters/IDataAdapter';
-import { SessionContext, SessionContextType } from '../contexts/SessionContext';
-import { DataAdapterContext } from '../contexts/DataAdapterContext';
-import { LabStateContext, LabStateContextValue } from '../contexts/app/LabStateContext';
-
+import { createWrapper } from './useUserActions.test'; // Import shared wrapper
 import { Role, RoleCategory, User, Language, Reservation, ReservationStatus, WaitlistEntry } from '../types';
-
-// This is a dynamic import because the context file itself is being modified.
-let ReservationsDataContext: React.Context<Reservation[]>;
-let ReservationsLoadingContext: React.Context<boolean>;
-
-beforeEach(async () => {
-  const reservationContextModule = await import('../contexts/ReservationContext');
-  // @ts-ignore - we are accessing a non-exported context for testing
-  ReservationsDataContext = reservationContextModule.ReservationsDataContext;
-  // @ts-ignore
-  ReservationsLoadingContext = reservationContextModule.ReservationsLoadingContext;
-});
 
 // Mock Dependencies
 const mockAdapter: IDataAdapter = {
@@ -34,47 +19,20 @@ const mockSetWaitlist = vi.fn();
 
 const mockCurrentUser: User = { id: 'user-1', name: 'Test User', email: 'test@test.com', companyId: 'company-a', role: Role.Researcher, roleCategory: RoleCategory.Tenant };
 const mockReservations: Reservation[] = [
-    { id: 'res-1', userId: 'user-1', equipmentId: 'eq-1', startTime: new Date(), endTime: new Date(), status: ReservationStatus.AwaitingCheckIn, actualStartTime: new Date() },
+    { id: 'res-1', userId: 'user-1', equipmentId: 'eq-1', startTime: new Date(), endTime: new Date(), status: ReservationStatus.AwaitingCheckIn, actualStartTime: new Date() } as Reservation,
 ];
-
-const createWrapper = () => {
-  const sessionContextValue: SessionContextType = {
-    currentUser: mockCurrentUser,
-    language: Language.EN,
-    setLanguage: vi.fn(), login: vi.fn(), logout: vi.fn(), isFacilityStaff: false, isTenantStaff: true,
-  };
-
-  const labStateContextValue: LabStateContextValue = {
-    setWaitlist: mockSetWaitlist,
-  } as any;
-  
-  return ({ children }: { children: ReactNode }) => React.createElement(
-    DataAdapterContext.Provider,
-    { value: mockAdapter },
-    React.createElement(
-      SessionContext.Provider,
-      { value: sessionContextValue },
-      React.createElement(
-        LabStateContext.Provider,
-        { value: labStateContextValue },
-        React.createElement(
-          ReservationsDataContext.Provider,
-          { value: mockReservations },
-          React.createElement(
-            ReservationsLoadingContext.Provider,
-            { value: false },
-            children
-          )
-        )
-      )
-    )
-  );
-};
 
 
 describe('useReservationActions', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+  });
+  
+  const wrapper = createWrapper({
+    adapter: mockAdapter,
+    sessionContextValue: { currentUser: mockCurrentUser, isTenantStaff: true },
+    labStateContextValue: { setWaitlist: mockSetWaitlist },
+    reservations: mockReservations,
   });
 
   it('should add a reservation successfully', async () => {
@@ -87,7 +45,7 @@ describe('useReservationActions', () => {
     };
     (mockAdapter.createReservation as any).mockResolvedValue({ success: true, data: { ...newReservation, id: 'res-2' } });
 
-    const { result } = renderHook(() => useReservationActions(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useReservationActions(), { wrapper });
     
     let actionResult;
     await act(async () => {
@@ -102,7 +60,7 @@ describe('useReservationActions', () => {
     const reservationToUpdate = { ...mockReservations[0], status: ReservationStatus.CheckedIn };
     (mockAdapter.updateReservation as any).mockResolvedValue({ success: true, data: reservationToUpdate });
 
-    const { result } = renderHook(() => useReservationActions(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useReservationActions(), { wrapper });
 
     let actionResult;
     await act(async () => {
@@ -126,7 +84,7 @@ describe('useReservationActions', () => {
     (mockAdapter.updateReservation as any).mockResolvedValue({ success: true, data: updatedReservation });
     (mockAdapter.createUsage as any).mockResolvedValue({ success: true, data: { id: 'usage-1', ...expectedUsage } });
 
-    const { result } = renderHook(() => useReservationActions(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useReservationActions(), { wrapper });
 
     let actionResult;
     await act(async () => {
@@ -142,7 +100,7 @@ describe('useReservationActions', () => {
   });
 
   it('should add an item to the waitlist', async () => {
-    const { result } = renderHook(() => useReservationActions(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useReservationActions(), { wrapper });
     
     let actionResult;
     await act(async () => {

@@ -10,7 +10,8 @@ import {
   REPORT_TOP_N_EQUIPMENT, 
   REPORT_ITEM_LIST_LIMIT, 
   APPROX_DAYS_IN_MONTH, 
-  APPROX_WORK_HOURS_PER_DAY 
+  APPROX_WORK_HOURS_PER_DAY,
+  REPORT_TOP_N_TENANTS,
 } from '../config/constants';
 
 /**
@@ -158,7 +159,7 @@ export const aggregateMonthlyData = (
   const byTenant = Object.entries(byTenantAmount)
     .map(([tenantName, amount]) => ({ tenantName, amount }))
     .sort((a, b) => b.amount - a.amount)
-    .slice(0, 10); // Limit to top 10
+    .slice(0, REPORT_TOP_N_TENANTS);
 
   return {
     period: `${year}-${String(month).padStart(2, '0')}`,

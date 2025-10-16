@@ -4,7 +4,6 @@ import { useEquipment } from '../../contexts/EquipmentContext';
 import { useUsers } from '../../contexts/UserContext';
 import { useTranslation } from '../../hooks/useTranslation';
 
-// FIX: import from barrel file
 import { EquipmentStatus, MaintenanceLogStatus } from '../../types';
 
 const MaintenanceStatus: React.FC = () => {

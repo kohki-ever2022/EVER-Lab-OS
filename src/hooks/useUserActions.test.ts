@@ -8,7 +8,10 @@ import { IDataAdapter } from '../adapters/IDataAdapter';
 import { SessionContext, SessionContextType } from '../contexts/SessionContext';
 import { DataAdapterContext } from '../contexts/DataAdapterContext';
 import { AdminContext, AdminContextValue } from '../contexts/app/AdminContext';
-import { Role, RoleCategory, User, Language, SystemSettings, Plan, EquipmentManual, MonthlyReport, BenchAssignment, InventorySnapshot, AuditLog } from '../types';
+import { LabStateContext, LabStateContextValue } from '../contexts/app/LabStateContext';
+import { NotificationContext } from '../contexts/NotificationContext';
+
+import { Role, RoleCategory, User, Language, SystemSettings, Plan, EquipmentManual, MonthlyReport, BenchAssignment, InventorySnapshot, AuditLog, Consumable, Reservation, WaitlistEntry, Notification } from '../types';
 
 // Mock Data Adapter
 const mockAdapter: IDataAdapter = {
@@ -26,6 +29,11 @@ const mockFacilityDirector: User = { id: 'admin-user', name: 'Admin', email: 'ad
 // This is a dynamic import because the context file itself is being modified.
 let UsersDataContext: React.Context<User[]>;
 let UsersLoadingContext: React.Context<boolean>;
+let ConsumablesDataContext: React.Context<Consumable[]>;
+let ConsumablesLoadingContext: React.Context<boolean>;
+let ReservationsDataContext: React.Context<Reservation[]>;
+let ReservationsLoadingContext: React.Context<boolean>;
+
 
 beforeEach(async () => {
   const userContextModule = await import('../contexts/UserContext');
@@ -33,62 +41,97 @@ beforeEach(async () => {
   UsersDataContext = userContextModule.UsersDataContext;
   // @ts-ignore
   UsersLoadingContext = userContextModule.UsersLoadingContext;
+  
+  const consumableContextModule = await import('../contexts/ConsumableContext');
+  // @ts-ignore
+  ConsumablesDataContext = consumableContextModule.ConsumablesDataContext;
+  // @ts-ignore
+  ConsumablesLoadingContext = consumableContextModule.ConsumablesLoadingContext;
+
+  const reservationContextModule = await import('../contexts/ReservationContext');
+  // @ts-ignore
+  ReservationsDataContext = reservationContextModule.ReservationsDataContext;
+  // @ts-ignore
+  ReservationsLoadingContext = reservationContextModule.ReservationsLoadingContext;
 });
 
+interface CreateWrapperOptions {
+    adapter?: IDataAdapter;
+    sessionContextValue?: Partial<SessionContextType>;
+    adminContextValue?: Partial<AdminContextValue>;
+    labStateContextValue?: Partial<LabStateContextValue>;
+    notificationContextValue?: Partial<{ notifications: Notification[], addNotification: (n: any) => void }>;
+    users?: User[];
+    consumables?: Consumable[];
+    reservations?: Reservation[];
+}
 
-const createWrapper = (
-    adapter: IDataAdapter, 
-    sessionContextValue: Partial<SessionContextType>,
-    users: User[] = []
-) => {
+export const createWrapper = (options: CreateWrapperOptions = {}) => {
+  const {
+    adapter = mockAdapter,
+    sessionContextValue = {},
+    adminContextValue = {},
+    labStateContextValue = {},
+    notificationContextValue = {},
+    users = [],
+    consumables = [],
+    reservations = [],
+  } = options;
+
   const fullSessionContextValue: SessionContextType = {
-    currentUser: null,
-    language: Language.EN,
-    setLanguage: vi.fn(),
-    login: vi.fn(),
-    logout: vi.fn(),
-    isFacilityStaff: false,
-    isTenantStaff: false,
+    currentUser: null, language: Language.EN, setLanguage: vi.fn(),
+    login: vi.fn(), logout: vi.fn(), isFacilityStaff: false, isTenantStaff: false,
     ...sessionContextValue,
   };
 
-  const adminContextValue: AdminContextValue = {
-    monthlyReports: [] as MonthlyReport[],
-    benchAssignments: [] as BenchAssignment[],
-    inventorySnapshots: [] as InventorySnapshot[],
-    setInventorySnapshots: vi.fn(),
-    auditLogs: [] as AuditLog[],
-    setAuditLogs: vi.fn(),
-    systemSettings: { labOpeningTime: '', labClosingTime: '', noShowPenalty: 0, surgePricingEnabled: false, surgeMultiplier: 1, surgeStartTime: '', surgeEndTime: '' } as SystemSettings,
-    setSystemSettings: vi.fn(),
-    plans: [] as Plan[],
-    setPlans: vi.fn(),
-    equipmentManuals: [] as EquipmentManual[],
+  const fullAdminContextValue: AdminContextValue = {
+    monthlyReports: [], benchAssignments: [], inventorySnapshots: [],
+    setInventorySnapshots: vi.fn(), auditLogs: [], setAuditLogs: vi.fn(),
+    systemSettings: { labOpeningTime: '', labClosingTime: '', noShowPenalty: 0, surgePricingEnabled: false, surgeMultiplier: 1, surgeStartTime: '', surgeEndTime: '' },
+    setSystemSettings: vi.fn(), plans: [], setPlans: vi.fn(), equipmentManuals: [],
+    ...adminContextValue
   };
 
-  return ({ children }: { children: ReactNode }) => {
-    return React.createElement(
-      DataAdapterContext.Provider,
-      { value: adapter },
-      React.createElement(
-        SessionContext.Provider,
-        { value: fullSessionContextValue },
-        React.createElement(
-          AdminContext.Provider,
-          { value: adminContextValue },
-          React.createElement(
-            UsersDataContext.Provider,
-            { value: users },
-            React.createElement(
-                UsersLoadingContext.Provider,
-                { value: false },
-                children
+  const fullLabStateContextValue: LabStateContextValue = {
+    consumableNotifications: [], setConsumableNotifications: vi.fn(),
+    co2IncubatorTrackingData: [], setCo2IncubatorTrackingData: vi.fn(),
+    memos: [], waitlist: [], setWaitlist: vi.fn(),
+    ...labStateContextValue
+  }
+
+  const fullNotificationContextValue = {
+      notifications: [],
+      addNotification: vi.fn(),
+      removeNotification: vi.fn(),
+      clearNotifications: vi.fn(),
+      ...notificationContextValue
+  }
+
+  return ({ children }: { children: ReactNode }) => (
+    React.createElement(DataAdapterContext.Provider, { value: adapter },
+      React.createElement(SessionContext.Provider, { value: fullSessionContextValue },
+        React.createElement(AdminContext.Provider, { value: fullAdminContextValue },
+          React.createElement(LabStateContext.Provider, { value: fullLabStateContextValue },
+            React.createElement(NotificationContext.Provider, { value: fullNotificationContextValue },
+              React.createElement(UsersDataContext.Provider, { value: users },
+                React.createElement(UsersLoadingContext.Provider, { value: false },
+                  React.createElement(ConsumablesDataContext.Provider, { value: consumables },
+                    React.createElement(ConsumablesLoadingContext.Provider, { value: false },
+                      React.createElement(ReservationsDataContext.Provider, { value: reservations },
+                        React.createElement(ReservationsLoadingContext.Provider, { value: false },
+                          children
+                        )
+                      )
+                    )
+                  )
+                )
+              )
             )
           )
         )
       )
-    );
-  };
+    )
+  );
 };
 
 
@@ -110,7 +153,7 @@ describe('useUserActions', () => {
     
     (mockAdapter.createUser as any).mockResolvedValue({ success: true, data: createdUser });
     
-    const wrapper = createWrapper(mockAdapter, adminSessionContext);
+    const wrapper = createWrapper({ sessionContextValue: adminSessionContext });
     const { result } = renderHook(() => useUserActions(), { wrapper });
     
     let actionResult;
@@ -131,7 +174,7 @@ describe('useUserActions', () => {
     };
     const newUser: Omit<User, 'id'> = { name: 'Another User', email: 'another@test.com', companyId: 'company-a', role: Role.Researcher, roleCategory: RoleCategory.Tenant };
 
-    const wrapper = createWrapper(mockAdapter, researcherSessionContext);
+    const wrapper = createWrapper({ sessionContextValue: researcherSessionContext });
     const { result } = renderHook(() => useUserActions(), { wrapper });
 
     let actionResult;
@@ -148,7 +191,7 @@ describe('useUserActions', () => {
     const userToUpdate = { ...mockUsers[0], name: 'Updated Name' };
     (mockAdapter.updateUser as any).mockResolvedValue({ success: true, data: userToUpdate });
 
-    const wrapper = createWrapper(mockAdapter, adminSessionContext, mockUsers);
+    const wrapper = createWrapper({ sessionContextValue: adminSessionContext, users: mockUsers });
     const { result } = renderHook(() => useUserActions(), { wrapper });
 
     let actionResult;
@@ -164,7 +207,7 @@ describe('useUserActions', () => {
     const userToUpdate = { ...mockUsers[0], email: 'admin@test.com' }; // email of another user
     const usersWithAdmin = [...mockUsers, mockFacilityDirector];
     
-    const wrapper = createWrapper(mockAdapter, adminSessionContext, usersWithAdmin);
+    const wrapper = createWrapper({ sessionContextValue: adminSessionContext, users: usersWithAdmin });
     const { result } = renderHook(() => useUserActions(), { wrapper });
 
     let actionResult;
@@ -181,7 +224,7 @@ describe('useUserActions', () => {
     const userIdToDelete = mockUsers[0].id;
     (mockAdapter.deleteUser as any).mockResolvedValue({ success: true, data: undefined });
 
-    const wrapper = createWrapper(mockAdapter, adminSessionContext, mockUsers);
+    const wrapper = createWrapper({ sessionContextValue: adminSessionContext, users: mockUsers });
     const { result } = renderHook(() => useUserActions(), { wrapper });
 
     let actionResult;
