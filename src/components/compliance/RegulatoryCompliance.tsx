@@ -1,32 +1,26 @@
+// src/components/compliance/RegulatoryCompliance.tsx
 import React, { useState, useEffect } from 'react';
 import { 
   RegulationType, 
   SubmissionStatus, 
   RegulatoryRequirement,
-  SupportStaffType,
-  RegulatorySupport,
 } from '../../types';
-import { Role } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { usePermissions } from '../../hooks/usePermissions';
-import { useToast } from '../../contexts/ToastContext';
-import { useComplianceActions } from '../../hooks/useComplianceActions';
+import NewRequirementModal from '../modals/NewRequirementModal';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export const RegulatoryCompliance: React.FC = () => {
   const { currentUser, isFacilityStaff } = useSessionContext();
   const { regulatoryRequirements } = useQmsContext();
   const { hasPermission } = usePermissions();
-  const { showToast } = useToast();
-  const { addRegulatoryRequirement } = useComplianceActions();
   const { t, isJapanese } = useTranslation();
   
   const [requirements, setRequirements] = useState<RegulatoryRequirement[]>(regulatoryRequirements || []);
   const [selectedType, setSelectedType] = useState<RegulationType | 'ALL'>('ALL');
   const [showSupportPanel, setShowSupportPanel] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newRequirement, setNewRequirement] = useState<Partial<Omit<RegulatoryRequirement, 'id'>>>({});
 
   useEffect(() => {
     setRequirements(regulatoryRequirements);
@@ -51,30 +45,6 @@ export const RegulatoryCompliance: React.FC = () => {
     [SubmissionStatus.Approved]: { key: 'statusApproved', color: 'bg-green-100 text-green-700' },
     [SubmissionStatus.Rejected]: { key: 'submissionStatusRejected', color: 'bg-red-200 text-red-800' },
     [SubmissionStatus.Expired]: { key: 'statusExpired', color: 'bg-gray-300 text-gray-800' }
-  };
-
-  const handleOpenModal = () => {
-    setNewRequirement({
-      tenantId: currentUser?.companyId,
-      type: RegulationType.Other,
-      submissionStatus: SubmissionStatus.Required,
-    });
-    setIsModalOpen(true);
-  };
-  
-  const handleAddRequirement = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newRequirement.requirementNameJP || !newRequirement.requirementNameEN || !newRequirement.submissionAuthority) {
-        showToast(t('requiredFields'), 'error');
-        return;
-    }
-    const result = await addRegulatoryRequirement(newRequirement as any);
-    if (result.success === false) {
-        showToast(t('addRequirementFailed'), 'error');
-    } else {
-        showToast(t('addRequirementSuccess'), 'success');
-        setIsModalOpen(false);
-    }
   };
 
   const filteredRequirements = requirements.filter(req => 
@@ -115,7 +85,7 @@ export const RegulatoryCompliance: React.FC = () => {
                 {t('supportInfo')}
               </button>
             )}
-            <button onClick={handleOpenModal} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            <button onClick={() => setIsModalOpen(true)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                 {t('newRequirement')}
             </button>
         </div>
@@ -201,35 +171,7 @@ export const RegulatoryCompliance: React.FC = () => {
         </table>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
-            <h3 className="text-lg font-bold mb-4">{t('newRequirement')}</h3>
-            <form onSubmit={handleAddRequirement} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium">{t('requirementNameJP')}</label>
-                <input type="text" value={newRequirement.requirementNameJP || ''} onChange={e => setNewRequirement(p => ({...p, requirementNameJP: e.target.value}))} className="w-full border rounded p-2 mt-1" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">{t('requirementNameEN')}</label>
-                <input type="text" value={newRequirement.requirementNameEN || ''} onChange={e => setNewRequirement(p => ({...p, requirementNameEN: e.target.value}))} className="w-full border rounded p-2 mt-1" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">{t('authority')}</label>
-                <input type="text" value={newRequirement.submissionAuthority || ''} onChange={e => setNewRequirement(p => ({...p, submissionAuthority: e.target.value}))} className="w-full border rounded p-2 mt-1" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">{t('deadline')}</label>
-                <input type="date" value={newRequirement.submissionDeadline ? new Date(newRequirement.submissionDeadline).toISOString().split('T')[0] : ''} onChange={e => setNewRequirement(p => ({...p, submissionDeadline: new Date(e.target.value)}))} className="w-full border rounded p-2 mt-1" />
-              </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border rounded hover:bg-gray-50">{t('cancel')}</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{t('add')}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <NewRequirementModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {canManageSupport && showSupportPanel && (
         <div className="mt-6 bg-blue-50 p-6 rounded-lg border border-blue-200">
