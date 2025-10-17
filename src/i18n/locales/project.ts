@@ -43,4 +43,8 @@ export const project = {
   milestones: { ja: 'マイルストーン', en: 'Milestones' },
   totalEquipmentUsage: { ja: '総機器利用時間', en: 'Total Equipment Usage' },
   noProjectsToDisplay: { ja: '表示するプロジェクトがありません。', en: 'No projects to display.' },
+  co2Incubator: { ja: 'CO2インキュベーター', en: 'CO2 Incubator' },
+  ganttChart: { ja: 'ガントチャート', en: 'Gantt Chart' },
+  myProjects: { ja: 'マイプロジェクト', en: 'My Projects' },
+  project: { ja: 'プロジェクト', en: 'Project' },
 };

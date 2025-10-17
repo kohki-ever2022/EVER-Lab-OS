@@ -16,4 +16,6 @@ export const layout = {
   monthlyReports: { ja: '月次レポート', en: 'Monthly Reports' },
   systemSettings: { ja: 'システム設定', en: 'System Settings' },
   chat: { ja: 'チャット', en: 'Chat' },
+  facilityLayout: { ja: '施設レイアウト', en: 'Facility Layout' },
+  areaP1: { ja: 'エリア P1', en: 'Area P1' },
 };

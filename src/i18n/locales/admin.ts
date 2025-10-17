@@ -67,4 +67,12 @@ export const admin = {
   noInvoicesAvailable: { ja: '利用可能な請求書はありません。', en: 'No invoices available.' },
   total: { ja: '合計:', en: 'Total:' },
   issued: { ja: '発行日:', en: 'Issued:' },
+  addNewUser: { ja: '新規ユーザー追加', en: 'Add New User' },
+  userManagement: { ja: 'ユーザー管理', en: 'User Management' },
+  editUser: { ja: 'ユーザー編集', en: 'Edit User' },
+  userSaved: { ja: 'ユーザー情報を保存しました。', en: 'User information saved.' },
+  deleteUserConfirm: { ja: 'このユーザーを本当に削除しますか？', en: 'Are you sure you want to delete this user?' },
+  userDeleted: { ja: 'ユーザーを削除しました。', en: 'User deleted.' },
+  selectCompany: { ja: '会社を選択', en: 'Select Company' },
+  emailAddress: { ja: 'メールアドレス', en: 'Email Address' },
 };

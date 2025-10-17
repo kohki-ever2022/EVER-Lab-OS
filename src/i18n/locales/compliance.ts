@@ -126,4 +126,8 @@ export const compliance = {
   categoryOther: { ja: 'その他', en: 'Other' },
   verify: { ja: '確認', en: 'Verify' },
   upload: { ja: 'アップロード', en: 'Upload' },
+  deadlineAddedToCalendar: { ja: 'カレンダーに提出期限を追加しました。', en: 'Deadline added to calendar.' },
+  failedToAddToCalendar: { ja: 'カレンダーへの追加に失敗しました。', en: 'Failed to add to calendar.' },
+  notificationCertExpiring: { ja: 'まもなく期限が切れる証明書があります。', en: 'You have certificates that are expiring soon.' },
+  notificationCertExpiringTitle: { ja: '証明書の有効期限が近づいています', en: 'Certificate Expiring Soon' },
 };
