@@ -1,10 +1,9 @@
 // src/components/chat/ChatInterface.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
-import { useUsers } from '../../contexts/UserContext';
 import { useDataAdapter } from '../../contexts/DataAdapterContext';
 import { useToast } from '../../contexts/ToastContext';
-import { ChatRoom, ChatMessage } from '../../types';
+import { ChatRoom, ChatMessage, ChatRoomType } from '../../types/chat';
 import { SendIcon } from '../common/Icons';
 import { useTranslation } from '../../hooks/useTranslation';
 import { escapeHtml } from '../../utils/sanitization';
@@ -12,7 +11,6 @@ import { escapeHtml } from '../../utils/sanitization';
 const ChatInterface: React.FC = () => {
   const { currentUser } = useSessionContext();
   const { t, isJapanese } = useTranslation();
-  const users = useUsers();
   const adapter = useDataAdapter();
   const { showToast } = useToast();
   
@@ -43,12 +41,6 @@ const ChatInterface: React.FC = () => {
         return;
     }
     
-    // Mark messages as read when opening a room
-    const room = chatRooms.find(r => r.id === selectedRoomId);
-    if (room && room.unreadCount[currentUser.id] > 0) {
-        adapter.markMessageAsRead(selectedRoomId, currentUser.id);
-    }
-    
     const unsubscribe = adapter.subscribeToChatMessages(selectedRoomId, (msgs) => {
       setMessages(msgs);
     });
@@ -65,8 +57,14 @@ const ChatInterface: React.FC = () => {
     const result = await adapter.sendChatMessage({
       roomId: selectedRoomId,
       senderId: currentUser.id,
+      senderName: currentUser.name,
+      senderAvatar: currentUser.imageUrl,
       content: escapeHtml(newMessage),
+      type: 'TEXT',
       createdAt: new Date(), // Pass client time; Firebase will overwrite with server time
+      updatedAt: new Date(),
+      isEdited: false,
+      isPinned: false,
     });
 
     if (result.success === false) {
@@ -75,10 +73,6 @@ const ChatInterface: React.FC = () => {
       setNewMessage('');
     }
   };
-  
-  const getSenderName = (senderId: string) => users.find(u => u.id === senderId)?.name || 'Unknown User';
-  const getSenderAvatar = (senderId: string) => users.find(u => u.id === senderId)?.imageUrl;
-
 
   if (!currentUser) return null;
 
@@ -102,14 +96,8 @@ const ChatInterface: React.FC = () => {
                 }`}
               >
                 <div className="flex justify-between items-start mb-1">
-                  <div className="font-semibold text-gray-800">{room.subject}</div>
-                  {room.unreadCount[currentUser!.id] > 0 && (
-                    <span className="bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
-                      {room.unreadCount[currentUser!.id]}
-                    </span>
-                  )}
+                  <div className="font-semibold text-gray-800">{room.name}</div>
                 </div>
-                <div className="text-sm text-gray-600 truncate">{room.lastMessage}</div>
                 <div className="text-xs text-gray-400 mt-1">
                   {new Date(room.lastMessageAt).toLocaleString(isJapanese ? 'ja-JP' : 'en-US', {
                     dateStyle: 'short',
@@ -126,19 +114,17 @@ const ChatInterface: React.FC = () => {
         {selectedRoomId ? (
           <>
             <div className="p-4 border-b flex-shrink-0">
-              <h3 className="font-bold">{chatRooms.find(r => r.id === selectedRoomId)?.subject}</h3>
+              <h3 className="font-bold">{chatRooms.find(r => r.id === selectedRoomId)?.name}</h3>
             </div>
             <div className="flex-1 p-4 overflow-y-auto">
               <div className="space-y-4">
                 {messages.map((msg, index) => {
                   const isMe = msg.senderId === currentUser.id;
-                  const senderName = getSenderName(msg.senderId);
-                  const senderAvatar = getSenderAvatar(msg.senderId);
 
                   return (
                     <div key={msg.id || index} className={`flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''}`}>
                        <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 flex items-center justify-center">
-                          {senderAvatar ? <img src={senderAvatar} alt={senderName} className="w-full h-full rounded-full object-cover" /> : senderName.charAt(0)}
+                          {msg.senderAvatar ? <img src={msg.senderAvatar} alt={msg.senderName} className="w-full h-full rounded-full object-cover" /> : msg.senderName.charAt(0)}
                        </div>
                       <div className={`p-3 rounded-lg max-w-xs md:max-w-md ${isMe ? 'bg-ever-blue text-white' : 'bg-gray-200'}`}>
                         <p className="text-sm">{msg.content}</p>

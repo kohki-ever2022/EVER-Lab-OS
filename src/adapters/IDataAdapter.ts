@@ -20,11 +20,10 @@ import {
   RegulatoryRequirement,
   InsuranceCertificate,
   MonthlyReport,
-  ChatRoom,
-  ChatMessage,
   Invoice,
   Result,
 } from '../types';
+import { ChatRoom, ChatMessage } from '../types/chat';
 
 /**
  * データ永続化層の抽象インターフェース (Repository Pattern)。
@@ -185,6 +184,5 @@ export interface IDataAdapter {
   createChatRoom(data: Omit<ChatRoom, 'id'>): Promise<Result<ChatRoom>>;
   getChatMessages(roomId: string): Promise<Result<ChatMessage[]>>;
   subscribeToChatMessages(roomId: string, callback: (data: ChatMessage[]) => void): () => void;
-  sendChatMessage(data: Omit<ChatMessage, 'id' | 'readBy'>): Promise<Result<ChatMessage>>;
-  markMessageAsRead(roomId: string, userId: string): Promise<Result<void>>;
+  sendChatMessage(data: Omit<ChatMessage, 'id'>): Promise<Result<ChatMessage>>;
 }

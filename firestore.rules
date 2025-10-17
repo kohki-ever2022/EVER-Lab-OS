@@ -1,18 +1,48 @@
-rules_version='2'
-
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // ヘルパー関数
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    
+    // ユーザードキュメント
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId);
+    }
+    
+    // 企業ドキュメント
+    match /companies/{companyId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['FACILITY_ADMIN', 'LAB_MANAGER'];
+    }
+    
+    // チャットルーム
+    match /chatRooms/{roomId} {
+      allow read: if isSignedIn() && 
+        request.auth.uid in resource.data.memberIds;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && 
+        request.auth.uid in resource.data.memberIds;
+      
+      // チャットメッセージ
+      match /messages/{messageId} {
+        allow read: if isSignedIn() && 
+          request.auth.uid in get(/databases/$(database)/documents/chatRooms/$(roomId)).data.memberIds;
+        allow create: if isSignedIn() && 
+          request.auth.uid in get(/databases/$(database)/documents/chatRooms/$(roomId)).data.memberIds;
+      }
+    }
+    
+    // その他のコレクション - デフォルトは拒否
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2025, 11, 16);
+      allow read, write: if false;
     }
   }
 }
