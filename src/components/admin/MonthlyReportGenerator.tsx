@@ -21,7 +21,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 
 const MonthlyReportGenerator: React.FC = () => {
   const { currentUser } = useSessionContext();
-  const { t, isJapanese, language } = useTranslation();
+  const { t, language } = useTranslation();
   const { monthlyReports } = useAdminContext();
   const { sds, ehsIncidents } = useQmsContext();
   const { invoices } = useBillingContext();

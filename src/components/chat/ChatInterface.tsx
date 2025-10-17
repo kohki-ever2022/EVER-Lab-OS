@@ -32,12 +32,16 @@ const ChatInterface: React.FC = () => {
     return () => unsubscribe();
   }, [currentUser, adapter]);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   // Subscribe to messages for the selected room
   useEffect(() => {
     if (!selectedRoomId || !currentUser || !adapter.subscribeToChatMessages) {
         setMessages([]);
         return;
-    };
+    }
     
     // Mark messages as read when opening a room
     const room = chatRooms.find(r => r.id === selectedRoomId);
@@ -54,10 +58,6 @@ const ChatInterface: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedRoomId || !currentUser || !adapter.sendChatMessage) return;

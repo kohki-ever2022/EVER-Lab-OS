@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Language, Role } from '../../types';
-import { ReservationStatus, Reservation, MaintenanceLogStatus, EquipmentStatus, MaintenanceLog } from '../../types';
+import { Role } from '../../types';
+import { ReservationStatus, MaintenanceLogStatus, EquipmentStatus, MaintenanceLog } from '../../types';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useLabStateContext } from '../../contexts/AppProviders';
 import { useReservations } from '../../contexts/ReservationContext';

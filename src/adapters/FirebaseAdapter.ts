@@ -3,9 +3,8 @@
 // Firebase Firestoreの関数をインポート
 import {
   collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc,
-  onSnapshot, query, where, QuerySnapshot, DocumentData, Firestore,
-  Unsubscribe, Timestamp, orderBy, runTransaction, serverTimestamp,
-  increment, DocumentReference,
+  onSnapshot, query, where, QuerySnapshot, DocumentData, Timestamp, orderBy, runTransaction, serverTimestamp,
+  increment, DocumentReference, FieldValue,
 } from 'firebase/firestore';
 
 // 実際のFirebase設定ファイルからdbインスタンスをインポート
@@ -14,7 +13,7 @@ import { db } from '../firebase';
 // 必要な型定義とインターフェースをインポート
 import {
   User, Company, Announcement, Equipment, Reservation, Usage, MaintenanceLog,
-  ReservationStatus, Consumable, Order, Project, Task, LabNotebookEntry,
+  Consumable, Order, Project, Task, LabNotebookEntry,
   Certificate, SDS, Ticket, RegulatoryRequirement, InsuranceCertificate,
   MonthlyReport, ChatRoom, ChatMessage, Invoice, Result,
 } from '../types';
@@ -219,7 +218,7 @@ export class FirebaseAdapter implements IDataAdapter {
         const roomData = roomDoc.data() as ChatRoom;
         const msgDoc = doc(collection(roomRef, COLLECTIONS.CHAT_MESSAGES));
         transaction.set(msgDoc, { ...data, createdAt: serverTimestamp(), readBy: [data.senderId] });
-        const unreadUpdates: { [key: string]: any } = {};
+        const unreadUpdates: { [key: string]: FieldValue } = {};
         roomData.participantIds.forEach(pid => { if (pid !== data.senderId) unreadUpdates[`unreadCount.${pid}`] = increment(1); });
         transaction.update(roomRef, { lastMessage: data.content, lastMessageAt: serverTimestamp(), ...unreadUpdates });
         return msgDoc;

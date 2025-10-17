@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useQmsContext } from '../../contexts/AppProviders';
 import { useUsers } from '../../contexts/UserContext';
 import { useModalContext } from '../../contexts/ModalContext';
 import { useCertificates } from '../../contexts/CertificateContext';
-import { CertificateStatus } from '../../types';
+import { Certificate } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const CertificateManagement: React.FC = () => {
@@ -17,7 +17,7 @@ const CertificateManagement: React.FC = () => {
 
     const [filter, setFilter] = useState<'all' | 'my' | 'expiring'>('my');
 
-    const getStatus = (expiryDate: Date) => {
+    const getStatus = useCallback((expiryDate: Date) => {
         const now = new Date();
         const thirtyDaysFromNow = new Date();
         thirtyDaysFromNow.setDate(now.getDate() + 30);
@@ -29,7 +29,7 @@ const CertificateManagement: React.FC = () => {
         } else {
             return { text: t('valid'), color: 'bg-green-100 text-green-700' };
         }
-    };
+    }, [t]);
 
     const displayCertificates = useMemo(() => {
         let certs = isFacilityStaff ? certificates : certificates.filter(c => c.userId === currentUser?.id);
@@ -55,7 +55,7 @@ const CertificateManagement: React.FC = () => {
             };
         }).sort((a,b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
 
-    }, [certificates, qualifications, userCertifications, users, isJapanese, currentUser, filter, isFacilityStaff, t]);
+    }, [certificates, qualifications, userCertifications, users, isJapanese, currentUser, filter, isFacilityStaff, getStatus]);
 
     return (
         <div>
@@ -109,7 +109,7 @@ const CertificateManagement: React.FC = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button 
-                                        onClick={() => openModal({ type: 'uploadCertificate', props: { certificateToEdit: cert as any } })} 
+                                        onClick={() => openModal({ type: 'uploadCertificate', props: { certificateToEdit: certificates.find(c => c.id === cert.id) as Certificate } })} 
                                         className="text-indigo-600 hover:text-indigo-900"
                                     >
                                         {t('viewRenew')}

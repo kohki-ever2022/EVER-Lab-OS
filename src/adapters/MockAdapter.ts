@@ -2,7 +2,7 @@
 
 import {
   User, Company, Announcement, Equipment, Reservation, Usage, MaintenanceLog,
-  EquipmentStatus, ReservationStatus, Consumable, Order, Project, Task,
+  Consumable, Order, Project, Task,
   LabNotebookEntry, Certificate, SDS, Ticket, RegulatoryRequirement,
   InsuranceCertificate, MonthlyReport, ChatRoom, ChatMessage, Invoice, Result,
 } from '../types';
@@ -17,7 +17,7 @@ function createGenericCrud<T extends { id: string }>(
   collectionName: string,
   adapter: MockAdapter
 ) {
-  const notify = (data: T[]) => (adapter as any).notifySubscribers(collectionName, data);
+  const notify = (data: T[]) => (adapter as unknown as { notifySubscribers: (collectionName: string, data: unknown[]) => void }).notifySubscribers(collectionName, data);
 
   return {
     async getAll(): Promise<Result<T[]>> {
@@ -27,7 +27,7 @@ function createGenericCrud<T extends { id: string }>(
       return { success: true, data: collection.find(i => i.id === id) || null };
     },
     async create(data: Omit<T, 'id'>): Promise<Result<T>> {
-      const newItem = { ...data, id: simpleUUID() } as T;
+      const newItem = { ...data, id: simpleUUID() } as unknown as T;
       collection.push(newItem);
       notify(collection);
       return { success: true, data: newItem };
@@ -50,7 +50,7 @@ function createGenericCrud<T extends { id: string }>(
       return { success: true, data: undefined };
     },
     subscribe(callback: (data: T[]) => void): () => void {
-      return (adapter as any).createSubscription(collectionName, collection, callback);
+        return (adapter as unknown as { createSubscription: (collectionName: string, dataArray: T[], callback: (data: T[]) => void) => () => void }).createSubscription(collectionName, collection, callback);
     }
   };
 }
@@ -97,7 +97,7 @@ export class MockAdapter implements IDataAdapter {
   private regulatoryRequirementCrud;
   private insuranceCertificateCrud;
 
-  private subscribers: Map<string, Function[]> = new Map();
+  private subscribers: Map<string, ((data: unknown[]) => void)[]> = new Map();
 
   constructor() {
     const d = getMockData();
@@ -145,17 +145,17 @@ export class MockAdapter implements IDataAdapter {
   }
 
   // --- Subscription Management (made public for generic helper) ---
-  public notifySubscribers(collectionName: string, data: any[]) {
+  public notifySubscribers(collectionName: string, data: unknown[]) {
     const callbacks = this.subscribers.get(collectionName);
     if (callbacks) callbacks.forEach(cb => cb(data));
   }
   
-  public createSubscription(collectionName: string, dataArray: any[], callback: (data: any[]) => void): () => void {
+  public createSubscription<T>(collectionName: string, dataArray: T[], callback: (data: T[]) => void): () => void {
     const cbs = this.subscribers.get(collectionName) || [];
-    this.subscribers.set(collectionName, [...cbs, callback]);
+    this.subscribers.set(collectionName, [...cbs, callback as (data: unknown[]) => void]);
     callback(dataArray);
     return () => {
-      const updatedCbs = (this.subscribers.get(collectionName) || []).filter(cb => cb !== callback);
+      const updatedCbs = (this.subscribers.get(collectionName) || []).filter(cb => cb !== (callback as (data: unknown[]) => void));
       this.subscribers.set(collectionName, updatedCbs);
     };
   }
@@ -293,7 +293,7 @@ export class MockAdapter implements IDataAdapter {
   }
   subscribeToChatRooms(userId: string, callback: (data: ChatRoom[]) => void): () => void {
     return this.createSubscription('chatRooms', this.chatRooms, (allRooms) => {
-        const userRooms = allRooms.filter(r => r.participantIds.includes(userId)).sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+        const userRooms = (allRooms as ChatRoom[]).filter(r => r.participantIds.includes(userId)).sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
         callback(userRooms);
     });
   }
@@ -308,7 +308,7 @@ export class MockAdapter implements IDataAdapter {
   }
   subscribeToChatMessages(roomId: string, callback: (data: ChatMessage[]) => void): () => void {
       return this.createSubscription('chatMessages', this.chatMessages, (allMessages) => {
-          const roomMessages = allMessages.filter(m => m.roomId === roomId).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+          const roomMessages = (allMessages as ChatMessage[]).filter(m => m.roomId === roomId).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
           callback(roomMessages);
       });
   }

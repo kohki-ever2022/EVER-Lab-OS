@@ -11,7 +11,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 
 const InventoryLockManager: React.FC = () => {
   const { currentUser } = useSessionContext();
-  const { t, isJapanese } = useTranslation();
+  const { t } = useTranslation();
   const users = useUsers();
   const consumables = useConsumables();
   const { showToast } = useToast();
