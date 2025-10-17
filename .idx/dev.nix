@@ -22,6 +22,12 @@
     "dbaeumer.vscode-eslint"
     "esbenp.prettier-vscode"
     "bradlc.vscode-tailwindcss"
+    "ms-vscode.vscode-typescript-next"
+    "toba.vsfire"
+    "firebase.vscode-firebase-explorer"
+    "usernamehw.errorlens"
+    "streetsidesoftware.code-spell-checker"
+    "github.copilot"
   ];
   
   # プレビュー設定
