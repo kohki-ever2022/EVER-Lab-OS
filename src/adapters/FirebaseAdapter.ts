@@ -4,7 +4,7 @@
 import {
   collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc,
   onSnapshot, query, where, QuerySnapshot, DocumentData, Timestamp, orderBy, runTransaction, serverTimestamp,
-  increment, DocumentReference, FieldValue,
+  increment, DocumentReference, FieldValue, limit,
 } from 'firebase/firestore';
 
 // 実際のFirebase設定ファイルからdbインスタンスをインポート
@@ -184,7 +184,10 @@ export class FirebaseAdapter implements IDataAdapter {
   }
 
   // --- Chat Operations (custom logic) ---
-  createChatRoom = (data: Omit<ChatRoom, 'id'>) => this.createGenericDoc<ChatRoom>(COLLECTIONS.CHAT_ROOMS, data);
+  async createChatRoom(data: Omit<ChatRoom, 'id'>): Promise<Result<ChatRoom>> {
+    return this.createGenericDoc<ChatRoom>(COLLECTIONS.CHAT_ROOMS, data);
+  }
+
   async getChatRooms(userId: string): Promise<Result<ChatRoom[]>> {
     if (!db) return { success: false, error: new Error("Firebase not configured.") };
     try {
@@ -192,11 +195,13 @@ export class FirebaseAdapter implements IDataAdapter {
       return { success: true, data: this.fromSnapshot<ChatRoom>(await getDocs(q)) };
     } catch (e) { return { success: false, error: e as Error }; }
   }
+
   subscribeToChatRooms(userId: string, cb: (d: ChatRoom[]) => void): () => void {
     if (!db) { console.error("Firebase not configured."); return () => {}; }
     const q = query(collection(db, COLLECTIONS.CHAT_ROOMS), where('memberIds', 'array-contains', userId), orderBy('lastMessageAt', 'desc'));
     return onSnapshot(q, (snapshot) => cb(this.fromSnapshot<ChatRoom>(snapshot)), (e) => console.error('Error subscribing to chat rooms:', e));
   }
+
   async getChatMessages(roomId: string): Promise<Result<ChatMessage[]>> {
       if (!db) return { success: false, error: new Error("Firebase not configured.") };
       try {
@@ -204,25 +209,50 @@ export class FirebaseAdapter implements IDataAdapter {
           return { success: true, data: this.fromSnapshot<ChatMessage>(await getDocs(q)) };
       } catch (e) { return { success: false, error: e as Error }; }
   }
-  subscribeToChatMessages(roomId: string, cb: (d: ChatMessage[]) => void): () => void {
-    if (!db) { console.error("Firebase not configured."); return () => {}; }
-    const q = query(collection(db, COLLECTIONS.CHAT_ROOMS, roomId, COLLECTIONS.CHAT_MESSAGES), orderBy('createdAt', 'asc'));
-    return onSnapshot(q, (snapshot) => cb(this.fromSnapshot<ChatMessage>(snapshot)), (e) => console.error('Error subscribing to chat messages:', e));
+
+  subscribeToChatMessages(roomId: string, callback: (messages: ChatMessage[]) => void): () => void {
+    if (!db) {
+      console.error("Firebase not configured.");
+      return () => {};
+    }
+    
+    const messagesRef = collection(db, COLLECTIONS.CHAT_ROOMS, roomId, 'messages');
+    const q = query(messagesRef, orderBy('createdAt', 'asc'), limit(100));
+    
+    return onSnapshot(q, (snapshot) => {
+      const messages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
+        updatedAt: doc.data().updatedAt?.toDate(),
+      })) as ChatMessage[];
+      callback(messages);
+    });
   }
-  async sendChatMessage(data: Omit<ChatMessage, 'id'>): Promise<Result<ChatMessage>> {
+
+  async sendChatMessage(message: Omit<ChatMessage, 'id' | 'createdAt' | 'updatedAt'>): Promise<Result<ChatMessage>> {
     if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    
     try {
-      const roomRef = doc(db, COLLECTIONS.CHAT_ROOMS, data.roomId);
-      const newDocRef = await runTransaction(db, async (transaction) => {
-        const roomDoc = await transaction.get(roomRef);
-        if (!roomDoc.exists()) throw new Error("Room does not exist!");
-        const msgDoc = doc(collection(roomRef, COLLECTIONS.CHAT_MESSAGES));
-        transaction.set(msgDoc, { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-        transaction.update(roomRef, { lastMessageAt: serverTimestamp() });
-        return msgDoc;
+      const { roomId } = message;
+      const messagesRef = collection(db, COLLECTIONS.CHAT_ROOMS, roomId, 'messages');
+      const docRef = await addDoc(messagesRef, {
+        ...message,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
-      return { success: true, data: await this.getDocAndConvert<ChatMessage>(newDocRef) };
-    } catch (e) { return { success: false, error: e as Error }; }
+      
+      // 最終メッセージ時刻を更新
+      await updateDoc(doc(db, COLLECTIONS.CHAT_ROOMS, roomId), {
+        lastMessageAt: serverTimestamp()
+      });
+      
+      const newMessage = await this.getDocAndConvert<ChatMessage>(docRef);
+      return { success: true, data: newMessage };
+    } catch (e) {
+      console.error('Error sending message:', e);
+      return { success: false, error: e as Error };
+    }
   }
   
   // --- Generic Implementations ---
