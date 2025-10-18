@@ -2,29 +2,37 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Path for chat files. roomId is the chat room ID, fileId is the unique file identifier.
-    match /chat-files/{roomId}/{fileId} {
+    
+    // チャットファイル用のルール
+    match /chat-files/{roomId}/{fileName} {
+      // 読み取り: 認証済みユーザーで、そのチャットルームのメンバーのみ
+      allow read: if request.auth != null &&
+        request.auth.uid in firestore.get(/databases/(default)/documents/chatRooms/$(roomId)).data.memberIds;
       
-      // Allow read access only to members of the chat room.
-      allow read: if request.auth != null && 
-                     request.auth.uid in get(/databases/(default)/documents/chatRooms/$(roomId)).data.memberIds;
-
-      // Allow write access only to authenticated members of the chat room.
-      // - Must be a member of the room.
-      // - File size must be less than 10MB.
-      // - File type must be one of the allowed types.
-      allow write: if request.auth != null && 
-                      request.auth.uid in get(/databases/(default)/documents/chatRooms/$(roomId)).data.memberIds &&
-                      request.resource.size < 10 * 1024 * 1024 &&
-                      (request.resource.contentType.matches('image/jpeg') ||
-                       request.resource.contentType.matches('image/png') ||
-                       request.resource.contentType.matches('image/gif') ||
-                       request.resource.contentType.matches('application/pdf') ||
-                       request.resource.contentType.matches('application/msword') ||
-                       request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document') ||
-                       request.resource.contentType.matches('application/vnd.ms-excel') ||
-                       request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') ||
-                       request.resource.contentType.matches('application/zip'));
+      // 書き込み: 認証済みユーザーで、そのチャットルームのメンバーのみ
+      // かつファイルサイズが10MB以下
+      allow write: if request.auth != null &&
+        request.auth.uid in firestore.get(/databases/(default)/documents/chatRooms/$(roomId)).data.memberIds &&
+        request.resource.size < 10 * 1024 * 1024 && // 10MB制限
+        request.resource.contentType.matches(
+          'image/(jpeg|jpg|png|gif|webp)|' +
+          'application/(pdf|msword|vnd.openxmlformats-officedocument.wordprocessingml.document|' +
+          'vnd.ms-excel|vnd.openxmlformats-officedocument.spreadsheetml.sheet|zip|x-zip-compressed)'
+        );
+    }
+    
+    // アバター画像用のルール
+    match /avatars/{userId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+        request.auth.uid == userId &&
+        request.resource.size < 5 * 1024 * 1024 && // 5MB制限
+        request.resource.contentType.matches('image/.*');
+    }
+    
+    // その他のファイルはデフォルトで拒否
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }
