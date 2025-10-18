@@ -1,4 +1,4 @@
-'''// src/adapters/FirebaseAdapter.ts
+// src/adapters/FirebaseAdapter.ts
 
 // Firebase Firestoreの関数をインポート
 import {
@@ -460,4 +460,3 @@ export class FirebaseAdapter implements IDataAdapter {
   createInvoice = (data: Omit<Invoice, 'id'>) => this.createGenericDoc<Invoice>(COLLECTIONS.INVOICES, data);
   updateInvoice = (item: Invoice) => this.updateGenericDoc<Invoice>(COLLECTIONS.INVOICES, item);
 }
-'''

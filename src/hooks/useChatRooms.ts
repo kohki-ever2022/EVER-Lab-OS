@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { ChatRoom } from '../types/chat';
+import { Result } from '../types';
 
 export const useChatRooms = () => {
   const { user } = useAuth();
@@ -28,6 +29,27 @@ export const useChatRooms = () => {
 
     return () => unsubscribe();
   }, [user, adapter]);
+  
+  const createRoom = useCallback(async (
+      data: Omit<ChatRoom, 'id' | 'lastMessageAt' | 'createdAt' | 'updatedAt' | 'memberInfo' | 'createdBy'>
+  ): Promise<string> => {
+    if (!user) {
+        throw new Error("User not authenticated.");
+    }
+    
+    const result = await adapter.createChatRoom({
+      ...data,
+      createdBy: user.id,
+      memberInfo: {}, // Should be populated by backend or trigger
+    });
 
-  return { chatRooms, loading, error };
+    if (result.success && result.data) {
+        return result.data.id;
+    } else {
+        throw result.error || new Error("Failed to create chat room.");
+    }
+  }, [user, adapter]);
+
+
+  return { chatRooms, loading, error, createRoom };
 };
