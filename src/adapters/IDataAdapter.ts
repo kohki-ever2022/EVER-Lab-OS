@@ -180,7 +180,7 @@ export interface IDataAdapter {
 
   // --- Chat Operations ---
   getChatRooms(userId: string): Promise<Result<ChatRoom[]>>;
-  subscribeToChatRooms(userId: string, callback: (data: ChatRoom[]) => void): () => void;
+  subscribeToChatRooms(userId: string, callback: (result: Result<ChatRoom[]>) => void): () => void;
   createChatRoom(data: Omit<ChatRoom, 'id'>): Promise<Result<ChatRoom>>;
   getChatMessages(roomId: string): Promise<Result<ChatMessage[]>>;
   subscribeToChatMessages(roomId: string, callback: (data: ChatMessage[]) => void): () => void;
@@ -189,4 +189,7 @@ export interface IDataAdapter {
   removeReaction(roomId: string, messageId: string, emoji: string, userId: string): Promise<Result<void>>;
   updateChatMessage(roomId: string, messageId: string, newContent: string): Promise<Result<void>>;
   deleteChatMessage(roomId: string, messageId: string): Promise<Result<void>>;
+  updateLastRead(roomId: string, userId: string): Promise<Result<void>>;
+  pinMessage(roomId: string, messageId: string): Promise<Result<void>>;
+  unpinMessage(roomId: string, messageId: string): Promise<Result<void>>;
 }

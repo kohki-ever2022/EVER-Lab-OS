@@ -55,10 +55,28 @@ export const useChat = (roomId: string) => {
     }
   }, [roomId, user]);
 
+  const updateMessage = useCallback(async (messageId: string, newContent: string) => {
+    if (!roomId) return;
+    const result = await dataAdapter.updateChatMessage(roomId, messageId, escapeHtml(newContent));
+    if (!result.success) {
+      setError(result.error as Error);
+    }
+  }, [roomId]);
+
+  const deleteMessage = useCallback(async (messageId: string) => {
+    if (!roomId) return;
+    const result = await dataAdapter.deleteChatMessage(roomId, messageId);
+    if (!result.success) {
+      setError(result.error as Error);
+    }
+  }, [roomId]);
+
   return {
     messages,
     loading,
     error,
     sendMessage,
+    updateMessage,
+    deleteMessage,
   };
 };

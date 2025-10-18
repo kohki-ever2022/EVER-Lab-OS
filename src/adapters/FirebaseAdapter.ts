@@ -314,6 +314,48 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
 
+  async updateChatMessage(roomId: string, messageId: string, newContent: string): Promise<Result<void>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const messageRef = doc(db, COLLECTIONS.CHAT_ROOMS, roomId, 'messages', messageId);
+      await updateDoc(messageRef, {
+        content: newContent,
+        isEdited: true,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true, data: undefined };
+    } catch (e) {
+      console.error("Error updating message:", e);
+      return { success: false, error: e as Error };
+    }
+  }
+
+  async deleteChatMessage(roomId: string, messageId: string): Promise<Result<void>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const messageRef = doc(db, COLLECTIONS.CHAT_ROOMS, roomId, 'messages', messageId);
+      await deleteDoc(messageRef);
+      return { success: true, data: undefined };
+    } catch (e) {
+      console.error("Error deleting message:", e);
+      return { success: false, error: e as Error };
+    }
+  }
+
+  async updateLastRead(roomId: string, userId: string): Promise<Result<void>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const roomRef = doc(db, COLLECTIONS.CHAT_ROOMS, roomId);
+      await updateDoc(roomRef, {
+        [`lastRead.${userId}`]: serverTimestamp(),
+      });
+      return { success: true, data: undefined };
+    } catch (e) {
+      console.error("Error updating last read timestamp:", e);
+      return { success: false, error: e as Error };
+    }
+  }
+
   // --- Generic Implementations ---
   getCompanies = () => this.getGenericCollection<Company>(COLLECTIONS.COMPANIES);
   getCompanyById = (id: string) => this.getGenericDocById<Company>(COLLECTIONS.COMPANIES, id);
@@ -418,4 +460,4 @@ export class FirebaseAdapter implements IDataAdapter {
   createInvoice = (data: Omit<Invoice, 'id'>) => this.createGenericDoc<Invoice>(COLLECTIONS.INVOICES, data);
   updateInvoice = (item: Invoice) => this.updateGenericDoc<Invoice>(COLLECTIONS.INVOICES, item);
 }
-''
+'''

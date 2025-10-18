@@ -1,40 +1,36 @@
-export enum ChatRoomType {
-  TEAM_CHAT = 'TEAM_CHAT',
-  DIRECT_MESSAGE = 'DIRECT_MESSAGE',
-  BULLETIN_BOARD = 'BULLETIN_BOARD'
-}
+import { Timestamp } from 'firebase/firestore';
 
+// チャットルームの型定義
 export interface ChatRoom {
   id: string;
-  type: ChatRoomType;
-  name: string;
-  memberIds: string[];
-  companyId?: string;
-  createdBy: string;
-  createdAt: Date;
-  lastMessageAt: Date;
-  metadata: {
-    pinnedMessages?: string[];
-    announcements?: string[];
-    description?: string;
-    avatar?: string;
-  };
+  name: string; // グループチャット名
+  memberIds: string[]; // 参加メンバーのIDリスト
+  memberInfo: { [key: string]: { name: string; avatar?: string; } }; // メンバーの詳細情報
+  isGroup: boolean; // グループチャットかどうか
+  lastMessage?: string; // 最後のメッセージのプレビュー
+  lastMessageAt: Timestamp | Date; // 最後のメッセージの送信日時
+  lastRead?: { [key: string]: Timestamp | Date }; // 各メンバーの最終既読日時
+  createdAt: Timestamp | Date;
+  updatedAt: Timestamp | Date;
+  createdBy: string; // 作成者のUID
 }
 
+// チャットメッセージの型定義
 export interface ChatMessage {
   id: string;
   roomId: string;
   senderId: string;
   senderName: string;
   senderAvatar?: string;
-  content: string;
-  type: 'TEXT' | 'FILE' | 'IMAGE' | 'SYSTEM';
+  content?: string; // テキストメッセージ
+  type: 'TEXT' | 'FILE' | 'IMAGE'; // メッセージタイプ
+  isEdited: boolean;
+  isPinned: boolean;
+  reactions?: { [key: string]: string[] }; // 絵文字リアクション（例: { '👍': ['uid1', 'uid2'] }）
+  createdAt: Timestamp | Date;
+  updatedAt: Timestamp | Date;
+  // ファイル関連情報
   fileUrl?: string;
   fileName?: string;
   fileSize?: number;
-  reactions?: Record<string, string[]>;
-  isEdited: boolean;
-  isPinned: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }

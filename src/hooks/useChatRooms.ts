@@ -1,49 +1,33 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
-import { dataAdapter } from '../config/adapterFactory';
-import type { ChatRoom } from '../types/chat';
-import { ChatRoomType } from '../types/chat';
+import { useDataAdapter } from '../contexts/DataAdapterContext';
+import { ChatRoom } from '../types/chat';
 
 export const useChatRooms = () => {
   const { user } = useAuth();
-  const [rooms, setRooms] = useState<ChatRoom[]>([]);
+  const adapter = useDataAdapter();
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const unsubscribe = dataAdapter.subscribeToChatRooms(user.id, (newRooms) => {
-      setRooms(newRooms);
+    const unsubscribe = adapter.subscribeToChatRooms(user.id, (roomsResult) => {
+      if (roomsResult.success) {
+        setChatRooms(roomsResult.data);
+        setError(null);
+      } else {
+        setError(roomsResult.error || new Error('Failed to fetch chat rooms.'));
+      }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, adapter]);
 
-  const createRoom = useCallback(async (
-    type: ChatRoomType,
-    name: string,
-    memberIds: string[],
-    metadata?: ChatRoom['metadata']
-  ) => {
-    if (!user) return;
-
-    const roomData: Omit<ChatRoom, 'id'> = {
-      type,
-      name,
-      memberIds: [user.id, ...memberIds],
-      createdBy: user.id,
-      createdAt: new Date(),
-      lastMessageAt: new Date(),
-      metadata: metadata || {},
-    };
-
-    return await dataAdapter.createChatRoom(roomData);
-  }, [user]);
-
-  return {
-    rooms,
-    loading,
-    createRoom,
-  };
+  return { chatRooms, loading, error };
 };
