@@ -15,7 +15,10 @@ export const restoreFirestoreBackup = onCall(async (request) => {
 
   const { backupDate, collectionIds } = request.data;
   if (!backupDate) {
-    throw new HttpsError('invalid-argument', 'バックアップ日付を指定してください');
+    throw new HttpsError(
+      'invalid-argument',
+      'バックアップ日付を指定してください'
+    );
   }
 
   const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
