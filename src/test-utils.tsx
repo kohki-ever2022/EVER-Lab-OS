@@ -5,18 +5,40 @@ import { IDataAdapter } from './adapters/IDataAdapter';
 import { SessionContext, SessionContextType } from './contexts/SessionContext';
 import { DataAdapterContext } from './contexts/DataAdapterContext';
 import { AdminContext, AdminContextValue } from './contexts/app/AdminContext';
-import { LabStateContext, LabStateContextValue } from './contexts/app/LabStateContext';
+import {
+  LabStateContext,
+  LabStateContextValue,
+} from './contexts/app/LabStateContext';
 import { NotificationContext } from './contexts/NotificationContext';
 
-import { 
-  Role, RoleCategory, User, SystemSettings, Plan, EquipmentManual, MonthlyReport, BenchAssignment, InventorySnapshot, AuditLog, 
-  Consumable, Reservation, WaitlistEntry, Notification, Language 
+import {
+  Role,
+  RoleCategory,
+  User,
+  SystemSettings,
+  Plan,
+  EquipmentManual,
+  MonthlyReport,
+  BenchAssignment,
+  InventorySnapshot,
+  AuditLog,
+  Consumable,
+  Reservation,
+  WaitlistEntry,
+  Notification,
+  Language,
 } from './types';
 
 // Statically import contexts
 import { UsersDataContext, UsersLoadingContext } from './contexts/UserContext';
-import { ConsumablesDataContext, ConsumablesLoadingContext } from './contexts/ConsumableContext';
-import { ReservationsDataContext, ReservationsLoadingContext } from './contexts/ReservationContext';
+import {
+  ConsumablesDataContext,
+  ConsumablesLoadingContext,
+} from './contexts/ConsumableContext';
+import {
+  ReservationsDataContext,
+  ReservationsLoadingContext,
+} from './contexts/ReservationContext';
 // FIX: Import AuditContext and its value type to correctly provide it in the test wrapper.
 import { AuditContext, AuditContextValue } from './contexts/app/AuditContext';
 
@@ -35,16 +57,19 @@ export const mockAdapter: IDataAdapter = {
 } as any; // Cast to any to avoid implementing all methods
 
 export interface CreateWrapperOptions {
-    adapter?: IDataAdapter;
-    sessionContextValue?: Partial<SessionContextType>;
-    adminContextValue?: Partial<AdminContextValue>;
-    // FIX: Add auditContextValue to allow mocking of the AuditContext.
-    auditContextValue?: Partial<AuditContextValue>;
-    labStateContextValue?: Partial<LabStateContextValue>;
-    notificationContextValue?: Partial<{ notifications: Notification[], addNotification: (n: any) => void }>;
-    users?: User[];
-    consumables?: Consumable[];
-    reservations?: Reservation[];
+  adapter?: IDataAdapter;
+  sessionContextValue?: Partial<SessionContextType>;
+  adminContextValue?: Partial<AdminContextValue>;
+  // FIX: Add auditContextValue to allow mocking of the AuditContext.
+  auditContextValue?: Partial<AuditContextValue>;
+  labStateContextValue?: Partial<LabStateContextValue>;
+  notificationContextValue?: Partial<{
+    notifications: Notification[];
+    addNotification: (n: any) => void;
+  }>;
+  users?: User[];
+  consumables?: Consumable[];
+  reservations?: Reservation[];
 }
 
 export const createWrapper = (options: CreateWrapperOptions = {}) => {
@@ -62,57 +87,103 @@ export const createWrapper = (options: CreateWrapperOptions = {}) => {
   } = options;
 
   const fullSessionContextValue: SessionContextType = {
-    currentUser: null, language: Language.EN, setLanguage: vi.fn(),
-    login: vi.fn(), logout: vi.fn(), isFacilityStaff: false, isTenantStaff: false,
+    currentUser: null,
+    language: Language.EN,
+    setLanguage: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    isFacilityStaff: false,
+    isTenantStaff: false,
     ...sessionContextValue,
   };
 
   const fullAdminContextValue: AdminContextValue = {
-    monthlyReports: [], benchAssignments: [], inventorySnapshots: [],
+    monthlyReports: [],
+    benchAssignments: [],
+    inventorySnapshots: [],
     setInventorySnapshots: vi.fn(),
-    systemSettings: { labOpeningTime: '', labClosingTime: '', noShowPenalty: 0, surgePricingEnabled: false, surgeMultiplier: 1, surgeStartTime: '', surgeEndTime: '' },
-    setSystemSettings: vi.fn(), plans: [], setPlans: vi.fn(), equipmentManuals: [],
-    ...adminContextValue
+    systemSettings: {
+      labOpeningTime: '',
+      labClosingTime: '',
+      noShowPenalty: 0,
+      surgePricingEnabled: false,
+      surgeMultiplier: 1,
+      surgeStartTime: '',
+      surgeEndTime: '',
+    },
+    setSystemSettings: vi.fn(),
+    plans: [],
+    setPlans: vi.fn(),
+    equipmentManuals: [],
+    ...adminContextValue,
   };
 
   // FIX: Create a separate context value object for the AuditContext.
   const fullAuditContextValue: AuditContextValue = {
-      auditLogs: [],
-      setAuditLogs: vi.fn(),
-      ...auditContextValue,
+    auditLogs: [],
+    setAuditLogs: vi.fn(),
+    ...auditContextValue,
   };
 
   const fullLabStateContextValue: LabStateContextValue = {
-    consumableNotifications: [], setConsumableNotifications: vi.fn(),
-    co2IncubatorTrackingData: [], setCo2IncubatorTrackingData: vi.fn(),
-    memos: [], waitlist: [], setWaitlist: vi.fn(),
-    ...labStateContextValue
-  }
+    consumableNotifications: [],
+    setConsumableNotifications: vi.fn(),
+    co2IncubatorTrackingData: [],
+    setCo2IncubatorTrackingData: vi.fn(),
+    memos: [],
+    waitlist: [],
+    setWaitlist: vi.fn(),
+    ...labStateContextValue,
+  };
 
   const fullNotificationContextValue = {
-      notifications: [],
-      addNotification: vi.fn(),
-      removeNotification: vi.fn(),
-      clearNotifications: vi.fn(),
-      markAsRead: vi.fn(),
-      markAllAsReadForUser: vi.fn(),
-      ...notificationContextValue
-  }
+    notifications: [],
+    addNotification: vi.fn(),
+    removeNotification: vi.fn(),
+    clearNotifications: vi.fn(),
+    markAsRead: vi.fn(),
+    markAllAsReadForUser: vi.fn(),
+    ...notificationContextValue,
+  };
 
-  return ({ children }: { children: ReactNode }) => (
-    React.createElement(DataAdapterContext.Provider, { value: adapter },
-      React.createElement(SessionContext.Provider, { value: fullSessionContextValue },
-        React.createElement(AdminContext.Provider, { value: fullAdminContextValue },
+  return ({ children }: { children: ReactNode }) =>
+    React.createElement(
+      DataAdapterContext.Provider,
+      { value: adapter },
+      React.createElement(
+        SessionContext.Provider,
+        { value: fullSessionContextValue },
+        React.createElement(
+          AdminContext.Provider,
+          { value: fullAdminContextValue },
           // FIX: Add the AuditContext.Provider to the wrapper hierarchy.
-          React.createElement(AuditContext.Provider, { value: fullAuditContextValue },
-            React.createElement(LabStateContext.Provider, { value: fullLabStateContextValue },
-              React.createElement(NotificationContext.Provider, { value: fullNotificationContextValue as any },
-                React.createElement(UsersDataContext.Provider, { value: users },
-                  React.createElement(UsersLoadingContext.Provider, { value: false },
-                    React.createElement(ConsumablesDataContext.Provider, { value: consumables },
-                      React.createElement(ConsumablesLoadingContext.Provider, { value: false },
-                        React.createElement(ReservationsDataContext.Provider, { value: reservations },
-                          React.createElement(ReservationsLoadingContext.Provider, { value: false },
+          React.createElement(
+            AuditContext.Provider,
+            { value: fullAuditContextValue },
+            React.createElement(
+              LabStateContext.Provider,
+              { value: fullLabStateContextValue },
+              React.createElement(
+                NotificationContext.Provider,
+                { value: fullNotificationContextValue as any },
+                React.createElement(
+                  UsersDataContext.Provider,
+                  { value: users },
+                  React.createElement(
+                    UsersLoadingContext.Provider,
+                    { value: false },
+                    React.createElement(
+                      ConsumablesDataContext.Provider,
+                      { value: consumables },
+                      React.createElement(
+                        ConsumablesLoadingContext.Provider,
+                        { value: false },
+                        React.createElement(
+                          ReservationsDataContext.Provider,
+                          { value: reservations },
+                          React.createElement(
+                            ReservationsLoadingContext.Provider,
+                            { value: false },
                             children
                           )
                         )
@@ -125,6 +196,5 @@ export const createWrapper = (options: CreateWrapperOptions = {}) => {
           )
         )
       )
-    )
-  );
+    );
 };

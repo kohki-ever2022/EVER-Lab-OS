@@ -1,5 +1,12 @@
 // src/contexts/UserContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useMemo,
+} from 'react';
 import { User } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -13,7 +20,9 @@ const UsersLoadingContext = createContext<boolean>(true);
 
 export const UserContext = createContext<UserContextValue | null>(null);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const adapter = useDataAdapter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);

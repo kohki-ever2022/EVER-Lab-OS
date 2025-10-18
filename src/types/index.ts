@@ -4,7 +4,9 @@
 
 // --- Enums & Types from core.ts ---
 
-export type Result<T, E = Error> = { success: true; data: T } | { success: false; error: E };
+export type Result<T, E = Error> =
+  | { success: true; data: T }
+  | { success: false; error: E };
 
 export enum Language {
   JA = 'JA',
@@ -73,8 +75,8 @@ export interface Protocol {
   description: string;
   companyId: string;
   equipmentId?: string;
-  consumableIds: { id: string, quantity: number }[];
-  requiredVials?: { sampleLotId: string, count: number };
+  consumableIds: { id: string; quantity: number }[];
+  requiredVials?: { sampleLotId: string; count: number };
 }
 
 export interface SampleLot {
@@ -128,8 +130,7 @@ export interface LabNotebookEntry {
 
 // --- Enums & Types from qms.ts ---
 
-export enum ApprovalStatus {
-}
+export enum ApprovalStatus {}
 
 export enum SDSStatus {
   Pending = 'Pending',
@@ -147,7 +148,7 @@ export enum RegulationType {
   SafetyHealthLaw = 'SAFETY_HEALTH_LAW',
   FireServiceLaw = 'FIRE_SERVICE_LAW',
   PoisonControlLaw = 'POISON_CONTROL_LAW',
-  Other = 'OTHER'
+  Other = 'OTHER',
 }
 
 export enum SubmissionStatus {
@@ -157,7 +158,7 @@ export enum SubmissionStatus {
   Submitted = 'SUBMITTED',
   Approved = 'APPROVED',
   Rejected = 'REJECTED',
-  Expired = 'EXPIRED'
+  Expired = 'EXPIRED',
 }
 
 export enum InsuranceType {
@@ -165,7 +166,7 @@ export enum InsuranceType {
   Liability = 'LIABILITY',
   ProductLiability = 'PRODUCT_LIABILITY',
   WorkersCompensation = 'WORKERS_COMP',
-  Other = 'OTHER'
+  Other = 'OTHER',
 }
 
 export enum ManualCategory {
@@ -179,7 +180,7 @@ export enum ManualCategory {
   TenantGuide = 'TENANT_GUIDE',
   FacilityStaffGuide = 'FACILITY_STAFF_GUIDE',
   FAQ = 'FAQ',
-  Other = 'OTHER'
+  Other = 'OTHER',
 }
 
 export enum ManualTargetAudience {
@@ -187,7 +188,7 @@ export enum ManualTargetAudience {
   Tenants = 'TENANTS',
   FacilityStaff = 'FACILITY_STAFF',
   NewUsers = 'NEW_USERS',
-  SpecificRoles = 'SPECIFIC_ROLES'
+  SpecificRoles = 'SPECIFIC_ROLES',
 }
 
 export enum LabRuleCategory {
@@ -201,13 +202,13 @@ export enum LabRuleCategory {
   Cleanliness = 'CLEANLINESS',
   Parking = 'PARKING',
   CommonArea = 'COMMON_AREA',
-  Other = 'OTHER'
+  Other = 'OTHER',
 }
 
 export enum RuleImportance {
   Mandatory = 'MANDATORY',
   Recommended = 'RECOMMENDED',
-  Optional = 'OPTIONAL'
+  Optional = 'OPTIONAL',
 }
 
 export interface SDSSummary {
@@ -364,8 +365,31 @@ export enum UserAvailabilityStatus {
   Away = 'AWAY',
 }
 
-export type Resource = 'reservation' | 'equipment' | 'inventory' | 'sds' | 'billing' | 'users' | 'projects' | 'quotations' | 'audit' | 'settings' | 'moneyforward' | 'system' | 'project' | 'regulatory' | 'manuals' | 'rules';
-export type Action = 'create' | 'read' | 'update' | 'delete' | 'manage' | 'cancelOwn' | 'configureSettings';
+export type Resource =
+  | 'reservation'
+  | 'equipment'
+  | 'inventory'
+  | 'sds'
+  | 'billing'
+  | 'users'
+  | 'projects'
+  | 'quotations'
+  | 'audit'
+  | 'settings'
+  | 'moneyforward'
+  | 'system'
+  | 'project'
+  | 'regulatory'
+  | 'manuals'
+  | 'rules';
+export type Action =
+  | 'create'
+  | 'read'
+  | 'update'
+  | 'delete'
+  | 'manage'
+  | 'cancelOwn'
+  | 'configureSettings';
 
 export enum ContractType {
   Monthly = 'Monthly',
@@ -448,23 +472,23 @@ export interface User {
 export type CurrentUser = Omit<User, 'password'>;
 
 export interface Company {
-    id: string;
-    nameJP: string;
-    nameEN: string;
-    planId: string;
-    consolidatedBilling: boolean;
-    contractType: ContractType;
-    contractStartDate: Date;
-    nameKana?: string;
-    representativeName?: string;
-    postalCode?: string;
-    address?: string;
-    phone?: string;
-    billingEmail?: string;
-    mfPartnerId?: string;
-    mfPartnerCode?: string;
-    registrationNumber?: string;
-    isActive?: boolean;
+  id: string;
+  nameJP: string;
+  nameEN: string;
+  planId: string;
+  consolidatedBilling: boolean;
+  contractType: ContractType;
+  contractStartDate: Date;
+  nameKana?: string;
+  representativeName?: string;
+  postalCode?: string;
+  address?: string;
+  phone?: string;
+  billingEmail?: string;
+  mfPartnerId?: string;
+  mfPartnerCode?: string;
+  registrationNumber?: string;
+  isActive?: boolean;
 }
 
 export interface Plan {
@@ -486,8 +510,7 @@ export interface RolePermissions {
 
 // --- Enums & Types from billing.ts ---
 
-export enum InvoiceStatus {
-}
+export enum InvoiceStatus {}
 
 // --- Enums & Types from chat.ts ---
 
@@ -552,7 +575,7 @@ export enum CalendarEventType {
   EquipmentMaintenance = 'EQUIPMENT_MAINTENANCE',
   ConsumableRestock = 'CONSUMABLE_RESTOCK',
   Meeting = 'MEETING',
-  Other = 'OTHER'
+  Other = 'OTHER',
 }
 
 export interface Equipment {

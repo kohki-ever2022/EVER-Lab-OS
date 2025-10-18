@@ -3,8 +3,14 @@ export const layout = {
   openMenu: { ja: 'メニューを開く', en: 'Open menu' },
   qrScan: { ja: 'QRスキャン', en: 'QR Scan' },
   notifications: { ja: '通知', en: 'Notifications' },
-  switchLangToEN: { ja: '言語を英語に切り替え', en: 'Switch language to English' },
-  switchLangToJA: { ja: '言語を日本語に切り替え', en: 'Switch language to Japanese' },
+  switchLangToEN: {
+    ja: '言語を英語に切り替え',
+    en: 'Switch language to English',
+  },
+  switchLangToJA: {
+    ja: '言語を日本語に切り替え',
+    en: 'Switch language to Japanese',
+  },
   markAllAsRead: { ja: 'すべて既読にする', en: 'Mark all as read' },
   noNewNotifications: { ja: '通知はありません。', en: 'No new notifications.' },
   main: { ja: 'メイン', en: 'Main' },

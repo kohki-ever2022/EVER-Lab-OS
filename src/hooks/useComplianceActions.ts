@@ -17,143 +17,230 @@ import {
   Certificate,
   SDS,
 } from '../types';
-import { googleCalendarService, createCalendarEventFromSchedule } from '../services/googleCalendarService';
+import {
+  googleCalendarService,
+  createCalendarEventFromSchedule,
+} from '../services/googleCalendarService';
 import { useCompanyContext } from '../contexts/CompanyContext';
 import { useTranslation } from './useTranslation';
 
-const simpleUUID = () => `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const simpleUUID = () =>
+  `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 export const useComplianceActions = () => {
-    const adapter = useDataAdapter();
-    const { labRules, setLabRules } = useQmsContext();
-    const { companies } = useCompanyContext();
-    const { currentUser } = useSessionContext();
-    const { addAuditLog } = useAudit();
-    const { addNotification } = useNotifications();
-    const { showToast } = useToast();
-    const { t, isJapanese, language } = useTranslation();
+  const adapter = useDataAdapter();
+  const { labRules, setLabRules } = useQmsContext();
+  const { companies } = useCompanyContext();
+  const { currentUser } = useSessionContext();
+  const { addAuditLog } = useAudit();
+  const { addNotification } = useNotifications();
+  const { showToast } = useToast();
+  const { t, isJapanese, language } = useTranslation();
 
-    const acknowledgeRule = useCallback(async (ruleId: string): Promise<Result<LabRule, Error>> => {
-        if (!currentUser) return { success: false, error: new Error('User not logged in.') };
-        const rule = labRules.find(r => r.id === ruleId);
-        if (!rule) return { success: false, error: new Error('Rule not found.') };
-        
-        const alreadyAcknowledged = rule.acknowledgedBy.some(ack => ack.userId === currentUser.id);
-        if (alreadyAcknowledged) return { success: true, data: rule };
-        
-        const updatedRule: LabRule = {
-            ...rule,
-            acknowledgedBy: [
-                ...rule.acknowledgedBy,
-                { userId: currentUser.id, userName: currentUser.name, acknowledgedAt: new Date(), ruleVersion: '1.0' /* TODO: manage versions */ }
-            ]
-        };
-        
-        setLabRules(prev => prev.map(r => r.id === ruleId ? updatedRule : r));
-        addAuditLog('RULE_ACKNOWLEDGED', `User acknowledged rule ${rule.ruleNumber}`);
-        return { success: true, data: updatedRule };
-    }, [currentUser, labRules, setLabRules, addAuditLog]);
+  const acknowledgeRule = useCallback(
+    async (ruleId: string): Promise<Result<LabRule, Error>> => {
+      if (!currentUser)
+        return { success: false, error: new Error('User not logged in.') };
+      const rule = labRules.find((r) => r.id === ruleId);
+      if (!rule) return { success: false, error: new Error('Rule not found.') };
 
-    const addRegulatoryRequirement = useCallback(async (req: Omit<RegulatoryRequirement, 'id' | 'lastUpdated'>): Promise<Result<RegulatoryRequirement, Error>> => {
-        const newReqWithCalendar: RegulatoryRequirement = { ...req, id: simpleUUID(), lastUpdated: new Date() } as RegulatoryRequirement;
-        
-        if (newReqWithCalendar.submissionDeadline) {
-            const companyName = companies.find(c => c.id === newReqWithCalendar.tenantId)?.[isJapanese ? 'nameJP' : 'nameEN'] || 'Tenant';
-            const calendarEvent = createCalendarEventFromSchedule(
-                CalendarEventType.RegulatorySubmission,
-                { jp: `【法規制】${newReqWithCalendar.requirementNameJP} 提出期限`, en: `[Compliance] ${newReqWithCalendar.requirementNameEN} Deadline` },
-                { jp: `提出先: ${newReqWithCalendar.submissionAuthority}`, en: `Authority: ${newReqWithCalendar.submissionAuthority}` },
-                newReqWithCalendar.submissionDeadline,
-                60,
-                [newReqWithCalendar.assignedTo || '', 'user-lab-manager'],
-                newReqWithCalendar.id,
-                [10080, 4320]
-            );
-            const syncResult = await googleCalendarService.createEvent(calendarEvent, language);
-            if (syncResult.success) {
-                newReqWithCalendar.googleCalendarEventId = syncResult.googleCalendarEventId;
-                showToast(t('deadlineAddedToCalendar'), 'success');
-            } else {
-                showToast(t('failedToAddToCalendar'), 'warning');
-            }
+      const alreadyAcknowledged = rule.acknowledgedBy.some(
+        (ack) => ack.userId === currentUser.id
+      );
+      if (alreadyAcknowledged) return { success: true, data: rule };
+
+      const updatedRule: LabRule = {
+        ...rule,
+        acknowledgedBy: [
+          ...rule.acknowledgedBy,
+          {
+            userId: currentUser.id,
+            userName: currentUser.name,
+            acknowledgedAt: new Date(),
+            ruleVersion: '1.0' /* TODO: manage versions */,
+          },
+        ],
+      };
+
+      setLabRules((prev) =>
+        prev.map((r) => (r.id === ruleId ? updatedRule : r))
+      );
+      addAuditLog(
+        'RULE_ACKNOWLEDGED',
+        `User acknowledged rule ${rule.ruleNumber}`
+      );
+      return { success: true, data: updatedRule };
+    },
+    [currentUser, labRules, setLabRules, addAuditLog]
+  );
+
+  const addRegulatoryRequirement = useCallback(
+    async (
+      req: Omit<RegulatoryRequirement, 'id' | 'lastUpdated'>
+    ): Promise<Result<RegulatoryRequirement, Error>> => {
+      const newReqWithCalendar: RegulatoryRequirement = {
+        ...req,
+        id: simpleUUID(),
+        lastUpdated: new Date(),
+      } as RegulatoryRequirement;
+
+      if (newReqWithCalendar.submissionDeadline) {
+        const companyName =
+          companies.find((c) => c.id === newReqWithCalendar.tenantId)?.[
+            isJapanese ? 'nameJP' : 'nameEN'
+          ] || 'Tenant';
+        const calendarEvent = createCalendarEventFromSchedule(
+          CalendarEventType.RegulatorySubmission,
+          {
+            jp: `【法規制】${newReqWithCalendar.requirementNameJP} 提出期限`,
+            en: `[Compliance] ${newReqWithCalendar.requirementNameEN} Deadline`,
+          },
+          {
+            jp: `提出先: ${newReqWithCalendar.submissionAuthority}`,
+            en: `Authority: ${newReqWithCalendar.submissionAuthority}`,
+          },
+          newReqWithCalendar.submissionDeadline,
+          60,
+          [newReqWithCalendar.assignedTo || '', 'user-lab-manager'],
+          newReqWithCalendar.id,
+          [10080, 4320]
+        );
+        const syncResult = await googleCalendarService.createEvent(
+          calendarEvent,
+          language
+        );
+        if (syncResult.success) {
+          newReqWithCalendar.googleCalendarEventId =
+            syncResult.googleCalendarEventId;
+          showToast(t('deadlineAddedToCalendar'), 'success');
+        } else {
+          showToast(t('failedToAddToCalendar'), 'warning');
         }
-        
-        const sanitizedReq = sanitizeObject(newReqWithCalendar);
-        return await adapter.createRegulatoryRequirement(sanitizedReq);
-    }, [adapter, companies, isJapanese, language, showToast, t]);
+      }
 
-    const checkAndNotifyForCertificate = useCallback((cert: InsuranceCertificate) => {
-        const now = new Date();
-        const expiry = new Date(cert.endDate);
-        const thirtyDaysFromNow = new Date();
-        thirtyDaysFromNow.setDate(now.getDate() + 30);
-        
-        if (expiry > now && expiry <= thirtyDaysFromNow) {
-            const message = t('notificationCertExpiring', {
-                name: cert.insuranceCompany,
-                date: expiry.toLocaleDateString(isJapanese ? 'ja-JP' : 'en-US')
-            });
+      const sanitizedReq = sanitizeObject(newReqWithCalendar);
+      return await adapter.createRegulatoryRequirement(sanitizedReq);
+    },
+    [adapter, companies, isJapanese, language, showToast, t]
+  );
 
-            addNotification({
-                recipientUserId: cert.uploadedBy,
-                type: NotificationType.CertificateExpiring,
-                priority: 'MEDIUM',
-                titleJP: t('notificationCertExpiringTitle'),
-                titleEN: t('notificationCertExpiringTitle'),
-                messageJP: message,
-                messageEN: message,
-                actionUrl: `#/insuranceManagement`
-            });
-        }
-    }, [addNotification, t, isJapanese]);
+  const checkAndNotifyForCertificate = useCallback(
+    (cert: InsuranceCertificate) => {
+      const now = new Date();
+      const expiry = new Date(cert.endDate);
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(now.getDate() + 30);
 
-    const addInsuranceCertificate = useCallback(async (cert: Omit<InsuranceCertificate, 'id'>): Promise<Result<InsuranceCertificate, Error>> => {
-        const result = await adapter.createInsuranceCertificate(sanitizeObject(cert));
-        if(result.success) {
-            checkAndNotifyForCertificate(result.data);
-        }
-        return result;
-    }, [adapter, checkAndNotifyForCertificate]);
-    
-    const updateInsuranceCertificate = useCallback(async (cert: InsuranceCertificate): Promise<Result<InsuranceCertificate, Error>> => {
-        const result = await adapter.updateInsuranceCertificate(sanitizeObject(cert));
-        if(result.success) {
-            checkAndNotifyForCertificate(result.data);
-        }
-        return result;
-    }, [adapter, checkAndNotifyForCertificate]);
+      if (expiry > now && expiry <= thirtyDaysFromNow) {
+        const message = t('notificationCertExpiring', {
+          name: cert.insuranceCompany,
+          date: expiry.toLocaleDateString(isJapanese ? 'ja-JP' : 'en-US'),
+        });
 
-    const addCertificate = useCallback(async (cert: Omit<Certificate, 'id'>): Promise<Result<Certificate, Error>> => {
-        const result = await adapter.createCertificate(sanitizeObject(cert));
-        if (result.success) {
-            addAuditLog('CERTIFICATE_UPLOAD', `Uploaded certificate '${cert.certificateType}' for user ${cert.userId}`);
-        }
-        return result;
-    }, [adapter, addAuditLog]);
+        addNotification({
+          recipientUserId: cert.uploadedBy,
+          type: NotificationType.CertificateExpiring,
+          priority: 'MEDIUM',
+          titleJP: t('notificationCertExpiringTitle'),
+          titleEN: t('notificationCertExpiringTitle'),
+          messageJP: message,
+          messageEN: message,
+          actionUrl: `#/insuranceManagement`,
+        });
+      }
+    },
+    [addNotification, t, isJapanese]
+  );
 
-    const updateCertificate = useCallback(async (cert: Certificate): Promise<Result<Certificate, Error>> => {
-        const result = await adapter.updateCertificate(sanitizeObject(cert));
-        if (result.success) {
-            addAuditLog('CERTIFICATE_UPDATE', `Updated certificate '${cert.certificateType}' for user ${cert.userId}`);
-        }
-        return result;
-    }, [adapter, addAuditLog]);
+  const addInsuranceCertificate = useCallback(
+    async (
+      cert: Omit<InsuranceCertificate, 'id'>
+    ): Promise<Result<InsuranceCertificate, Error>> => {
+      const result = await adapter.createInsuranceCertificate(
+        sanitizeObject(cert)
+      );
+      if (result.success) {
+        checkAndNotifyForCertificate(result.data);
+      }
+      return result;
+    },
+    [adapter, checkAndNotifyForCertificate]
+  );
 
-    const updateSds = useCallback(async (sds: SDS): Promise<Result<SDS, Error>> => {
-        const result = await adapter.updateSds(sanitizeObject(sds));
-        if (result.success) {
-            addAuditLog('SDS_UPDATE', `Updated SDS for '${sds.chemicalName}'`);
-        }
-        return result;
-    }, [adapter, addAuditLog]);
+  const updateInsuranceCertificate = useCallback(
+    async (
+      cert: InsuranceCertificate
+    ): Promise<Result<InsuranceCertificate, Error>> => {
+      const result = await adapter.updateInsuranceCertificate(
+        sanitizeObject(cert)
+      );
+      if (result.success) {
+        checkAndNotifyForCertificate(result.data);
+      }
+      return result;
+    },
+    [adapter, checkAndNotifyForCertificate]
+  );
 
-    return useMemo(() => ({
-        acknowledgeRule,
-        addRegulatoryRequirement,
-        addInsuranceCertificate,
-        updateInsuranceCertificate,
-        addCertificate,
-        updateCertificate,
-        updateSds
-    }), [acknowledgeRule, addRegulatoryRequirement, addInsuranceCertificate, updateInsuranceCertificate, addCertificate, updateCertificate, updateSds]);
+  const addCertificate = useCallback(
+    async (
+      cert: Omit<Certificate, 'id'>
+    ): Promise<Result<Certificate, Error>> => {
+      const result = await adapter.createCertificate(sanitizeObject(cert));
+      if (result.success) {
+        addAuditLog(
+          'CERTIFICATE_UPLOAD',
+          `Uploaded certificate '${cert.certificateType}' for user ${cert.userId}`
+        );
+      }
+      return result;
+    },
+    [adapter, addAuditLog]
+  );
+
+  const updateCertificate = useCallback(
+    async (cert: Certificate): Promise<Result<Certificate, Error>> => {
+      const result = await adapter.updateCertificate(sanitizeObject(cert));
+      if (result.success) {
+        addAuditLog(
+          'CERTIFICATE_UPDATE',
+          `Updated certificate '${cert.certificateType}' for user ${cert.userId}`
+        );
+      }
+      return result;
+    },
+    [adapter, addAuditLog]
+  );
+
+  const updateSds = useCallback(
+    async (sds: SDS): Promise<Result<SDS, Error>> => {
+      const result = await adapter.updateSds(sanitizeObject(sds));
+      if (result.success) {
+        addAuditLog('SDS_UPDATE', `Updated SDS for '${sds.chemicalName}'`);
+      }
+      return result;
+    },
+    [adapter, addAuditLog]
+  );
+
+  return useMemo(
+    () => ({
+      acknowledgeRule,
+      addRegulatoryRequirement,
+      addInsuranceCertificate,
+      updateInsuranceCertificate,
+      addCertificate,
+      updateCertificate,
+      updateSds,
+    }),
+    [
+      acknowledgeRule,
+      addRegulatoryRequirement,
+      addInsuranceCertificate,
+      updateInsuranceCertificate,
+      addCertificate,
+      updateCertificate,
+      updateSds,
+    ]
+  );
 };

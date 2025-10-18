@@ -18,8 +18,9 @@ import { useTranslation } from './hooks/useTranslation';
 import './firebase';
 
 // Dynamically import the App component to code-split the main app bundle from the login page.
-const App = lazy(() => import('./App').then(module => ({ default: module.App })));
-
+const App = lazy(() =>
+  import('./App').then((module) => ({ default: module.App }))
+);
 
 const AppShell: React.FC = () => {
   const { currentUser } = useSessionContext();
@@ -28,20 +29,26 @@ const AppShell: React.FC = () => {
   return (
     <Routes>
       <Route
-        path="/login"
-        element={!currentUser ? <Login /> : <Navigate to="/" replace />}
+        path='/login'
+        element={!currentUser ? <Login /> : <Navigate to='/' replace />}
       />
       <Route
-        path="/*"
+        path='/*'
         element={
           currentUser ? (
             <AppProviders>
-              <Suspense fallback={<div className="min-h-screen flex items-center justify-center">{t('loadingApplication')}</div>}>
+              <Suspense
+                fallback={
+                  <div className='min-h-screen flex items-center justify-center'>
+                    {t('loadingApplication')}
+                  </div>
+                }
+              >
                 <App />
               </Suspense>
             </AppProviders>
           ) : (
-            <Navigate to="/login" replace />
+            <Navigate to='/login' replace />
           )
         }
       />
@@ -51,7 +58,7 @@ const AppShell: React.FC = () => {
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
+  throw new Error('Could not find root element to mount to');
 }
 
 const root = ReactDOM.createRoot(rootElement);

@@ -8,12 +8,12 @@ import { ProductionGeminiService } from './gemini/ProductionGeminiService';
  */
 class GeminiServiceFactory {
   private static instance: IGeminiService | null = null;
-  
+
   static getService(): IGeminiService {
     if (!this.instance) {
       // Vite projects expose env variables on import.meta.env
       const useMock = import.meta.env.VITE_USE_MOCK_GEMINI === 'true';
-      
+
       if (useMock) {
         console.log('🔧 Using Mock Gemini Service (Development Mode)');
         this.instance = new MockGeminiService();

@@ -9,11 +9,13 @@ describe('useChat', () => {
     const mockMessages = [
       { id: '1', content: 'Hello', senderId: 'user1', createdAt: new Date() },
     ];
-    
-    (dataAdapter.subscribeToChatMessages as jest.Mock).mockImplementation((roomId, callback) => {
-      callback(mockMessages);
-      return jest.fn();
-    });
+
+    (dataAdapter.subscribeToChatMessages as jest.Mock).mockImplementation(
+      (roomId, callback) => {
+        callback(mockMessages);
+        return jest.fn();
+      }
+    );
 
     const { result } = renderHook(() => useChat('room1'));
 
@@ -31,8 +33,11 @@ describe('useChat', () => {
       await result.current.sendMessage('Test message');
     });
 
-    expect(dataAdapter.sendMessage).toHaveBeenCalledWith('room1', expect.objectContaining({
-      content: 'Test message',
-    }));
+    expect(dataAdapter.sendMessage).toHaveBeenCalledWith(
+      'room1',
+      expect.objectContaining({
+        content: 'Test message',
+      })
+    );
   });
 });

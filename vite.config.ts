@@ -5,21 +5,18 @@ import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
-    server: {
-      port: 3000,
-      host: '0.0.0.0',
+  server: {
+    port: 3000,
+    host: '0.0.0.0',
+  },
+  plugins: [react(), tsconfigPaths()],
+  css: {
+    postcss: {
+      plugins: [tailwindcss, autoprefixer],
     },
-    plugins: [react(), tsconfigPaths()],
-    css: {
-      postcss: {
-        plugins: [
-          tailwindcss,
-          autoprefixer,
-        ],
-      },
-    },
-    test: {
-      globals: true,
-      environment: 'jsdom',
-    },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+  },
 });

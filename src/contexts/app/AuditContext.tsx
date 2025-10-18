@@ -1,5 +1,11 @@
 // src/contexts/app/AuditContext.tsx
-import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useMemo,
+} from 'react';
 import { AuditLog } from '../../types';
 import { getMockData } from '../../data/mockData';
 
@@ -10,13 +16,17 @@ export interface AuditContextValue {
 
 export const AuditContext = createContext<AuditContextValue | null>(null);
 
-export const AuditProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuditProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const initialData = getMockData();
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(initialData.auditLogs);
 
   const value = useMemo(() => ({ auditLogs, setAuditLogs }), [auditLogs]);
 
-  return <AuditContext.Provider value={value}>{children}</AuditContext.Provider>;
+  return (
+    <AuditContext.Provider value={value}>{children}</AuditContext.Provider>
+  );
 };
 
 export const useAuditContext = () => {

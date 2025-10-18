@@ -1,5 +1,5 @@
 // src/services/gemini/IGeminiService.ts
-import { Usage, Equipment, Language, SDSSummary } from "../../types";
+import { Usage, Equipment, Language, SDSSummary } from '../../types';
 
 /**
  * Gemini APIとの通信を抽象化するインターフェース。
@@ -19,10 +19,7 @@ export interface IGeminiService {
     language: Language
   ): Promise<string>;
 
-  summarizeSDSDocument(
-    sdsText: string,
-    language: Language
-  ): Promise<string>;
+  summarizeSDSDocument(sdsText: string, language: Language): Promise<string>;
 
   generateText(prompt: string, language: Language): Promise<string>;
 }

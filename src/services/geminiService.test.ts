@@ -16,28 +16,48 @@ describe('geminiService (Mock Implementation)', () => {
   });
 
   it('should return mock usage insights', async () => {
-    const insightsJA = await geminiService.getUsageInsights([], [], Language.JA, 'user-1');
+    const insightsJA = await geminiService.getUsageInsights(
+      [],
+      [],
+      Language.JA,
+      'user-1'
+    );
     expect(insightsJA).toContain('AIによる利用傾向分析 (モック)');
 
-    const insightsEN = await geminiService.getUsageInsights([], [], Language.EN, 'user-1');
+    const insightsEN = await geminiService.getUsageInsights(
+      [],
+      [],
+      Language.EN,
+      'user-1'
+    );
     expect(insightsEN).toContain('AI Usage Analysis (Mock)');
   });
 
   it('should return mock UI/UX analysis as a JSON string', async () => {
-    const analysisJson = await geminiService.getUiUxAnalysis('base64data', 'image/png', Language.EN);
+    const analysisJson = await geminiService.getUiUxAnalysis(
+      'base64data',
+      'image/png',
+      Language.EN
+    );
     const analysis = JSON.parse(analysisJson);
-    
+
     expect(analysis.overallScore).toBe(85);
     expect(analysis.summary).toContain('clean and modern design');
     expect(analysis.issues).toHaveLength(2);
     expect(analysis.issues[0].severity).toBe('Major');
   });
-  
+
   it('should return mock SDS summary as a JSON string', async () => {
-    const summaryJson = await geminiService.summarizeSDSDocument('sds text', Language.EN);
+    const summaryJson = await geminiService.summarizeSDSDocument(
+      'sds text',
+      Language.EN
+    );
     const summary = JSON.parse(summaryJson);
-    
-    expect(summary.hazards).toEqual(["Skin irritation", "Serious eye irritation"]);
+
+    expect(summary.hazards).toEqual([
+      'Skin irritation',
+      'Serious eye irritation',
+    ]);
     expect(summary.handling).toContain('Wear protective gloves');
     expect(summary.ppe).toHaveLength(2);
   });

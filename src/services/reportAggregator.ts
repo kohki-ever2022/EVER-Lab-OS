@@ -1,15 +1,21 @@
 // src/services/reportAggregator.ts
 import { Reservation, Equipment, ReservationStatus } from '../types';
 import { Consumable } from '../types';
-import { SDS, Certificate, CertificateStatus, EhsIncident, SDSStatus } from '../types';
+import {
+  SDS,
+  Certificate,
+  CertificateStatus,
+  EhsIncident,
+  SDSStatus,
+} from '../types';
 import { Invoice } from '../types';
 import { User } from '../types';
 import { Language } from '../types';
 import { translate } from '../i18n/translations';
-import { 
-  REPORT_TOP_N_EQUIPMENT, 
-  REPORT_ITEM_LIST_LIMIT, 
-  APPROX_DAYS_IN_MONTH, 
+import {
+  REPORT_TOP_N_EQUIPMENT,
+  REPORT_ITEM_LIST_LIMIT,
+  APPROX_DAYS_IN_MONTH,
   APPROX_WORK_HOURS_PER_DAY,
   REPORT_TOP_N_TENANTS,
 } from '../config/constants';
@@ -80,81 +86,145 @@ export const aggregateMonthlyData = (
   month: number,
   sources: MonthlyDataSources
 ): MonthlyReportData => {
-  const { reservations, equipment, consumables, sds, certificates, invoices, users, incidents, language } = sources;
+  const {
+    reservations,
+    equipment,
+    consumables,
+    sds,
+    certificates,
+    invoices,
+    users,
+    incidents,
+    language,
+  } = sources;
   const isJapanese = language === Language.JA;
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0, 23, 59, 59);
 
   // --- Equipment Usage ---
-  const monthReservations = reservations.filter(r => {
+  const monthReservations = reservations.filter((r) => {
     const d = new Date(r.startTime);
     return d >= startDate && d <= endDate;
   });
 
-  const byEquipmentUsage = equipment.map(e => {
-    const equipReservations = monthReservations.filter(r => r.equipmentId === e.id && r.status === ReservationStatus.Completed);
-    const totalMinutes = equipReservations.reduce((sum, r) => {
+  const byEquipmentUsage = equipment
+    .map((e) => {
+      const equipReservations = monthReservations.filter(
+        (r) =>
+          r.equipmentId === e.id && r.status === ReservationStatus.Completed
+      );
+      const totalMinutes = equipReservations.reduce((sum, r) => {
         if (r.actualStartTime && r.actualEndTime) {
-            return sum + (new Date(r.actualEndTime).getTime() - new Date(r.actualStartTime).getTime()) / 60000;
+          return (
+            sum +
+            (new Date(r.actualEndTime).getTime() -
+              new Date(r.actualStartTime).getTime()) /
+              60000
+          );
         }
         return sum;
-    }, 0);
-    return {
-      equipmentName: isJapanese ? e.nameJP : e.nameEN,
-      totalHours: Math.round(totalMinutes / 60),
-      reservationCount: equipReservations.length,
-    };
-  }).sort((a, b) => b.totalHours - a.totalHours)
-  .slice(0, REPORT_TOP_N_EQUIPMENT);
+      }, 0);
+      return {
+        equipmentName: isJapanese ? e.nameJP : e.nameEN,
+        totalHours: Math.round(totalMinutes / 60),
+        reservationCount: equipReservations.length,
+      };
+    })
+    .sort((a, b) => b.totalHours - a.totalHours)
+    .slice(0, REPORT_TOP_N_EQUIPMENT);
 
-  const totalUsageHours = byEquipmentUsage.reduce((sum, e) => sum + e.totalHours, 0);
-  const totalAvailableHours = equipment.length * APPROX_DAYS_IN_MONTH * APPROX_WORK_HOURS_PER_DAY;
-  const overallUtilizationRate = totalAvailableHours > 0 ? Math.round((totalUsageHours / totalAvailableHours) * 100) : 0;
-
+  const totalUsageHours = byEquipmentUsage.reduce(
+    (sum, e) => sum + e.totalHours,
+    0
+  );
+  const totalAvailableHours =
+    equipment.length * APPROX_DAYS_IN_MONTH * APPROX_WORK_HOURS_PER_DAY;
+  const overallUtilizationRate =
+    totalAvailableHours > 0
+      ? Math.round((totalUsageHours / totalAvailableHours) * 100)
+      : 0;
 
   // --- Inventory ---
-  const hazardousItems = consumables.filter(c => c.isHazardous);
+  const hazardousItems = consumables.filter((c) => c.isHazardous);
   const calculateMultiple = (item: Consumable) => {
-      if (!item.isHazardous || !item.designatedQuantity || !item.packageSize || item.designatedQuantity === 0) return 0;
-      const totalAmount = (item.stock * item.packageSize);
-      return totalAmount / item.designatedQuantity;
+    if (
+      !item.isHazardous ||
+      !item.designatedQuantity ||
+      !item.packageSize ||
+      item.designatedQuantity === 0
+    )
+      return 0;
+    const totalAmount = item.stock * item.packageSize;
+    return totalAmount / item.designatedQuantity;
   };
-  const hazardousRatio = hazardousItems.reduce((sum, item) => sum + calculateMultiple(item), 0);
-  
-  const allStockoutItems = consumables.filter(c => c.stock <= 0);
-  const stockoutItems = allStockoutItems.slice(0, REPORT_ITEM_LIST_LIMIT).map(c => isJapanese ? c.nameJP : c.nameEN);
+  const hazardousRatio = hazardousItems.reduce(
+    (sum, item) => sum + calculateMultiple(item),
+    0
+  );
+
+  const allStockoutItems = consumables.filter((c) => c.stock <= 0);
+  const stockoutItems = allStockoutItems
+    .slice(0, REPORT_ITEM_LIST_LIMIT)
+    .map((c) => (isJapanese ? c.nameJP : c.nameEN));
   if (allStockoutItems.length > REPORT_ITEM_LIST_LIMIT) {
-      const remainingCount = allStockoutItems.length - REPORT_ITEM_LIST_LIMIT;
-      stockoutItems.push(translate('moreItems', language, { count: remainingCount }));
+    const remainingCount = allStockoutItems.length - REPORT_ITEM_LIST_LIMIT;
+    stockoutItems.push(
+      translate('moreItems', language, { count: remainingCount })
+    );
   }
 
-  const allReorderItems = consumables.filter(c => c.stock > 0 && c.stock <= c.lowStockThreshold);
-  const reorderNeededItems = allReorderItems.slice(0, REPORT_ITEM_LIST_LIMIT).map(c => isJapanese ? c.nameJP : c.nameEN);
+  const allReorderItems = consumables.filter(
+    (c) => c.stock > 0 && c.stock <= c.lowStockThreshold
+  );
+  const reorderNeededItems = allReorderItems
+    .slice(0, REPORT_ITEM_LIST_LIMIT)
+    .map((c) => (isJapanese ? c.nameJP : c.nameEN));
   if (allReorderItems.length > REPORT_ITEM_LIST_LIMIT) {
-      const remainingCount = allReorderItems.length - REPORT_ITEM_LIST_LIMIT;
-      reorderNeededItems.push(translate('moreItems', language, { count: remainingCount }));
+    const remainingCount = allReorderItems.length - REPORT_ITEM_LIST_LIMIT;
+    reorderNeededItems.push(
+      translate('moreItems', language, { count: remainingCount })
+    );
   }
-
 
   // --- Compliance ---
-  const pendingSDSCount = sds.filter(s => s.status === SDSStatus.Pending).length;
-  const expiredCertificatesCount = certificates.filter(c => c.status === CertificateStatus.Expired).length;
-  const monthIncidents = incidents.filter(i => new Date(i.reportedAt) >= startDate && new Date(i.reportedAt) <= endDate);
+  const pendingSDSCount = sds.filter(
+    (s) => s.status === SDSStatus.Pending
+  ).length;
+  const expiredCertificatesCount = certificates.filter(
+    (c) => c.status === CertificateStatus.Expired
+  ).length;
+  const monthIncidents = incidents.filter(
+    (i) =>
+      new Date(i.reportedAt) >= startDate && new Date(i.reportedAt) <= endDate
+  );
 
   // --- Financial ---
-  const monthInvoices = invoices.filter(i => i.period === `${year}-${String(month).padStart(2, '0')}`);
+  const monthInvoices = invoices.filter(
+    (i) => i.period === `${year}-${String(month).padStart(2, '0')}`
+  );
   const totalRevenue = monthInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
-  
+
   const prevMonthDate = new Date(year, month - 2, 1);
   const prevMonthPeriod = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
-  const prevMonthInvoices = invoices.filter(i => i.period === prevMonthPeriod);
-  const previousMonthRevenue = prevMonthInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
-  const revenueChangePercentage = previousMonthRevenue > 0 ? ((totalRevenue - previousMonthRevenue) / previousMonthRevenue) * 100 : (totalRevenue > 0 ? 100 : 0);
+  const prevMonthInvoices = invoices.filter(
+    (i) => i.period === prevMonthPeriod
+  );
+  const previousMonthRevenue = prevMonthInvoices.reduce(
+    (sum, i) => sum + i.totalAmount,
+    0
+  );
+  const revenueChangePercentage =
+    previousMonthRevenue > 0
+      ? ((totalRevenue - previousMonthRevenue) / previousMonthRevenue) * 100
+      : totalRevenue > 0
+        ? 100
+        : 0;
 
   const byTenantAmount: Record<string, number> = {};
-    monthInvoices.forEach(inv => {
-        byTenantAmount[inv.companyName] = (byTenantAmount[inv.companyName] || 0) + inv.totalAmount;
-    });
+  monthInvoices.forEach((inv) => {
+    byTenantAmount[inv.companyName] =
+      (byTenantAmount[inv.companyName] || 0) + inv.totalAmount;
+  });
 
   const byTenant = Object.entries(byTenantAmount)
     .map(([tenantName, amount]) => ({ tenantName, amount }))
@@ -165,9 +235,15 @@ export const aggregateMonthlyData = (
     period: `${year}-${String(month).padStart(2, '0')}`,
     equipmentUsage: {
       totalReservations: monthReservations.length,
-      completedReservations: monthReservations.filter(r => r.status === ReservationStatus.Completed).length,
-      cancelledReservations: monthReservations.filter(r => r.status === ReservationStatus.Cancelled).length,
-      noShowCount: monthReservations.filter(r => r.status === ReservationStatus.NoShow).length,
+      completedReservations: monthReservations.filter(
+        (r) => r.status === ReservationStatus.Completed
+      ).length,
+      cancelledReservations: monthReservations.filter(
+        (r) => r.status === ReservationStatus.Cancelled
+      ).length,
+      noShowCount: monthReservations.filter(
+        (r) => r.status === ReservationStatus.NoShow
+      ).length,
       totalUsageHours,
       overallUtilizationRate,
       byEquipment: byEquipmentUsage,

@@ -1,4 +1,11 @@
-import React, { createContext, useState, useContext, ReactNode, useMemo, useCallback } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useMemo,
+  useCallback,
+} from 'react';
 import { Language, Role, RoleCategory, User, CurrentUser } from '../types';
 
 export interface SessionContextType {
@@ -11,7 +18,9 @@ export interface SessionContextType {
   isTenantStaff: boolean;
 }
 
-export const SessionContext = createContext<SessionContextType | undefined>(undefined);
+export const SessionContext = createContext<SessionContextType | undefined>(
+  undefined
+);
 
 interface SessionProviderProps {
   children: ReactNode;
@@ -21,7 +30,9 @@ interface SessionProviderProps {
  * Provides session-related state and actions to the application,
  * such as current user, language, and authentication methods.
  */
-export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
+export const SessionProvider: React.FC<SessionProviderProps> = ({
+  children,
+}) => {
   const [language, setLanguage] = useState<Language>(Language.JA);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
@@ -37,9 +48,9 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
   const login = useCallback((userToLogin: User): boolean => {
     if (userToLogin) {
-        const { password, ...currentUserData } = userToLogin;
-        setCurrentUser(currentUserData);
-        return true;
+      const { password, ...currentUserData } = userToLogin;
+      setCurrentUser(currentUserData);
+      return true;
     }
     return false;
   }, []);
@@ -48,17 +59,22 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     setCurrentUser(null);
   }, []);
 
-  const value = useMemo(() => ({
-    language,
-    setLanguage,
-    currentUser,
-    login,
-    logout,
-    isFacilityStaff,
-    isTenantStaff,
-  }), [language, currentUser, login, logout, isFacilityStaff, isTenantStaff]);
+  const value = useMemo(
+    () => ({
+      language,
+      setLanguage,
+      currentUser,
+      login,
+      logout,
+      isFacilityStaff,
+      isTenantStaff,
+    }),
+    [language, currentUser, login, logout, isFacilityStaff, isTenantStaff]
+  );
 
-  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+  );
 };
 
 /**

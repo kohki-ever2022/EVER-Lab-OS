@@ -5,9 +5,7 @@ const requiredEnvVars = [
 ] as const;
 
 export function validateEnvironmentVariables(): void {
-  const missing = requiredEnvVars.filter(
-    (key) => !import.meta.env[key]
-  );
+  const missing = requiredEnvVars.filter((key) => !import.meta.env[key]);
 
   if (missing.length > 0) {
     throw new Error(
@@ -21,7 +19,7 @@ export function validateEnvironmentVariables(): void {
       console.warn('WARNING: Mock data is enabled in production!');
     }
     if (import.meta.env.VITE_USE_MOCK_GEMINI === 'true') {
-        console.warn('WARNING: Mock Gemini is enabled in production!');
+      console.warn('WARNING: Mock Gemini is enabled in production!');
     }
   }
 }

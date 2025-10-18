@@ -1,12 +1,20 @@
 // src/contexts/CompanyContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { Company } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
 const CompaniesDataContext = createContext<Company[]>([]);
 const CompaniesLoadingContext = createContext<boolean>(true);
 
-export const CompanyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const CompanyProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const adapter = useDataAdapter();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);

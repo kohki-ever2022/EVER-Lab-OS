@@ -1,5 +1,12 @@
 // src/contexts/ConsumableContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useMemo,
+} from 'react';
 import { Consumable } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -11,7 +18,9 @@ interface ConsumableContextValue {
 const ConsumablesDataContext = createContext<Consumable[]>([]);
 const ConsumablesLoadingContext = createContext<boolean>(true);
 
-export const ConsumableProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ConsumableProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const adapter = useDataAdapter();
   const [consumables, setConsumables] = useState<Consumable[]>([]);
   const [loading, setLoading] = useState(true);

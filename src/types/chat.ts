@@ -5,7 +5,7 @@ export interface ChatRoom {
   id: string;
   name: string; // グループチャット名
   memberIds: string[]; // 参加メンバーのIDリスト
-  memberInfo: { [key: string]: { name: string; avatar?: string; } }; // メンバーの詳細情報
+  memberInfo: { [key: string]: { name: string; avatar?: string } }; // メンバーの詳細情報
   isGroup: boolean; // グループチャットかどうか
   lastMessage?: string; // 最後のメッセージのプレビュー
   lastMessageAt: Timestamp | Date; // 最後のメッセージの送信日時

@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+  useMemo,
+} from 'react';
 import {
   User,
   Tenant,
@@ -36,8 +43,19 @@ export type ModalPayload =
   | { type: 'purchaseConsumable'; props: { consumable: Consumable } }
   | { type: 'projectDetails'; props: { project: Project | null } }
   | { type: 'logProtocol'; props: { protocol: Protocol } }
-  | { type: 'editTask'; props: { task: Task | null, prefilledData?: Partial<Task> | null } }
-  | { type: 'eSignature'; props: { request: { type: 'DocumentVersion' | 'LegalDocument', entity: DocumentVersion | LegalDocument } } }
+  | {
+      type: 'editTask';
+      props: { task: Task | null; prefilledData?: Partial<Task> | null };
+    }
+  | {
+      type: 'eSignature';
+      props: {
+        request: {
+          type: 'DocumentVersion' | 'LegalDocument';
+          entity: DocumentVersion | LegalDocument;
+        };
+      };
+    }
   | { type: 'tenantDetails'; props: { tenant: Tenant } }
   | { type: 'legalDocDetails'; props: { document: LegalDocument } }
   | { type: 'vialDetails'; props: { vial: Vial } }
@@ -56,9 +74,31 @@ export type ModalPayload =
   | { type: 'quoteResponse'; props: { quotation: Quotation } }
   | { type: 'inquiryResponse'; props: { inquiry: Inquiry } }
   | { type: 'uploadCertificate'; props: { certificateToEdit?: Certificate } }
-  | { type: 'benchDetails'; props: { benchInfo: { id: string; assignment?: BenchAssignment } | null } }
-  | { type: 'confirmAction'; props: { title: string; message: string; onConfirm: () => void; confirmText?: string; cancelText?: string; } }
-  | { type: 'promptAction'; props: { title: string; message: string; onConfirm: (value: string) => void; confirmText?: string; cancelText?: string; inputLabel?: string; } };
+  | {
+      type: 'benchDetails';
+      props: { benchInfo: { id: string; assignment?: BenchAssignment } | null };
+    }
+  | {
+      type: 'confirmAction';
+      props: {
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        confirmText?: string;
+        cancelText?: string;
+      };
+    }
+  | {
+      type: 'promptAction';
+      props: {
+        title: string;
+        message: string;
+        onConfirm: (value: string) => void;
+        confirmText?: string;
+        cancelText?: string;
+        inputLabel?: string;
+      };
+    };
 
 interface ModalContextType {
   activeModal: ModalPayload | null;
@@ -72,17 +112,23 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
  * Provides a global system for managing and displaying modals.
  * Allows any component to open a modal without complex prop drilling.
  */
-export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ModalProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [activeModal, setActiveModal] = useState<ModalPayload | null>(null);
-  const openModal = useCallback((payload: ModalPayload) => setActiveModal(payload), []);
+  const openModal = useCallback(
+    (payload: ModalPayload) => setActiveModal(payload),
+    []
+  );
   const closeModal = useCallback(() => setActiveModal(null), []);
-  
-  const value = useMemo(() => ({ activeModal, openModal, closeModal }), [activeModal, openModal, closeModal]);
+
+  const value = useMemo(
+    () => ({ activeModal, openModal, closeModal }),
+    [activeModal, openModal, closeModal]
+  );
 
   return (
-    <ModalContext.Provider value={value}>
-      {children}
-    </ModalContext.Provider>
+    <ModalContext.Provider value={value}>{children}</ModalContext.Provider>
   );
 };
 
@@ -92,6 +138,7 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
  */
 export const useModalContext = (): ModalContextType => {
   const context = useContext(ModalContext);
-  if (!context) throw new Error('useModalContext must be used within a ModalProvider');
+  if (!context)
+    throw new Error('useModalContext must be used within a ModalProvider');
   return context;
 };

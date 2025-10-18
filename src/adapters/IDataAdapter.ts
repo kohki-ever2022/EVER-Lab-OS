@@ -59,7 +59,9 @@ export interface IDataAdapter {
   // --- Reservation Operations ---
   getReservations(): Promise<Result<Reservation[]>>;
   getReservationById(id: string): Promise<Result<Reservation | null>>;
-  createReservation(data: Omit<Reservation, 'id'>): Promise<Result<Reservation>>;
+  createReservation(
+    data: Omit<Reservation, 'id'>
+  ): Promise<Result<Reservation>>;
   updateReservation(reservation: Reservation): Promise<Result<Reservation>>;
   deleteReservation(id: string): Promise<Result<void>>;
   /** 予約状況はリアルタイム性が高いため、購読機能を設ける。 */
@@ -104,35 +106,51 @@ export interface IDataAdapter {
   createTask(data: Omit<Task, 'id'>): Promise<Result<Task>>;
   updateTask(task: Task): Promise<Result<Task>>;
   deleteTask(id: string): Promise<Result<void>>;
-  
+
   // --- Lab Notebook Operations ---
   getLabNotebookEntries(): Promise<Result<LabNotebookEntry[]>>;
-  createLabNotebookEntry(data: Omit<LabNotebookEntry, 'id'>): Promise<Result<LabNotebookEntry>>;
-  updateLabNotebookEntry(entry: LabNotebookEntry): Promise<Result<LabNotebookEntry>>;
+  createLabNotebookEntry(
+    data: Omit<LabNotebookEntry, 'id'>
+  ): Promise<Result<LabNotebookEntry>>;
+  updateLabNotebookEntry(
+    entry: LabNotebookEntry
+  ): Promise<Result<LabNotebookEntry>>;
   deleteLabNotebookEntry(id: string): Promise<Result<void>>;
-  subscribeToLabNotebookEntries(callback: (data: LabNotebookEntry[]) => void): () => void;
+  subscribeToLabNotebookEntries(
+    callback: (data: LabNotebookEntry[]) => void
+  ): () => void;
 
   // --- MaintenanceLog Operations ---
   getMaintenanceLogs(): Promise<Result<MaintenanceLog[]>>;
   getMaintenanceLogById(id: string): Promise<Result<MaintenanceLog | null>>;
-  createMaintenanceLog(data: Omit<MaintenanceLog, 'id'>): Promise<Result<MaintenanceLog>>;
+  createMaintenanceLog(
+    data: Omit<MaintenanceLog, 'id'>
+  ): Promise<Result<MaintenanceLog>>;
   updateMaintenanceLog(log: MaintenanceLog): Promise<Result<MaintenanceLog>>;
   deleteMaintenanceLog(id: string): Promise<Result<void>>;
-  subscribeToMaintenanceLogs(callback: (data: MaintenanceLog[]) => void): () => void;
+  subscribeToMaintenanceLogs(
+    callback: (data: MaintenanceLog[]) => void
+  ): () => void;
 
   // --- Announcement Operations ---
   getAnnouncements(): Promise<Result<Announcement[]>>;
   getAnnouncementById(id: string): Promise<Result<Announcement | null>>;
-  createAnnouncement(data: Omit<Announcement, 'id'>): Promise<Result<Announcement>>;
+  createAnnouncement(
+    data: Omit<Announcement, 'id'>
+  ): Promise<Result<Announcement>>;
   updateAnnouncement(announcement: Announcement): Promise<Result<Announcement>>;
   deleteAnnouncement(id: string): Promise<Result<void>>;
   /** お知らせもリアルタイムで更新されることが望ましい。 */
-  subscribeToAnnouncements(callback: (data: Announcement[]) => void): () => void;
+  subscribeToAnnouncements(
+    callback: (data: Announcement[]) => void
+  ): () => void;
 
   // --- Certificate Operations ---
   getCertificates(): Promise<Result<Certificate[]>>;
   getCertificateById(id: string): Promise<Result<Certificate | null>>;
-  createCertificate(data: Omit<Certificate, 'id'>): Promise<Result<Certificate>>;
+  createCertificate(
+    data: Omit<Certificate, 'id'>
+  ): Promise<Result<Certificate>>;
   updateCertificate(certificate: Certificate): Promise<Result<Certificate>>;
   deleteCertificate(id: string): Promise<Result<void>>;
   subscribeToCertificates(callback: (data: Certificate[]) => void): () => void;
@@ -147,9 +165,13 @@ export interface IDataAdapter {
 
   // --- Monthly Report Operations ---
   getMonthlyReports(): Promise<Result<MonthlyReport[]>>;
-  createMonthlyReport(data: Omit<MonthlyReport, 'id'>): Promise<Result<MonthlyReport>>;
-  subscribeToMonthlyReports(callback: (data: MonthlyReport[]) => void): () => void;
-  
+  createMonthlyReport(
+    data: Omit<MonthlyReport, 'id'>
+  ): Promise<Result<MonthlyReport>>;
+  subscribeToMonthlyReports(
+    callback: (data: MonthlyReport[]) => void
+  ): () => void;
+
   // --- Ticket Operations ---
   getTickets(): Promise<Result<Ticket[]>>;
   getTicketById(id: string): Promise<Result<Ticket | null>>;
@@ -160,19 +182,35 @@ export interface IDataAdapter {
 
   // --- RegulatoryRequirement Operations ---
   getRegulatoryRequirements(): Promise<Result<RegulatoryRequirement[]>>;
-  getRegulatoryRequirementById(id: string): Promise<Result<RegulatoryRequirement | null>>;
-  createRegulatoryRequirement(data: Omit<RegulatoryRequirement, 'id'>): Promise<Result<RegulatoryRequirement>>;
-  updateRegulatoryRequirement(req: RegulatoryRequirement): Promise<Result<RegulatoryRequirement>>;
+  getRegulatoryRequirementById(
+    id: string
+  ): Promise<Result<RegulatoryRequirement | null>>;
+  createRegulatoryRequirement(
+    data: Omit<RegulatoryRequirement, 'id'>
+  ): Promise<Result<RegulatoryRequirement>>;
+  updateRegulatoryRequirement(
+    req: RegulatoryRequirement
+  ): Promise<Result<RegulatoryRequirement>>;
   deleteRegulatoryRequirement(id: string): Promise<Result<void>>;
-  subscribeToRegulatoryRequirements(callback: (data: RegulatoryRequirement[]) => void): () => void;
+  subscribeToRegulatoryRequirements(
+    callback: (data: RegulatoryRequirement[]) => void
+  ): () => void;
 
   // --- InsuranceCertificate Operations ---
   getInsuranceCertificates(): Promise<Result<InsuranceCertificate[]>>;
-  getInsuranceCertificateById(id: string): Promise<Result<InsuranceCertificate | null>>;
-  createInsuranceCertificate(data: Omit<InsuranceCertificate, 'id'>): Promise<Result<InsuranceCertificate>>;
-  updateInsuranceCertificate(cert: InsuranceCertificate): Promise<Result<InsuranceCertificate>>;
+  getInsuranceCertificateById(
+    id: string
+  ): Promise<Result<InsuranceCertificate | null>>;
+  createInsuranceCertificate(
+    data: Omit<InsuranceCertificate, 'id'>
+  ): Promise<Result<InsuranceCertificate>>;
+  updateInsuranceCertificate(
+    cert: InsuranceCertificate
+  ): Promise<Result<InsuranceCertificate>>;
   deleteInsuranceCertificate(id: string): Promise<Result<void>>;
-  subscribeToInsuranceCertificates(callback: (data: InsuranceCertificate[]) => void): () => void;
+  subscribeToInsuranceCertificates(
+    callback: (data: InsuranceCertificate[]) => void
+  ): () => void;
 
   // --- Invoice Operations ---
   createInvoice(data: Omit<Invoice, 'id'>): Promise<Result<Invoice>>;
@@ -180,15 +218,38 @@ export interface IDataAdapter {
 
   // --- Chat Operations ---
   getChatRooms(userId: string): Promise<Result<ChatRoom[]>>;
-  subscribeToChatRooms(userId: string, callback: (result: Result<ChatRoom[]>) => void): () => void;
+  subscribeToChatRooms(
+    userId: string,
+    callback: (result: Result<ChatRoom[]>) => void
+  ): () => void;
   createChatRoom(data: Omit<ChatRoom, 'id'>): Promise<Result<ChatRoom>>;
   getChatMessages(roomId: string): Promise<Result<ChatMessage[]>>;
-  subscribeToChatMessages(roomId: string, callback: (data: ChatMessage[]) => void): () => void;
-  subscribeToPinnedMessages(roomId: string, callback: (result: Result<ChatMessage[]>) => void): { unsubscribe: () => void; getPinnedMessages: () => Promise<void> };
+  subscribeToChatMessages(
+    roomId: string,
+    callback: (data: ChatMessage[]) => void
+  ): () => void;
+  subscribeToPinnedMessages(
+    roomId: string,
+    callback: (result: Result<ChatMessage[]>) => void
+  ): { unsubscribe: () => void; getPinnedMessages: () => Promise<void> };
   sendChatMessage(data: Omit<ChatMessage, 'id'>): Promise<Result<ChatMessage>>;
-  addReaction(roomId: string, messageId: string, emoji: string, userId: string): Promise<Result<void>>;
-  removeReaction(roomId: string, messageId: string, emoji: string, userId: string): Promise<Result<void>>;
-  updateChatMessage(roomId: string, messageId: string, newContent: string): Promise<Result<void>>;
+  addReaction(
+    roomId: string,
+    messageId: string,
+    emoji: string,
+    userId: string
+  ): Promise<Result<void>>;
+  removeReaction(
+    roomId: string,
+    messageId: string,
+    emoji: string,
+    userId: string
+  ): Promise<Result<void>>;
+  updateChatMessage(
+    roomId: string,
+    messageId: string,
+    newContent: string
+  ): Promise<Result<void>>;
   deleteChatMessage(roomId: string, messageId: string): Promise<Result<void>>;
   updateLastRead(roomId: string, userId: string): Promise<Result<void>>;
   pinMessage(roomId: string, messageId: string): Promise<Result<void>>;

@@ -22,5 +22,5 @@ export const getEquipment = functions.https.onCall(async (data, context) => {
   }
 
   const snapshot = await query.get();
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 });

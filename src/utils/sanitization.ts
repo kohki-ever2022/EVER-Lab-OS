@@ -6,13 +6,13 @@
  * @returns A sanitized string safe for rendering as text content.
  */
 export const escapeHtml = (unsafe: string): string => {
-    if (typeof unsafe !== 'string' || !unsafe) return '';
-    return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+  if (typeof unsafe !== 'string' || !unsafe) return '';
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 };
 
 /**
@@ -21,28 +21,27 @@ export const escapeHtml = (unsafe: string): string => {
  * @param obj The object to sanitize.
  * @returns A new object with all string properties sanitized.
  */
-export const sanitizeObject = <T extends object>(obj: T): T => {
-    if (obj === null || typeof obj !== 'object') {
-        return obj;
-    }
+export const sanitizeObject = <T>(obj: T): T => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
 
-    if (Array.isArray(obj)) {
-        // @ts-ignore
-        return obj.map(item => sanitizeObject(item));
-    }
+  if (Array.isArray(obj)) {
+    return obj.map((item) => sanitizeObject(item)) as unknown as T;
+  }
 
-    const sanitized: { [key: string]: any } = {};
-    for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            const value = obj[key];
-            if (typeof value === 'string') {
-                sanitized[key] = escapeHtml(value);
-            } else if (typeof value === 'object') {
-                sanitized[key] = sanitizeObject(value as object);
-            } else {
-                sanitized[key] = value;
-            }
-        }
+  const sanitized: { [key: string]: unknown } = {};
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = (obj as { [key: string]: unknown })[key];
+      if (typeof value === 'string') {
+        sanitized[key] = escapeHtml(value);
+      } else if (typeof value === 'object') {
+        sanitized[key] = sanitizeObject(value as object);
+      } else {
+        sanitized[key] = value;
+      }
     }
-    return sanitized as T;
+  }
+  return sanitized as T;
 };

@@ -13,7 +13,7 @@ export const generateMonthlyReport = async (
 ): Promise<string> => {
   const lang = translate('langNameForPrompt', language);
   const errorMsg = translate('reportGenerationFailed', language);
-  
+
   const prompt = `
 あなたはBSL-2対応の共同利用型研究施設の運営コンサルタントです。
 以下のJSONデータから、施設運営者（施設責任者、ラボマネージャー）向けの包括的な月次レポートを${lang}で生成してください。
@@ -34,13 +34,17 @@ ${JSON.stringify(data, null, 2)}
 【出力形式】
 Markdown形式で、見出し、太字、箇条書きを効果的に使用して、プロフェッショナルで読みやすいレポートを作成してください。各セクションで具体的な数値を引用し、専門的な洞察を加えてください。
   `;
-  
+
   const reportText = await geminiService.generateText(prompt, language);
 
-  if (!reportText || reportText.includes("Error:") || reportText.includes("エラー:")) {
-      console.error('Failed to generate monthly report:', reportText);
-      return errorMsg;
+  if (
+    !reportText ||
+    reportText.includes('Error:') ||
+    reportText.includes('エラー:')
+  ) {
+    console.error('Failed to generate monthly report:', reportText);
+    return errorMsg;
   }
-  
+
   return reportText;
 };

@@ -1,5 +1,8 @@
 // src/services/googleCalendarService.ts
-import { IGoogleCalendarService, createCalendarEventFromSchedule } from './googleCalendar/IGoogleCalendarService';
+import {
+  IGoogleCalendarService,
+  createCalendarEventFromSchedule,
+} from './googleCalendar/IGoogleCalendarService';
 import { MockGoogleCalendarService } from './googleCalendar/MockGoogleCalendarService';
 import { ProductionGoogleCalendarService } from './googleCalendar/ProductionGoogleCalendarService';
 
@@ -11,11 +14,11 @@ export { createCalendarEventFromSchedule };
  */
 class GoogleCalendarServiceFactory {
   private static instance: IGoogleCalendarService | null = null;
-  
+
   static getService(): IGoogleCalendarService {
     if (!this.instance) {
       const useMock = import.meta.env.VITE_USE_MOCK_GOOGLE_CALENDAR === 'true';
-      
+
       if (useMock) {
         console.log('🔧 Using Mock Google Calendar Service');
         this.instance = new MockGoogleCalendarService();
@@ -31,4 +34,5 @@ class GoogleCalendarServiceFactory {
 /**
  * アプリケーション全体で使用するGoogleカレンダーサービスのシングルトンインスタンス。
  */
-export const googleCalendarService: IGoogleCalendarService = GoogleCalendarServiceFactory.getService();
+export const googleCalendarService: IGoogleCalendarService =
+  GoogleCalendarServiceFactory.getService();

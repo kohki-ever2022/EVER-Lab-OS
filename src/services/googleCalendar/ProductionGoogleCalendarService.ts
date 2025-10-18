@@ -8,26 +8,44 @@ import { IGoogleCalendarService } from './IGoogleCalendarService';
  * 実際のGoogle API連携にはOAuth2.0認証などが必要です。
  */
 export class ProductionGoogleCalendarService implements IGoogleCalendarService {
-    private notImplementedError(): CalendarSyncResult {
-        return {
-            success: false,
-            errorMessage: "Google Calendar integration is not implemented in this environment.",
-            syncedAt: new Date(),
-        };
-    }
+  private notImplementedError(): CalendarSyncResult {
+    return {
+      success: false,
+      errorMessage:
+        'Google Calendar integration is not implemented in this environment.',
+      syncedAt: new Date(),
+    };
+  }
 
-    async createEvent(event: CalendarEvent, language: Language): Promise<CalendarSyncResult> {
-        console.warn('[Production Stub] Google Calendar createEvent is not implemented.', event);
-        return this.notImplementedError();
-    }
+  async createEvent(
+    event: CalendarEvent,
+    language: Language
+  ): Promise<CalendarSyncResult> {
+    console.warn(
+      '[Production Stub] Google Calendar createEvent is not implemented.',
+      event
+    );
+    return this.notImplementedError();
+  }
 
-    async updateEvent(event: CalendarEvent, language: Language): Promise<CalendarSyncResult> {
-        console.warn('[Production Stub] Google Calendar updateEvent is not implemented.', event);
-        return this.notImplementedError();
-    }
+  async updateEvent(
+    event: CalendarEvent,
+    language: Language
+  ): Promise<CalendarSyncResult> {
+    console.warn(
+      '[Production Stub] Google Calendar updateEvent is not implemented.',
+      event
+    );
+    return this.notImplementedError();
+  }
 
-    async deleteEvent(googleCalendarEventId: string): Promise<CalendarSyncResult> {
-        console.warn('[Production Stub] Google Calendar deleteEvent is not implemented.', googleCalendarEventId);
-        return this.notImplementedError();
-    }
+  async deleteEvent(
+    googleCalendarEventId: string
+  ): Promise<CalendarSyncResult> {
+    console.warn(
+      '[Production Stub] Google Calendar deleteEvent is not implemented.',
+      googleCalendarEventId
+    );
+    return this.notImplementedError();
+  }
 }

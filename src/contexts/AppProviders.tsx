@@ -44,7 +44,10 @@ import { AdminProvider, useAdminContext } from './app/AdminContext';
 import { AuditProvider, useAuditContext } from './app/AuditContext';
 import { QmsProvider, useQmsContext } from './app/QmsContext';
 import { BillingProvider, useBillingContext } from './app/BillingContext';
-import { PurchasingProvider, usePurchasingContext } from './app/PurchasingContext';
+import {
+  PurchasingProvider,
+  usePurchasingContext,
+} from './app/PurchasingContext';
 import { LabStateProvider, useLabStateContext } from './app/LabStateContext';
 
 // Re-export hooks for convenience
@@ -54,7 +57,7 @@ export {
   useQmsContext,
   useBillingContext,
   usePurchasingContext,
-  useLabStateContext
+  useLabStateContext,
 };
 
 /**
@@ -82,8 +85,13 @@ const providers = [
   ModalProvider,
 ];
 
-export const AppProviders: React.FC<{ children: ReactNode }> = ({ children }) => {
-  return providers.reduceRight((acc, Provider) => {
-    return <Provider>{acc}</Provider>;
-  }, <>{children}</>);
+export const AppProviders: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  return providers.reduceRight(
+    (acc, Provider) => {
+      return <Provider>{acc}</Provider>;
+    },
+    <>{children}</>
+  );
 };

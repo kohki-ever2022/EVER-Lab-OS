@@ -1,7 +1,10 @@
 // src/hooks/useUserActions.ts
 import { useCallback, useMemo } from 'react';
 import { User, Result, Role } from '../types';
-import { ValidationError, validateEmail as validateEmailFormat } from '../utils/validation';
+import {
+  ValidationError,
+  validateEmail as validateEmailFormat,
+} from '../utils/validation';
 import { sanitizeObject } from '../utils/sanitization';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useSessionContext } from '../contexts/SessionContext';
@@ -16,113 +19,193 @@ import { useTranslation } from './useTranslation';
  * @returns An object containing functions for user management.
  */
 export const useUserActions = () => {
-    const adapter = useDataAdapter();
-    const users = useUsers();
-    const { currentUser } = useSessionContext();
-    const { t } = useTranslation();
-    const { hasPermission, canAccessData } = usePermissions();
-    const { addAuditLog } = useAudit();
-    
-    /**
-     * Adds a new user to the system.
-     * @param user - The user data to create (without id).
-     * @returns A Result object containing the new user or an error.
-     */
-    const addUser = useCallback(async (user: Omit<User, 'id'>): Promise<Result<User, ValidationError | Error>> => {
-        try {
-            if (!hasPermission('users', 'create')) {
-                 throw new ValidationError('role', 'PERMISSION_DENIED', 'Permission denied to create this user.');
-            }
-            if (currentUser?.role === Role.LabManager && user.role === Role.FacilityDirector) {
-                throw new ValidationError('role', 'PERMISSION_DENIED', 'Lab Managers cannot create Facility Directors.');
-            }
-            if (currentUser?.role === Role.ProjectManager && user.role !== Role.Researcher) {
-                 throw new ValidationError('role', 'PERMISSION_DENIED', 'Project Managers can only create Researchers.');
-            }
-            
-            if (user.name.length < 2) throw new ValidationError('name', 'TOO_SHORT', 'Name must be at least 2 characters.');
-            validateEmailFormat(user.email);
-            
-            const sanitizedUser = sanitizeObject(user);
-            const result = await adapter.createUser(sanitizedUser);
+  const adapter = useDataAdapter();
+  const users = useUsers();
+  const { currentUser } = useSessionContext();
+  const { t } = useTranslation();
+  const { hasPermission, canAccessData } = usePermissions();
+  const { addAuditLog } = useAudit();
 
-            if (result.success) {
-                addAuditLog('USER_CREATE', `Created user '${result.data.name}' (${result.data.id})`);
-            }
-            
-            return result;
-        } catch (e) {
-            return { success: false, error: e instanceof Error ? e : new Error(String(e)) };
+  /**
+   * Adds a new user to the system.
+   * @param user - The user data to create (without id).
+   * @returns A Result object containing the new user or an error.
+   */
+  const addUser = useCallback(
+    async (
+      user: Omit<User, 'id'>
+    ): Promise<Result<User, ValidationError | Error>> => {
+      try {
+        if (!hasPermission('users', 'create')) {
+          throw new ValidationError(
+            'role',
+            'PERMISSION_DENIED',
+            'Permission denied to create this user.'
+          );
         }
-    }, [hasPermission, currentUser, adapter, addAuditLog]);
-
-    /**
-     * Updates an existing user's information.
-     * @param user - The complete user object with updated data.
-     * @returns A Result object containing the updated user or an error.
-     */
-    const updateUser = useCallback(async (user: User): Promise<Result<User, ValidationError | Error>> => {
-        try {
-            const originalUser = users.find(u => u.id === user.id);
-            if (!originalUser) {
-                throw new ValidationError('general', 'NOT_FOUND', 'User not found');
-            }
-            
-            if (currentUser?.id !== user.id) { 
-                if (!hasPermission('users', 'update') || !canAccessData(user.id, user.companyId)) {
-                    throw new ValidationError('role', 'PERMISSION_DENIED', 'Permission denied to edit this user.');
-                }
-                if (currentUser?.role === Role.LabManager && originalUser.role === Role.FacilityDirector) {
-                    throw new ValidationError('role', 'PERMISSION_DENIED', 'Lab Managers cannot edit Facility Directors.');
-                }
-            }
-
-            if (user.name.length < 2) throw new ValidationError('name', 'TOO_SHORT', 'Name must be at least 2 characters.');
-            validateEmailFormat(user.email);
-            if (users.some(u => u.email.toLowerCase() === user.email.toLowerCase() && u.id !== user.id)) {
-                throw new ValidationError('email', 'EXISTS', 'Email already exists.');
-            }
-
-            const sanitizedUser = sanitizeObject(user);
-            const result = await adapter.updateUser(sanitizedUser);
-
-            if (result.success) {
-                addAuditLog('USER_UPDATE', `Updated user '${sanitizedUser.name}' (${sanitizedUser.id})`);
-            }
-            return result;
-        } catch(e) {
-             return { success: false, error: e instanceof Error ? e : new Error(String(e)) };
+        if (
+          currentUser?.role === Role.LabManager &&
+          user.role === Role.FacilityDirector
+        ) {
+          throw new ValidationError(
+            'role',
+            'PERMISSION_DENIED',
+            'Lab Managers cannot create Facility Directors.'
+          );
         }
-    }, [users, currentUser, hasPermission, canAccessData, adapter, addAuditLog]);
-
-    /**
-     * Deletes a user from the system.
-     * @param userId - The ID of the user to delete.
-     * @returns A Result object indicating success or failure.
-     */
-    const deleteUser = useCallback(async (userId: string): Promise<Result<void, Error>> => {
-        try {
-            if (!hasPermission('users', 'delete')) {
-                throw new Error(t('permissionDeniedDeleteUser'));
-            }
-
-            const userToDelete = users.find(u => u.id === userId);
-            if (!userToDelete) {
-                throw new Error("User not found.");
-            }
-            const result = await adapter.deleteUser(userId);
-            if (result.success) {
-                addAuditLog('USER_DELETE', `Deleted user '${userToDelete.name}' (${userId})`);
-            }
-            return result;
-        } catch (e) {
-            return { success: false, error: e instanceof Error ? e : new Error(String(e)) };
+        if (
+          currentUser?.role === Role.ProjectManager &&
+          user.role !== Role.Researcher
+        ) {
+          throw new ValidationError(
+            'role',
+            'PERMISSION_DENIED',
+            'Project Managers can only create Researchers.'
+          );
         }
-    }, [hasPermission, t, users, adapter, addAuditLog]);
 
-    return useMemo(() => ({
-        addUser,
-        updateUser,
-        deleteUser,
-    }), [addUser, updateUser, deleteUser]);
+        if (user.name.length < 2)
+          throw new ValidationError(
+            'name',
+            'TOO_SHORT',
+            'Name must be at least 2 characters.'
+          );
+        validateEmailFormat(user.email);
+
+        const sanitizedUser = sanitizeObject(user);
+        const result = await adapter.createUser(sanitizedUser);
+
+        if (result.success) {
+          addAuditLog(
+            'USER_CREATE',
+            `Created user '${result.data.name}' (${result.data.id})`
+          );
+        }
+
+        return result;
+      } catch (e) {
+        return {
+          success: false,
+          error: e instanceof Error ? e : new Error(String(e)),
+        };
+      }
+    },
+    [hasPermission, currentUser, adapter, addAuditLog]
+  );
+
+  /**
+   * Updates an existing user's information.
+   * @param user - The complete user object with updated data.
+   * @returns A Result object containing the updated user or an error.
+   */
+  const updateUser = useCallback(
+    async (user: User): Promise<Result<User, ValidationError | Error>> => {
+      try {
+        const originalUser = users.find((u) => u.id === user.id);
+        if (!originalUser) {
+          throw new ValidationError('general', 'NOT_FOUND', 'User not found');
+        }
+
+        if (currentUser?.id !== user.id) {
+          if (
+            !hasPermission('users', 'update') ||
+            !canAccessData(user.id, user.companyId)
+          ) {
+            throw new ValidationError(
+              'role',
+              'PERMISSION_DENIED',
+              'Permission denied to edit this user.'
+            );
+          }
+          if (
+            currentUser?.role === Role.LabManager &&
+            originalUser.role === Role.FacilityDirector
+          ) {
+            throw new ValidationError(
+              'role',
+              'PERMISSION_DENIED',
+              'Lab Managers cannot edit Facility Directors.'
+            );
+          }
+        }
+
+        if (user.name.length < 2)
+          throw new ValidationError(
+            'name',
+            'TOO_SHORT',
+            'Name must be at least 2 characters.'
+          );
+        validateEmailFormat(user.email);
+        if (
+          users.some(
+            (u) =>
+              u.email.toLowerCase() === user.email.toLowerCase() &&
+              u.id !== user.id
+          )
+        ) {
+          throw new ValidationError('email', 'EXISTS', 'Email already exists.');
+        }
+
+        const sanitizedUser = sanitizeObject(user);
+        const result = await adapter.updateUser(sanitizedUser);
+
+        if (result.success) {
+          addAuditLog(
+            'USER_UPDATE',
+            `Updated user '${sanitizedUser.name}' (${sanitizedUser.id})`
+          );
+        }
+        return result;
+      } catch (e) {
+        return {
+          success: false,
+          error: e instanceof Error ? e : new Error(String(e)),
+        };
+      }
+    },
+    [users, currentUser, hasPermission, canAccessData, adapter, addAuditLog]
+  );
+
+  /**
+   * Deletes a user from the system.
+   * @param userId - The ID of the user to delete.
+   * @returns A Result object indicating success or failure.
+   */
+  const deleteUser = useCallback(
+    async (userId: string): Promise<Result<void, Error>> => {
+      try {
+        if (!hasPermission('users', 'delete')) {
+          throw new Error(t('permissionDeniedDeleteUser'));
+        }
+
+        const userToDelete = users.find((u) => u.id === userId);
+        if (!userToDelete) {
+          throw new Error('User not found.');
+        }
+        const result = await adapter.deleteUser(userId);
+        if (result.success) {
+          addAuditLog(
+            'USER_DELETE',
+            `Deleted user '${userToDelete.name}' (${userId})`
+          );
+        }
+        return result;
+      } catch (e) {
+        return {
+          success: false,
+          error: e instanceof Error ? e : new Error(String(e)),
+        };
+      }
+    },
+    [hasPermission, t, users, adapter, addAuditLog]
+  );
+
+  return useMemo(
+    () => ({
+      addUser,
+      updateUser,
+      deleteUser,
+    }),
+    [addUser, updateUser, deleteUser]
+  );
 };

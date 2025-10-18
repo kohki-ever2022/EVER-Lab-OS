@@ -23,21 +23,22 @@ let functions: Functions | undefined;
 
 // Initialize Firebase only if config is valid and it hasn't been initialized
 if (isConfigValid) {
-    try {
-        if (!getApps().length) {
-            app = initializeApp(firebaseConfig);
-        } else {
-            app = getApp();
-        }
-        db = getFirestore(app);
-        functions = getFunctions(app);
-    } catch (error) {
-        console.error("Firebase initialization failed:", error);
+  try {
+    if (!getApps().length) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApp();
     }
+    db = getFirestore(app);
+    functions = getFunctions(app);
+  } catch (error) {
+    console.error('Firebase initialization failed:', error);
+  }
 } else {
-    console.warn("Firebase configuration is missing or incomplete. Firebase services will be disabled.");
+  console.warn(
+    'Firebase configuration is missing or incomplete. Firebase services will be disabled.'
+  );
 }
-
 
 // You can export the app instance if it's needed elsewhere,
 // but for services like getFunctions(), getFirestore(), etc.,

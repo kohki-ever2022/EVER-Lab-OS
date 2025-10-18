@@ -14,10 +14,12 @@ export const DataAdapterContext = createContext<IDataAdapter | null>(null);
  * `useDataAdapter`フックを通じてアダプターにアクセスできます。
  * @param {ReactNode} children - ラップする子コンポーネント
  */
-export const DataAdapterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const DataAdapterProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   // AdapterFactoryからシングルトンのアダプターインスタンスを取得
   const adapter = AdapterFactory.getAdapter();
-  
+
   return (
     <DataAdapterContext.Provider value={adapter}>
       {children}

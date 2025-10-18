@@ -24,52 +24,68 @@ export const useChat = (roomId: string) => {
     if (!roomId) return;
 
     setLoading(true);
-    const unsubscribe = dataAdapter.subscribeToChatMessages(roomId, (newMessages) => {
-      setMessages(newMessages);
-      setLoading(false);
-    });
+    const unsubscribe = dataAdapter.subscribeToChatMessages(
+      roomId,
+      (newMessages) => {
+        setMessages(newMessages);
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
   }, [roomId]);
 
-  const sendMessage = useCallback(async (payload: SendMessagePayload) => {
-    if (!user || (!payload.content.trim() && !payload.file)) return;
+  const sendMessage = useCallback(
+    async (payload: SendMessagePayload) => {
+      if (!user || (!payload.content.trim() && !payload.file)) return;
 
-    const message: Omit<ChatMessage, 'id' | 'createdAt' | 'updatedAt'> = {
-      roomId,
-      senderId: user.id,
-      senderName: user.name || 'Unknown',
-      senderAvatar: user.imageUrl || undefined,
-      content: escapeHtml(payload.content.trim()),
-      type: payload.file ? 'FILE' : 'TEXT',
-      isEdited: false,
-      isPinned: false,
-      fileUrl: payload.file?.url,
-      fileName: payload.file?.name,
-      fileSize: payload.file?.size,
-    };
+      const message: Omit<ChatMessage, 'id' | 'createdAt' | 'updatedAt'> = {
+        roomId,
+        senderId: user.id,
+        senderName: user.name || 'Unknown',
+        senderAvatar: user.imageUrl || undefined,
+        content: escapeHtml(payload.content.trim()),
+        type: payload.file ? 'FILE' : 'TEXT',
+        isEdited: false,
+        isPinned: false,
+        fileUrl: payload.file?.url,
+        fileName: payload.file?.name,
+        fileSize: payload.file?.size,
+      };
 
-    const result = await dataAdapter.sendChatMessage(message);
-    if (!result.success) {
-      setError(result.error as Error);
-    }
-  }, [roomId, user]);
+      const result = await dataAdapter.sendChatMessage(message);
+      if (!result.success) {
+        setError(result.error as Error);
+      }
+    },
+    [roomId, user]
+  );
 
-  const updateMessage = useCallback(async (messageId: string, newContent: string) => {
-    if (!roomId) return;
-    const result = await dataAdapter.updateChatMessage(roomId, messageId, escapeHtml(newContent));
-    if (!result.success) {
-      setError(result.error as Error);
-    }
-  }, [roomId]);
+  const updateMessage = useCallback(
+    async (messageId: string, newContent: string) => {
+      if (!roomId) return;
+      const result = await dataAdapter.updateChatMessage(
+        roomId,
+        messageId,
+        escapeHtml(newContent)
+      );
+      if (!result.success) {
+        setError(result.error as Error);
+      }
+    },
+    [roomId]
+  );
 
-  const deleteMessage = useCallback(async (messageId: string) => {
-    if (!roomId) return;
-    const result = await dataAdapter.deleteChatMessage(roomId, messageId);
-    if (!result.success) {
-      setError(result.error as Error);
-    }
-  }, [roomId]);
+  const deleteMessage = useCallback(
+    async (messageId: string) => {
+      if (!roomId) return;
+      const result = await dataAdapter.deleteChatMessage(roomId, messageId);
+      if (!result.success) {
+        setError(result.error as Error);
+      }
+    },
+    [roomId]
+  );
 
   return {
     messages,

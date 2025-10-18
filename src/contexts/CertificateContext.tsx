@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+  useMemo,
+} from 'react';
 import { Certificate, NotificationType } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 import { useSessionContext } from './SessionContext';
@@ -10,9 +18,13 @@ interface CertificateContextType {
   refetch: () => Promise<void>;
 }
 
-const CertificateContext = createContext<CertificateContextType | undefined>(undefined);
+const CertificateContext = createContext<CertificateContextType | undefined>(
+  undefined
+);
 
-export const CertificateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const CertificateProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const adapter = useDataAdapter();
@@ -31,7 +43,7 @@ export const CertificateProvider: React.FC<{ children: ReactNode }> = ({ childre
   useEffect(() => {
     fetchCertificates();
   }, [fetchCertificates]);
-  
+
   // Moved from useAppEffects.ts
   useEffect(() => {
     if (!currentUser || loading || certificates.length === 0) return;
@@ -42,12 +54,13 @@ export const CertificateProvider: React.FC<{ children: ReactNode }> = ({ childre
       const thirtyDaysFromNow = new Date();
       thirtyDaysFromNow.setDate(today.getDate() + 30);
 
-      const userCertificates = certificates.filter(c => c.userId === currentUser.id);
+      const userCertificates = certificates.filter(
+        (c) => c.userId === currentUser.id
+      );
 
       userCertificates.forEach((cert: Certificate) => {
         const expiryDate = new Date(cert.expiryDate);
         if (expiryDate <= thirtyDaysFromNow && expiryDate > today) {
-          
           addNotification({
             recipientUserId: currentUser.id,
             type: NotificationType.CertificateExpiring,
@@ -69,7 +82,10 @@ export const CertificateProvider: React.FC<{ children: ReactNode }> = ({ childre
     return () => clearInterval(intervalId);
   }, [certificates, loading, currentUser, addNotification]);
 
-  const value = useMemo(() => ({ certificates, loading, refetch: fetchCertificates }), [certificates, loading, fetchCertificates]);
+  const value = useMemo(
+    () => ({ certificates, loading, refetch: fetchCertificates }),
+    [certificates, loading, fetchCertificates]
+  );
 
   return (
     <CertificateContext.Provider value={value}>
@@ -81,7 +97,9 @@ export const CertificateProvider: React.FC<{ children: ReactNode }> = ({ childre
 export const useCertificates = () => {
   const context = useContext(CertificateContext);
   if (!context) {
-    throw new Error('useCertificates must be used within a CertificateProvider');
+    throw new Error(
+      'useCertificates must be used within a CertificateProvider'
+    );
   }
   return context;
 };

@@ -1,5 +1,12 @@
 // src/contexts/ReservationContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useMemo,
+} from 'react';
 import { Reservation } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
@@ -11,7 +18,9 @@ interface ReservationContextValue {
 const ReservationsDataContext = createContext<Reservation[]>([]);
 const ReservationsLoadingContext = createContext<boolean>(true);
 
-export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ReservationProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const adapter = useDataAdapter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,17 +36,19 @@ export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   return (
     <ReservationsDataContext.Provider value={reservations}>
-        <ReservationsLoadingContext.Provider value={loading}>
-            {children}
-        </ReservationsLoadingContext.Provider>
+      <ReservationsLoadingContext.Provider value={loading}>
+        {children}
+      </ReservationsLoadingContext.Provider>
     </ReservationsDataContext.Provider>
   );
 };
 
 export const useReservations = () => {
-    const context = useContext(ReservationsDataContext);
-    if (context === undefined) {
-        throw new Error('useReservations must be used within a ReservationProvider');
-    }
-    return context;
-}
+  const context = useContext(ReservationsDataContext);
+  if (context === undefined) {
+    throw new Error(
+      'useReservations must be used within a ReservationProvider'
+    );
+  }
+  return context;
+};

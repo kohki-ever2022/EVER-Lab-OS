@@ -4,7 +4,7 @@ import { Role, RolePermissions } from '../types';
  * EVER-Lab-OS 権限マトリックス
  * このファイルは、各役割がどのリソースに対して何のアクションを実行できるかを定義する
  * システム全体のアクセス制御の「信頼できる唯一の情報源（Single Source of Truth）」です。
- * 
+ *
  * スコープの説明:
  * - all: 全てのテナントのデータにアクセス可能。主に施設運営者向け。
  * - own_tenant: 自分が所属するテナントのデータにのみアクセス可能。テナントの管理者向け。
@@ -31,7 +31,7 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       { resource: 'manuals', action: 'manage', scope: 'all' },
     ],
   },
-  
+
   {
     role: Role.LabManager,
     permissions: [
@@ -41,18 +41,18 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       { resource: 'equipment', action: 'manage', scope: 'all' },
       { resource: 'inventory', action: 'manage', scope: 'all' },
       { resource: 'sds', action: 'manage', scope: 'all' },
-      
+
       // 請求書は閲覧のみ可能。作成や編集は財務責任を持つ施設責任者に限定される。
       { resource: 'billing', action: 'read', scope: 'all' },
-      
+
       // ユーザーの削除は不可。誤操作によるデータ損失を防ぐため、無効化までの権限とする。
       { resource: 'users', action: 'create', scope: 'all' },
       { resource: 'users', action: 'read', scope: 'all' },
       { resource: 'users', action: 'update', scope: 'all' },
-      
+
       { resource: 'projects', action: 'read', scope: 'all' },
       { resource: 'quotations', action: 'read', scope: 'all' },
-      
+
       // 監査ログとMF設定は機微情報を含むため閲覧のみ。
       { resource: 'audit', action: 'read', scope: 'all' },
       { resource: 'moneyforward', action: 'read', scope: 'all' },
@@ -60,7 +60,7 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       { resource: 'manuals', action: 'manage', scope: 'all' },
     ],
   },
-  
+
   {
     role: Role.ProjectManager,
     permissions: [
@@ -77,7 +77,7 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       { resource: 'manuals', action: 'read', scope: 'own_tenant' },
     ],
   },
-  
+
   {
     role: Role.Researcher,
     permissions: [
@@ -94,7 +94,7 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       // 請求書やユーザー管理機能へのアクセス権はない
     ],
   },
-  
+
   {
     role: Role.Supplier,
     permissions: [

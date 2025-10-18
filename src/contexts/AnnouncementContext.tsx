@@ -1,12 +1,20 @@
 // src/contexts/AnnouncementContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { Announcement } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
 const AnnouncementsDataContext = createContext<Announcement[]>([]);
 const AnnouncementsLoadingContext = createContext<boolean>(true);
 
-export const AnnouncementProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AnnouncementProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const adapter = useDataAdapter();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,12 +22,12 @@ export const AnnouncementProvider: React.FC<{ children: ReactNode }> = ({ childr
   useEffect(() => {
     setLoading(true);
     const unsubscribe = adapter.subscribeToAnnouncements((data) => {
-        setAnnouncements(data);
-        setLoading(false);
+      setAnnouncements(data);
+      setLoading(false);
     });
     return () => unsubscribe();
   }, [adapter]);
-  
+
   return (
     <AnnouncementsDataContext.Provider value={announcements}>
       <AnnouncementsLoadingContext.Provider value={loading}>
@@ -32,7 +40,9 @@ export const AnnouncementProvider: React.FC<{ children: ReactNode }> = ({ childr
 export const useAnnouncements = () => {
   const context = useContext(AnnouncementsDataContext);
   if (context === undefined) {
-    throw new Error('useAnnouncements must be used within an AnnouncementProvider');
+    throw new Error(
+      'useAnnouncements must be used within an AnnouncementProvider'
+    );
   }
   return context;
 };

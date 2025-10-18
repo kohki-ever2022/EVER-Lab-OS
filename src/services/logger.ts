@@ -4,7 +4,7 @@ export enum LogLevel {
   INFO = 1,
   WARN = 2,
   ERROR = 3,
-  CRITICAL = 4
+  CRITICAL = 4,
 }
 
 interface LogEntry {
@@ -17,22 +17,27 @@ interface LogEntry {
 class Logger {
   private level: LogLevel;
   private isDevelopment: boolean;
-  
+
   constructor() {
     // This relies on the build tool (like Vite) correctly setting this environment variable.
     this.isDevelopment = import.meta.env.MODE !== 'production';
     this.level = this.isDevelopment ? LogLevel.DEBUG : LogLevel.WARN;
   }
-  
+
   private log(level: LogLevel, message: string, data?: unknown) {
     if (level < this.level) return;
-    
+
     const timestamp = new Date().toISOString();
-    const logEntry: LogEntry = { timestamp, level: LogLevel[level], message, data };
-    
+    const logEntry: LogEntry = {
+      timestamp,
+      level: LogLevel[level],
+      message,
+      data,
+    };
+
     if (this.isDevelopment) {
       // In development, log to the console with appropriate methods for better debugging
-      switch(level) {
+      switch (level) {
         case LogLevel.ERROR:
         case LogLevel.CRITICAL:
           console.error(`[${LogLevel[level]}] ${message}`, data);
@@ -48,19 +53,29 @@ class Logger {
       this.sendToLoggingService(logEntry);
     }
   }
-  
+
   private sendToLoggingService(logEntry: LogEntry) {
     // This is a placeholder for sending logs to a service like
     // Google Cloud Logging, Sentry, Datadog, etc.
     // In a real application, you would have a fetch/API call here.
     // console.log("Sending to logging service:", logEntry); // Avoid this in production
   }
-  
-  debug(message: string, data?: unknown) { this.log(LogLevel.DEBUG, message, data); }
-  info(message: string, data?: unknown) { this.log(LogLevel.INFO, message, data); }
-  warn(message: string, data?: unknown) { this.log(LogLevel.WARN, message, data); }
-  error(message: string, data?: unknown) { this.log(LogLevel.ERROR, message, data); }
-  critical(message: string, data?: unknown) { this.log(LogLevel.CRITICAL, message, data); }
+
+  debug(message: string, data?: unknown) {
+    this.log(LogLevel.DEBUG, message, data);
+  }
+  info(message: string, data?: unknown) {
+    this.log(LogLevel.INFO, message, data);
+  }
+  warn(message: string, data?: unknown) {
+    this.log(LogLevel.WARN, message, data);
+  }
+  error(message: string, data?: unknown) {
+    this.log(LogLevel.ERROR, message, data);
+  }
+  critical(message: string, data?: unknown) {
+    this.log(LogLevel.CRITICAL, message, data);
+  }
 }
 
 export const logger = new Logger();

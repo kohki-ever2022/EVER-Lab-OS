@@ -11,20 +11,26 @@ const Billing: React.FC = () => {
   const { t } = useTranslation();
   const { invoices } = useBillingContext();
   const { hasPermission } = usePermissions();
-  
+
   if (!currentUser) return null;
 
   if (!hasPermission('billing', 'read')) {
-      return (
-          <div className="text-center py-12">
-              <h3 className="text-lg font-medium text-gray-900">{t('permissionDenied')}</h3>
-              <p className="mt-1 text-sm text-gray-500">{t('permissionDeniedViewPage')}</p>
-          </div>
-      );
+    return (
+      <div className='text-center py-12'>
+        <h3 className='text-lg font-medium text-gray-900'>
+          {t('permissionDenied')}
+        </h3>
+        <p className='mt-1 text-sm text-gray-500'>
+          {t('permissionDeniedViewPage')}
+        </p>
+      </div>
+    );
   }
 
-  const myInvoices = invoices.filter(inv => inv.companyId === currentUser.companyId);
-  
+  const myInvoices = invoices.filter(
+    (inv) => inv.companyId === currentUser.companyId
+  );
+
   const handleViewPDF = (invoice: Invoice) => {
     if (invoice.mfPdfUrl) {
       window.open(invoice.mfPdfUrl, '_blank');
@@ -35,26 +41,26 @@ const Billing: React.FC = () => {
 
   const downloadPDF = async (invoice: Invoice) => {
     if (invoice.mfPdfUrl) {
-        alert(t('cannotDownloadPdf'));
+      alert(t('cannotDownloadPdf'));
     } else {
-        alert(t('cannotDisplayPdf'));
+      alert(t('cannotDisplayPdf'));
     }
   };
-  
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">{t('invoices')}</h1>
-      
+    <div className='p-6'>
+      <h1 className='text-2xl font-bold mb-6'>{t('invoices')}</h1>
+
       {myInvoices.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2">
-            {myInvoices.map(invoice => (
+        <div className='grid gap-4 md:grid-cols-2'>
+          {myInvoices.map((invoice) => (
             <InvoiceCard
-                key={invoice.id}
-                invoice={invoice}
-                onViewPDF={() => handleViewPDF(invoice)}
-                onDownload={() => downloadPDF(invoice)}
+              key={invoice.id}
+              invoice={invoice}
+              onViewPDF={() => handleViewPDF(invoice)}
+              onDownload={() => downloadPDF(invoice)}
             />
-            ))}
+          ))}
         </div>
       ) : (
         <p>{t('noInvoicesAvailable')}</p>
