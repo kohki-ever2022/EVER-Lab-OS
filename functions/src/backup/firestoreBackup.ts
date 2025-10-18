@@ -10,7 +10,7 @@ const client = new admin.firestore.v1.FirestoreAdminClient();
 export const scheduledFirestoreBackup = functions.pubsub
   .schedule('0 2 * * *') // 毎日午前2時(JST)
   .timeZone('Asia/Tokyo')
-  .onRun(async (context) => {
+  .onRun(async () => {
     const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
     if (!projectId) {
       console.error('GCP project ID not set.');
