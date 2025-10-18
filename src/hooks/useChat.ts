@@ -4,6 +4,16 @@ import { dataAdapter } from '../config/adapterFactory';
 import type { ChatMessage } from '../types/chat';
 import { escapeHtml } from '../utils/textUtils';
 
+// The payload for sending a message, which can include content and/or file info.
+interface SendMessagePayload {
+  content: string;
+  file?: {
+    url: string;
+    name: string;
+    size: number;
+  } | null;
+}
+
 export const useChat = (roomId: string) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -22,18 +32,21 @@ export const useChat = (roomId: string) => {
     return () => unsubscribe();
   }, [roomId]);
 
-  const sendMessage = useCallback(async (content: string, type: ChatMessage['type'] = 'TEXT') => {
-    if (!user || !content.trim()) return;
+  const sendMessage = useCallback(async (payload: SendMessagePayload) => {
+    if (!user || (!payload.content.trim() && !payload.file)) return;
 
     const message: Omit<ChatMessage, 'id' | 'createdAt' | 'updatedAt'> = {
       roomId,
       senderId: user.id,
       senderName: user.name || 'Unknown',
       senderAvatar: user.imageUrl || undefined,
-      content: escapeHtml(content.trim()),
-      type,
+      content: escapeHtml(payload.content.trim()),
+      type: payload.file ? 'FILE' : 'TEXT',
       isEdited: false,
       isPinned: false,
+      fileUrl: payload.file?.url,
+      fileName: payload.file?.name,
+      fileSize: payload.file?.size,
     };
 
     const result = await dataAdapter.sendChatMessage(message);

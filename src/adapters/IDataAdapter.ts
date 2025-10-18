@@ -185,4 +185,8 @@ export interface IDataAdapter {
   getChatMessages(roomId: string): Promise<Result<ChatMessage[]>>;
   subscribeToChatMessages(roomId: string, callback: (data: ChatMessage[]) => void): () => void;
   sendChatMessage(data: Omit<ChatMessage, 'id'>): Promise<Result<ChatMessage>>;
+  addReaction(roomId: string, messageId: string, emoji: string, userId: string): Promise<Result<void>>;
+  removeReaction(roomId: string, messageId: string, emoji: string, userId: string): Promise<Result<void>>;
+  updateChatMessage(roomId: string, messageId: string, newContent: string): Promise<Result<void>>;
+  deleteChatMessage(roomId: string, messageId: string): Promise<Result<void>>;
 }

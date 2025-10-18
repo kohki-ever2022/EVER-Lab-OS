@@ -1,10 +1,10 @@
-// src/adapters/FirebaseAdapter.ts
+'''// src/adapters/FirebaseAdapter.ts
 
 // Firebase Firestoreの関数をインポート
 import {
   collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc,
   onSnapshot, query, where, QuerySnapshot, DocumentData, Timestamp, orderBy, runTransaction, serverTimestamp,
-  increment, DocumentReference, FieldValue, limit,
+  increment, DocumentReference, FieldValue, arrayUnion, arrayRemove, limit,
 } from 'firebase/firestore';
 
 // 実際のFirebase設定ファイルからdbインスタンスをインポート
@@ -242,7 +242,7 @@ export class FirebaseAdapter implements IDataAdapter {
         updatedAt: serverTimestamp(),
       });
       
-      // 最終メッセージ時刻を更新
+      // Update last message timestamp
       await updateDoc(doc(db, COLLECTIONS.CHAT_ROOMS, roomId), {
         lastMessageAt: serverTimestamp()
       });
@@ -255,6 +255,65 @@ export class FirebaseAdapter implements IDataAdapter {
     }
   }
   
+  async addReaction(roomId: string, messageId: string, emoji: string, userId: string): Promise<Result<void>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const messageRef = doc(db, COLLECTIONS.CHAT_ROOMS, roomId, 'messages', messageId);
+      await runTransaction(db, async (transaction) => {
+        const messageDoc = await transaction.get(messageRef);
+        if (!messageDoc.exists()) {
+          throw new Error("Message not found");
+        }
+        
+        const reactions = messageDoc.data().reactions || {};
+        const users = reactions[emoji] || [];
+        
+        if (!users.includes(userId)) {
+          const newUsers = [...users, userId];
+          transaction.update(messageRef, {
+            [`reactions.${emoji}`]: newUsers,
+             updatedAt: serverTimestamp(),
+          });
+        }
+      });
+      return { success: true, data: undefined };
+    } catch (e) {
+      console.error("Error adding reaction:", e);
+      return { success: false, error: e as Error };
+    }
+  }
+
+  async removeReaction(roomId: string, messageId: string, emoji: string, userId: string): Promise<Result<void>> {
+    if (!db) return { success: false, error: new Error("Firebase not configured.") };
+    try {
+      const messageRef = doc(db, COLLECTIONS.CHAT_ROOMS, roomId, 'messages', messageId);
+       await runTransaction(db, async (transaction) => {
+        const messageDoc = await transaction.get(messageRef);
+        if (!messageDoc.exists()) {
+          throw new Error("Message not found");
+        }
+
+        const reactions = messageDoc.data().reactions || {};
+        if (reactions[emoji] && reactions[emoji].includes(userId)) {
+          const updatedUsers = reactions[emoji].filter((id: string) => id !== userId);
+          
+          if (updatedUsers.length > 0) {
+            transaction.update(messageRef, { [`reactions.${emoji}`]: updatedUsers, updatedAt: serverTimestamp() });
+          } else {
+             // If no users left for this emoji, remove the emoji field itself.
+             // Firestore does not have a direct "unset" in transactions, so we update the whole map.
+             delete reactions[emoji]
+             transaction.update(messageRef, { reactions: reactions, updatedAt: serverTimestamp() });
+          }
+        }
+      });
+      return { success: true, data: undefined };
+    } catch (e) {
+      console.error("Error removing reaction:", e);
+      return { success: false, error: e as Error };
+    }
+  }
+
   // --- Generic Implementations ---
   getCompanies = () => this.getGenericCollection<Company>(COLLECTIONS.COMPANIES);
   getCompanyById = (id: string) => this.getGenericDocById<Company>(COLLECTIONS.COMPANIES, id);
@@ -359,3 +418,4 @@ export class FirebaseAdapter implements IDataAdapter {
   createInvoice = (data: Omit<Invoice, 'id'>) => this.createGenericDoc<Invoice>(COLLECTIONS.INVOICES, data);
   updateInvoice = (item: Invoice) => this.updateGenericDoc<Invoice>(COLLECTIONS.INVOICES, item);
 }
+''
