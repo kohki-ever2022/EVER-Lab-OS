@@ -16,7 +16,11 @@
     "analyze": "npm run analyze:circular && npm run analyze:duplicates && npm run analyze:unused",
     "analyze:circular": "madge --circular --extensions ts,tsx src",
     "analyze:duplicates": "jscpd src",
-    "analyze:unused": "knip"
+    "analyze:unused": "knip",
+    "api:validate": "openapi-lint openapi/spec.yaml",
+    "api:bundle": "openapi-generator-cli bundle -r openapi/spec.yaml -o openapi/bundled.yaml",
+    "api:generate-docs": "redoc-cli bundle openapi/bundled.yaml -o docs/api.html",
+    "api:generate-types": "openapi-typescript openapi/bundled.yaml --output src/types/api.ts"
   },
   "dependencies": {
     "@google/genai": "^1.25.0",
@@ -27,6 +31,7 @@
     "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.25.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
@@ -42,8 +47,11 @@
     "jsdom": "^27.0.0",
     "knip": "^5.66.0",
     "madge": "^8.0.0",
+    "openapi-lint": "^0.0.1",
+    "openapi-typescript": "^7.10.1",
     "postcss": "^8.4.0",
     "prettier": "^3.1.0",
+    "redoc-cli": "^0.13.21",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.3.0",
     "vite": "^5.0.0",
