@@ -1,7 +1,6 @@
 // src/hooks/useInventoryActions.ts
 import { useCallback, useMemo } from 'react';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
-import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
 import { useNotifications } from '../hooks/useNotifications';
 import { Consumable, Order, OrderStatus } from '../types';
@@ -16,7 +15,6 @@ export const useInventoryActions = () => {
   const adapter = useDataAdapter();
   const consumables = useConsumables();
   const users = useUsers();
-  const { currentUser } = useSessionContext();
   const { t } = useTranslation();
   const { addAuditLog } = useAudit();
   const { addNotification } = useNotifications();

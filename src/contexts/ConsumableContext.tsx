@@ -8,11 +8,8 @@ interface ConsumableContextValue {
   loading: boolean;
 }
 
-export const ConsumablesDataContext = createContext<Consumable[]>([]);
-export const ConsumablesLoadingContext = createContext<boolean>(true);
-
-// Keep original context export for test setup compatibility if needed, though ideally tests should be updated.
-export const ConsumableContext = createContext<ConsumableContextValue | null>(null);
+const ConsumablesDataContext = createContext<Consumable[]>([]);
+const ConsumablesLoadingContext = createContext<boolean>(true);
 
 export const ConsumableProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -41,14 +38,6 @@ export const useConsumables = () => {
   const context = useContext(ConsumablesDataContext);
   if (context === undefined) {
     throw new Error('useConsumables must be used within a ConsumableProvider');
-  }
-  return context;
-};
-
-export const useConsumablesLoading = () => {
-  const context = useContext(ConsumablesLoadingContext);
-  if (context === undefined) {
-    throw new Error('useConsumablesLoading must be used within a ConsumableProvider');
   }
   return context;
 };

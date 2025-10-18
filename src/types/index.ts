@@ -25,35 +25,6 @@ export enum Role {
   Supplier = 'SUPPLIER',
 }
 
-export type View = AdminView | TenantView | SupplierView;
-
-export type AdminView =
-    | 'adminDashboard' | 'equipmentManagement' | 'billingManagement'
-    | 'userManagement' | 'roleManagement' | 'settings' | 'auditLog'
-    | 'maintenanceLog' | 'allInventoryViewer' | 'salesConsumablesManagement'
-    | 'internalConsumablesManagement' | 'hazardousMaterialsDashboard'
-    | 'labCalendarAdmin' | 'memos' | 'facilityDashboard' | 'compliance'
-    | 'bsl2Checklist' | 'facilityLayout' | 'introductionsPipeline'
-    | 'qmsDashboard' | 'cmmsDashboard' | 'coldChain' | 'dataPlatform'
-    | 'tenantCrm' | 'legalDocsIp' | 'ehsDashboard' | 'budgeting'
-    | 'wasteCompliance' | 'helpdesk' | 'allOrders' | 'inventoryLockManager'
-    | 'facilityConsumableNotification' | 'co2IncubatorManagement' | 'manuals' | 'rules'
-    | 'insuranceManagement' | 'monthlyReportGenerator' | 'training' | 'sdsManagement'
-    | 'projectProgress' | 'projectGanttChart' | 'chat';
-
-export type TenantView =
-    | 'dashboard' | 'equipment' | 'reservations' | 'billing' | 'announcements'
-    | 'profile' | 'memberManagement' | 'maintenanceStatus' | 'projects'
-    | 'certificateManagement' | 'insuranceManagement' | 'labCalendarUser' | 'protocols'
-    | 'sampleManagement' | 'billingSummary' | 'tasks' | 'training'
-    | 'myTickets' | 'sdsManagement' | 'quotationList' | 'purchaseOrders'
-    | 'inventoryList' | 'consumablesStore' | 'supplierInquiry'
-    | 'reorderSuggestions' | 'favoriteConsumables'
-    | 'facilityConsumableNotification' | 'manuals' | 'rules' | 'electronicLabNotebook'
-    | 'projectProgress' | 'projectGanttChart' | 'chat';
-
-export type SupplierView = 'dashboard' | 'profile' | 'supplierDashboard';
-
 // --- Enums & Types from research.ts ---
 
 export enum MilestoneStatus {
@@ -63,7 +34,6 @@ export enum MilestoneStatus {
 }
 
 export enum TaskScope {
-  Personal = 'PERSONAL',
   Team = 'TEAM',
 }
 
@@ -79,23 +49,6 @@ export enum TaskPriority {
   Medium = 'MEDIUM',
   High = 'HIGH',
   Urgent = 'URGENT',
-}
-
-export enum PipelineStage {
-  Idea = 'IDEA',
-  Sourcing = 'SOURCING',
-  Ordered = 'ORDERED',
-  Installation = 'INSTALLATION',
-  Validation = 'VALIDATION',
-  InService = 'IN_SERVICE',
-}
-
-export enum VialStatus {
-    Available = 'Available',
-    Reserved = 'Reserved',
-    InUse = 'InUse',
-    Depleted = 'Depleted',
-    Disposed = 'Disposed',
 }
 
 export interface Milestone {
@@ -158,55 +111,6 @@ export interface Task {
   projectId?: string;
 }
 
-export interface PipelineItem {
-  id: string;
-  name: string;
-  type: 'Equipment' | 'Reagent';
-  stage: PipelineStage;
-}
-
-export interface Freezer {
-  id: string;
-  name: string;
-  location: string;
-  targetTemperature: number;
-}
-
-export interface FreezerRack {
-  id: string;
-  name: string;
-  freezerId: string;
-}
-
-export interface SampleBox {
-  id: string;
-  name: string;
-  rackId: string;
-  gridSize: [number, number]; // [rows, columns]
-}
-
-export interface Vial {
-  id: string;
-  sampleLotId: string;
-  boxId: string;
-  position: [number, number]; // [row, column]
-  status: VialStatus;
-  volume: number;
-  volumeUnit: 'uL' | 'mL';
-  expiryDate: Date;
-  custodyChain: { id: string; userId: string; timestamp: Date; action: string; details: string }[];
-}
-
-export interface TemperatureLog {
-  id: string;
-  freezerId: string;
-  timestamp: Date;
-  temperature: number;
-  isExcursion: boolean;
-  acknowledgedAt?: Date;
-  acknowledgedBy?: string;
-}
-
 export interface LabNotebookEntry {
   id: string;
   userId: string;
@@ -224,135 +128,17 @@ export interface LabNotebookEntry {
 
 // --- Enums & Types from qms.ts ---
 
-export enum DocumentStatus {
-    Draft = 'Draft',
-    InApproval = 'InApproval',
-    Effective = 'Effective',
-    Retired = 'Retired',
-}
-
 export enum ApprovalStatus {
-    Pending = 'Pending',
-    Approved = 'Approved',
-    Rejected = 'Rejected',
-}
-
-export enum DeviationStatus {
-    Open = 'Open',
-    UnderInvestigation = 'UnderInvestigation',
-    CapaInitiated = 'CapaInitiated',
-    Closed = 'Closed',
-}
-
-export enum LegalDocumentType {
-    NDA = 'NDA',
-    MTA = 'MTA',
-    CDA = 'CDA',
-    LeaseAgreement = 'LeaseAgreement',
-}
-
-export enum LegalDocumentStatus {
-    Draft = 'Draft',
-    InReview = 'InReview',
-    Active = 'Active',
-    Expired = 'Expired',
-}
-
-export enum EhsIncidentType {
-    Incident = 'Incident',
-    NearMiss = 'NearMiss',
-    SafetyObservation = 'SafetyObservation',
-}
-
-export enum EhsIncidentStatus {
-    Reported = 'Reported',
-    UnderInvestigation = 'UnderInvestigation',
-    ActionsPending = 'ActionsPending',
-    Closed = 'Closed',
-}
-
-export enum RiskLikelihood {
-    Rare = 1,
-    Unlikely = 2,
-    Possible = 3,
-    Likely = 4,
-    AlmostCertain = 5,
-}
-
-export enum RiskSeverity {
-    Insignificant = 1,
-    Minor = 2,
-    Moderate = 3,
-    Major = 4,
-    Catastrophic = 5,
-}
-
-export enum RiskLevel {
-    Low = 'Low',
-    Medium = 'Medium',
-    High = 'High',
-    Critical = 'Critical',
-}
-
-export enum BudgetType {
-    Company = 'Company',
-    Project = 'Project',
-}
-
-export enum WasteStreamType {
-    OrganicSolvent = 'OrganicSolvent',
-    HalogenatedSolvent = 'HalogenatedSolvent',
-    AqueousAcid = 'AqueousAcid',
-    AqueousAlkali = 'AqueousAlkali',
-    Solid = 'Solid',
-}
-
-export enum WasteContainerStatus {
-    Active = 'Active',
-    Full = 'Full',
-    PendingPickup = 'PendingPickup',
-    Disposed = 'Disposed',
-}
-
-export enum WastePickupStatus {
-    Scheduled = 'Scheduled',
-    Completed = 'Completed',
-    Cancelled = 'Cancelled',
-}
-
-export enum TicketCategory {
-    Equipment = 'Equipment',
-    IT = 'IT',
-    Facility = 'Facility',
-    Billing = 'Billing',
-    Other = 'Other',
-}
-
-export enum TicketStatus {
-    Open = 'Open',
-    InProgress = 'InProgress',
-    Resolved = 'Resolved',
-    Closed = 'Closed',
-}
-
-export enum TicketPriority {
-    Low = 'Low',
-    Medium = 'MEDIUM',
-    High = 'High',
-    Urgent = 'Urgent',
 }
 
 export enum SDSStatus {
-    Pending = 'Pending',
-    Approved = 'Approved',
-    Rejected = 'Rejected',
-    Superseded = 'Superseded',
+  Pending = 'Pending',
+  Approved = 'Approved',
 }
 
 export enum CertificateStatus {
-    Valid = 'Valid',
-    Expiring = 'Expiring',
-    Expired = 'Expired',
+  Valid = 'Valid',
+  Expired = 'Expired',
 }
 
 export enum RegulationType {
@@ -372,12 +158,6 @@ export enum SubmissionStatus {
   Approved = 'APPROVED',
   Rejected = 'REJECTED',
   Expired = 'EXPIRED'
-}
-
-export enum SupportStaffType {
-  SocialInsuranceLaborConsultant = 'SOCIAL_INSURANCE',
-  AdministrativeScrivener = 'ADMINISTRATIVE_SCRIVENER',
-  FacilityStaff = 'FACILITY_STAFF'
 }
 
 export enum InsuranceType {
@@ -406,8 +186,6 @@ export enum ManualTargetAudience {
   AllUsers = 'ALL_USERS',
   Tenants = 'TENANTS',
   FacilityStaff = 'FACILITY_STAFF',
-  LabManagers = 'LAB_MANAGERS',
-  Administrators = 'ADMINISTRATORS',
   NewUsers = 'NEW_USERS',
   SpecificRoles = 'SPECIFIC_ROLES'
 }
@@ -440,215 +218,6 @@ export interface SDSSummary {
   spillResponse: string;
   disposal: string;
   ppe: string[];
-}
-
-export interface ControlledDocument {
-    id: string;
-    title: string;
-    docType: 'SOP' | 'Manual' | 'Policy';
-    latestVersion: number;
-    currentStatus: DocumentStatus;
-}
-
-export interface Approval {
-    id: string;
-    approverId: string;
-    status: ApprovalStatus;
-    approvedAt?: Date;
-    comments?: string;
-}
-
-export interface DocumentVersion {
-    id: string;
-    documentId: string;
-    version: number;
-    title: string;
-    content: string;
-    status: DocumentStatus;
-    createdByUserId: string;
-    createdAt: Date;
-    effectiveDate?: Date;
-    approvals: Approval[];
-}
-
-export interface Deviation {
-    id: string;
-    title: string;
-    description: string;
-    reportedAt: Date;
-    reportedByUserId: string;
-    status: DeviationStatus;
-    relatedDocumentId?: string;
-    capaId?: string;
-}
-
-export interface Capa {
-    id: string;
-    deviationId: string;
-    rootCause: string;
-    correctiveActions: string[];
-    preventiveActions: string[];
-}
-
-export interface ChangeRequest {
-    id: string;
-    title: string;
-    description: string;
-    requestedByUserId: string;
-    requestedAt: Date;
-    status: 'Pending' | 'Approved' | 'Rejected';
-}
-
-export interface ReadReceipt {
-    id: string;
-    documentVersionId: string;
-    userId: string;
-    readAt: Date;
-}
-
-export interface ESignature {
-    userId: string;
-    timestamp: Date;
-    reason: string;
-}
-
-export interface LegalDocument {
-    id: string;
-    title: string;
-    type: LegalDocumentType;
-    status: LegalDocumentStatus;
-    companyId: string;
-    content: string;
-    version: number;
-    createdAt: Date;
-    effectiveDate?: Date;
-    expiryDate?: Date;
-    approvals: Approval[];
-}
-
-export interface LegalClause {
-    id: string;
-    title: string;
-    content: string;
-}
-
-export interface FiveWhy {
-  problemStatement: string;
-  why1: string;
-  why2: string;
-  why3: string;
-  why4: string;
-  why5: string;
-  rootCause: string;
-}
-
-export interface EhsActionItem {
-  id: string;
-  description: string;
-  assigneeId: string;
-  dueDate: Date;
-  isCompleted: boolean;
-}
-
-export interface EhsIncident {
-  id: string;
-  title: string;
-  description: string;
-  type: EhsIncidentType;
-  status: EhsIncidentStatus;
-  reportedAt: Date;
-  reportedByUserId: string;
-  location: string;
-  involvedUserIds: string[];
-  likelihood?: RiskLikelihood;
-  severity?: RiskSeverity;
-  riskLevel?: RiskLevel;
-  fiveWhy?: FiveWhy;
-  actionItems: EhsActionItem[];
-  requiresRetraining?: boolean;
-}
-
-export interface Budget {
-  id: string;
-  name: string;
-  type: BudgetType;
-  targetId: string; // Company ID or Project ID
-  periodStart: Date;
-  periodEnd: Date;
-  capexAmount: number;
-  opexAmount: number;
-}
-
-export interface WasteChemical {
-  id: string;
-  name: string;
-  casNumber: string;
-}
-
-export interface WasteContainer {
-  id: string;
-  name: string;
-  type: WasteStreamType;
-  location: string;
-  capacity: number;
-  currentVolume: number;
-  status: WasteContainerStatus;
-  chemicals: { chemicalId: string, amount: number }[];
-}
-
-export interface WastePickupSchedule {
-  id: string;
-  scheduledDate: Date;
-  vendor: string;
-  containerIds: string[];
-  status: WastePickupStatus;
-  manifestId?: string;
-}
-
-export interface WasteManifest {
-  id: string;
-  pickupId: string;
-  generationDate: Date;
-  containerIds: string[];
-}
-
-export interface TicketComment {
-    id: string;
-    authorId: string;
-    content: string;
-    createdAt: Date;
-    isInternal: boolean;
-}
-
-export interface Ticket {
-  id: string;
-  subject: string;
-  description: string;
-  requesterId: string;
-  category: TicketCategory;
-  status: TicketStatus;
-  priority: TicketPriority;
-  assigneeId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  slaDueDate: Date;
-  comments: TicketComment[];
-}
-
-export interface KnowledgeBaseArticle {
-  id: string;
-  title: string;
-  content: string; // Markdown
-  category: TicketCategory;
-  keywords: string[];
-}
-
-export interface CsatSurvey {
-  id: string;
-  ticketId: string;
-  rating: number; // 1-5
-  comment?: string;
-  submittedAt: Date;
 }
 
 export interface SDS {
@@ -708,37 +277,6 @@ export interface RegulatoryRequirement {
   googleCalendarEventId?: string;
 }
 
-export interface RegulatorySupport {
-  id: string;
-  requirementId: string;
-  tenantId: string;
-  supportStaffType: SupportStaffType;
-  supportContent: string;
-  supportContentJP: string;
-  supportContentEN: string;
-  providedBy: string;
-  providedDate: Date;
-  documents: string[];
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
-}
-
-export interface MHLWSubmissionChecklist {
-  id: string;
-  tenantId: string;
-  fiscalYear: number;
-  items: {
-    itemName: string;
-    itemNameJP: string;
-    itemNameEN: string;
-    isRequired: boolean;
-    deadline: Date;
-    status: SubmissionStatus;
-    documentUrl?: string;
-  }[];
-  lastReviewDate: Date;
-  nextReviewDate: Date;
-}
-
 export interface InsuranceCertificate {
   id: string;
   tenantId: string;
@@ -758,26 +296,6 @@ export interface InsuranceCertificate {
   googleCalendarEventId?: string;
 }
 
-export interface ManualAttachment {
-  id: string;
-  fileName: string;
-  fileUrl: string;
-  fileType: 'PDF' | 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'OTHER';
-  fileSize: number;
-  uploadedAt: Date;
-  uploadedBy: string;
-}
-
-export interface ManualVersion {
-  version: string;
-  changedAt: Date;
-  changedBy: string;
-  changeDescription: string;
-  changeDescriptionJP: string;
-  changeDescriptionEN: string;
-  previousContent?: string;
-}
-
 export interface Manual {
   id: string;
   category: ManualCategory;
@@ -792,9 +310,9 @@ export interface Manual {
   content: string;
   contentJP: string;
   contentEN: string;
-  attachments: ManualAttachment[];
+  attachments: any[]; // ManualAttachment[]
   version: string;
-  versionHistory: ManualVersion[];
+  versionHistory: any[]; // ManualVersion[]
   author: string;
   createdAt: Date;
   updatedAt: Date;
@@ -835,40 +353,10 @@ export interface LabRule {
   createdBy: string;
   relatedManuals: string[];
   relatedRules: string[];
-  acknowledgedBy: RuleAcknowledgment[];
+  acknowledgedBy: any[]; // RuleAcknowledgment[]
 }
-
-export interface RuleAcknowledgment {
-  userId: string;
-  userName: string;
-  acknowledgedAt: Date;
-  ruleVersion: string;
-}
-
-export interface ViewHistory {
-  id: string;
-  userId: string;
-  itemId: string;
-  itemType: 'MANUAL' | 'RULE';
-  viewedAt: Date;
-  duration?: number;
-}
-
-export interface ManualSearchFilter {
-  category?: ManualCategory[];
-  targetAudience?: ManualTargetAudience[];
-  tags?: string[];
-  searchText?: string;
-  dateFrom?: Date;
-  dateTo?: Date;
-}
-
 
 // --- Enums & Types from common.ts ---
-
-export type ValidationResult<T> =
-  | { success: true; data: T }
-  | { success: false; errors: Record<string, string> };
 
 export enum UserAvailabilityStatus {
   Available = 'AVAILABLE',
@@ -876,37 +364,12 @@ export enum UserAvailabilityStatus {
   Away = 'AWAY',
 }
 
-export enum CourseStatus {
-    NotStarted = 'NotStarted',
-    InProgress = 'InProgress',
-    Completed = 'Completed',
-}
-
-export enum TenantLifecycleStage {
-    Lead = 'Lead',
-    Application = 'Application',
-    Kyc = 'Kyc',
-    Contract = 'Contract',
-    MoveIn = 'MoveIn',
-    Onboarding = 'Onboarding',
-    Active = 'Active',
-    Offboarding = 'Offboarding',
-    Archived = 'Archived',
-}
-
 export type Resource = 'reservation' | 'equipment' | 'inventory' | 'sds' | 'billing' | 'users' | 'projects' | 'quotations' | 'audit' | 'settings' | 'moneyforward' | 'system' | 'project' | 'regulatory' | 'manuals' | 'rules';
 export type Action = 'create' | 'read' | 'update' | 'delete' | 'manage' | 'cancelOwn' | 'configureSettings';
 
 export enum ContractType {
-    Monthly = 'Monthly',
-    Annual = 'Annual',
-    MultiMonth = 'MultiMonth',
-}
-
-export enum AnnouncementImportance {
-  Urgent = 'URGENT',
-  Important = 'IMPORTANT',
-  Normal = 'NORMAL',
+  Monthly = 'Monthly',
+  Annual = 'Annual',
 }
 
 export interface SystemSettings {
@@ -927,23 +390,9 @@ export interface Announcement {
   contentEN: string;
   startDate: Date;
   endDate: Date;
-  importance: AnnouncementImportance;
+  importance: any; // AnnouncementImportance
   targetCompanyId?: string[];
   targetRole?: Role[];
-}
-
-export interface FixedOption {
-  id: string;
-  nameJP: string;
-  nameEN: string;
-  monthlyFee: number;
-}
-
-export interface BenchAssignment {
-  id: string;
-  companyId: string;
-  startDate: string;
-  fixedOptionIds: string[];
 }
 
 export interface AuditLog {
@@ -976,15 +425,6 @@ export interface Notification {
   read: boolean;
   actionUrl?: string;
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
-}
-
-export interface Memo {
-  id: string;
-  senderId: string;
-  recipientId: string;
-  message: string;
-  timestamp: Date;
-  isRead: boolean;
 }
 
 // --- Enums & Types from user.ts ---
@@ -1039,185 +479,14 @@ export interface Plan {
   allowedHoursEnd: string;
 }
 
-export interface Qualification {
-  id: string;
-  nameJP: string;
-  nameEN: string;
-}
-
-export interface Shift {
-  id: string;
-  userId: string;
-  startTime: Date;
-  endTime: Date;
-  shiftTypeJP: string;
-  shiftTypeEN: string;
-  notesJP?: string;
-  notesEN?: string;
-}
-
-export interface Course {
-  id: string;
-  name: string;
-  description: string;
-  content: string; // Markdown/HTML content
-  quiz: {
-    questions: {
-      question: string;
-      options: string[];
-      correctAnswer: string;
-    }[];
-    passingScore: number;
-  };
-  qualificationId: string; // The qualification awarded upon completion
-}
-
-export interface UserCertification {
-  id: string;
-  userId: string;
-  qualificationId: string;
-  issuedAt: Date;
-  expiresAt: Date;
-  courseId: string;
-}
-
-export interface UserCourseProgress {
-  id: string;
-  userId: string;
-  courseId: string;
-  status: CourseStatus;
-  score?: number;
-  completedAt?: Date;
-}
-
-export interface Tenant {
-    id: string; // Corresponds to Company ID
-    primaryContactId: string; // Corresponds to User ID of primary contact
-    stage: TenantLifecycleStage;
-    kycStatus: 'Pending' | 'Approved' | 'Rejected';
-}
-
-export interface Permission {
-  resource: Resource;
-  action: Action;
-  scope: 'all' | 'own_tenant' | 'own_only';
-}
-
 export interface RolePermissions {
   role: Role;
-  permissions: Permission[];
+  permissions: any[]; // Permission[]
 }
 
 // --- Enums & Types from billing.ts ---
 
 export enum InvoiceStatus {
-    Draft = 'Draft',
-    Issued = 'Issued',
-    Sent = 'Sent',
-    Paid = 'Paid',
-    Overdue = 'Overdue',
-    Cancelled = 'Cancelled',
-}
-
-export enum PaymentMethod {
-  Monthly = 'MONTHLY',
-  Annual = 'ANNUAL',
-  MultiMonth = 'MULTI_MONTH'
-}
-
-export enum PaymentCycle {
-  CurrentMonth = 'CURRENT_MONTH',
-  NextMonth = 'NEXT_MONTH',
-  Immediate = 'IMMEDIATE'
-}
-
-export enum ChargeItemType {
-  BaseRent = 'BASE_RENT',
-  EquipmentUsage = 'EQUIPMENT_USAGE',
-  DedicatedEquipment = 'DEDICATED_EQUIPMENT',
-  Option = 'OPTION',
-  Utility = 'UTILITY'
-}
-
-export interface ChargeItem {
-  id: string;
-  type: ChargeItemType;
-  name: string;
-  nameJP: string;
-  nameEN: string;
-  amount: number;
-  paymentCycle: PaymentCycle;
-  isTaxable: boolean;
-  tenantId: string;
-  equipmentId?: string;
-  startDate: Date;
-  endDate?: Date;
-}
-
-export interface TaxRate {
-  id: string;
-  effectiveDate: string;
-  rate: number;
-}
-
-export interface InvoiceLine {
-  id?: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-}
-
-export interface Invoice {
-  id: string;
-  invoiceNumber: string;
-  companyId: string;
-  companyName: string;
-  period: string; // YYYY-MM
-  issueDate: Date;
-  dueDate: Date;
-  fixedCosts: {
-    facilityFee: number;
-    storageFee: number;
-  };
-  variableCosts: {
-    itemName: string;
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    subtotal: number;
-  }[];
-  subtotalBeforeTax: number;
-  taxAmount: number;
-  totalAmount: number;
-  status: InvoiceStatus;
-  notes?: string;
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
-  mfPartnerId?: string;
-  mfInvoiceId?: string;
-  mfInvoiceUrl?: string;
-  mfPdfUrl?: string;
-  localPdfPath?: string;
-}
-
-export interface SpaceOccupyingLease {
-    id: string;
-    tenantId: string;
-    equipmentId: string;
-    monthlyFee: number;
-    startDate: Date;
-    endDate?: Date;
-}
-
-export interface MFConfig {
-    clientId: string;
-    clientSecret: string;
-    redirectUri: string;
-    accessToken?: string;
-    refreshToken?: string;
-    tokenExpiresAt?: string;
 }
 
 // --- Enums & Types from chat.ts ---
@@ -1246,12 +515,6 @@ export interface ChatMessage {
   editedAt?: Date;
 }
 
-export enum ChatRoomType {
-  TenantToFacility = 'TENANT_TO_FACILITY',
-  Internal = 'INTERNAL'
-}
-
-
 // --- Enums & Types from equipment.ts ---
 
 export enum EquipmentStatus {
@@ -1274,29 +537,6 @@ export enum MaintenanceLogStatus {
   Reported = 'REPORTED',
   InProgress = 'IN_PROGRESS',
   Completed = 'COMPLETED',
-}
-
-export enum WorkOrderStatus {
-    Open = 'Open',
-    InProgress = 'InProgress',
-    OnHold = 'OnHold',
-    Completed = 'Completed',
-    Cancelled = 'Cancelled',
-}
-
-export enum CalibrationStatus {
-    Ok = 'Ok',
-    Due = 'Due',
-    Overdue = 'Overdue',
-    OutOfTolerance = 'OutOfTolerance',
-}
-
-export enum WaitlistStatus {
-    Pending = 'Pending',
-    Notified = 'Notified',
-    Fulfilled = 'Fulfilled',
-    Expired = 'Expired',
-    Cancelled = 'Cancelled',
 }
 
 export enum ManualType {
@@ -1403,151 +643,10 @@ export interface EquipmentManual {
   createdAt: Date;
 }
 
-export interface WaitlistEntry {
-  id: string;
-  userId: string;
-  equipmentId: string;
-  requestedStartTime: Date;
-  requestedEndTime: Date;
-  createdAt: Date;
-  status: WaitlistStatus;
-}
-
-export interface WorkOrder {
-  id: string;
-  title: string;
-  description: string;
-  equipmentId: string;
-  status: WorkOrderStatus;
-  priority: TaskPriority;
-  assigneeId?: string;
-  createdAt: Date;
-  dueDate?: Date;
-}
-
-export interface CalibrationRecord {
-  id: string;
-  equipmentId: string;
-  performedAt: Date;
-  performedByUserId: string;
-  status: CalibrationStatus;
-  notes?: string;
-  certificateUrl?: string;
-}
-
-export interface SparePart {
-  id: string;
-  name: string;
-  partNumber: string;
-  stock: number;
-  location: string;
-}
-
-export interface CO2IncubatorTracking {
-  id: string;
-  equipmentId: string;
-  equipmentName: string;
-  gasType: 'CO2' | 'N2' | 'O2';
-  cylinderSize: number; // in kg
-  currentLevel: number; // in kg
-  minimumLevel: number; // in kg, threshold for critical alert
-  lastMeasuredDate: Date;
-  lastMeasuredBy: string; // userId
-  previousLevel?: number; // for calculation
-  previousDate?: Date; // for calculation
-  estimatedEmptyDate: Date | null;
-  alertTriggered: boolean;
-  alertDate?: Date;
-  notes?: string;
-  replacementScheduled: boolean;
-  replacementDate?: Date;
-  googleCalendarEventId?: string;
-}
-
-export interface CalendarEvent {
-  id: string;
-  eventType: CalendarEventType;
-  title: string;
-  titleJP: string;
-  titleEN: string;
-  description: string;
-  descriptionJP: string;
-  descriptionEN: string;
-  startDateTime: Date;
-  endDateTime: Date;
-  isAllDay: boolean;
-  location?: string;
-  googleCalendarEventId?: string;
-  isSyncedToGoogle: boolean;
-  lastSyncedAt?: Date;
-  reminderMinutes: number[];
-  relatedItemId?: string;
-  assignedTo: string[];
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
-  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED';
-  completedAt?: Date;
-  completedBy?: string;
-}
-
-export interface GoogleCalendarSyncSettings {
-  userId: string;
-  isEnabled: boolean;
-  calendarId: string;
-  syncEventTypes: CalendarEventType[];
-  autoSync: boolean;
-  lastSyncAt?: Date;
-  syncErrors?: string[];
-}
-
-export interface CalendarSyncResult {
-  success: boolean;
-  googleCalendarEventId?: string;
-  errorMessage?: string;
-  syncedAt: Date;
-}
-
 // --- Enums & Types from inventory.ts ---
 
 export enum OrderStatus {
-  PendingApproval = 'PENDING_APPROVAL',
-  Approved = 'APPROVED',
   Ordered = 'ORDERED',
-  Delivered = 'DELIVERED',
-  Cancelled = 'CANCELLED',
-  Rejected = 'REJECTED',
-}
-
-export enum InventoryType {
-  General = 'general',
-  Volume = 'volume',
-  HazardousOrPoisonous = 'hazardous_poison',
-  Unclassified = 'unclassified',
-}
-
-export enum PoisonousDesignation {
-  None = 'NONE',
-  Poison = 'POISON',
-  Deleterious = 'DELETERIOUS',
-  SpecifiedPoison = 'SPECIFIED_POISON',
-}
-
-export enum QuotationStatus {
-  Requested = 'REQUESTED',
-  Answered = 'ANSWERED',
-  Ordered = 'ORDERED',
-  Expired = 'EXPIRED',
-}
-
-export enum InquiryStatus {
-  Sent = 'SENT',
-  Answered = 'ANSWERED',
-}
-
-export enum ExpenseType {
-    CapEx = 'CapEx',
-    OpEx = 'OpEx',
 }
 
 export interface Consumable {
@@ -1575,8 +674,8 @@ export interface Consumable {
   casNumber?: string;
   modelNumber?: string;
   lotNumber?: string;
-  inventoryType: InventoryType;
-  poisonousDesignation?: PoisonousDesignation;
+  inventoryType: any; // InventoryType
+  poisonousDesignation?: any; // PoisonousDesignation
   properStock?: number;
   isLocked?: boolean;
   lockDate?: Date;
@@ -1595,25 +694,6 @@ export interface Order {
   projectId?: string;
 }
 
-export interface PurchaseOrderLine {
-    id: string;
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    totalPrice: number;
-    expenseType: ExpenseType;
-}
-
-export interface PurchaseOrder {
-  id: string;
-  requesterId: string;
-  companyId: string;
-  orderDate: Date;
-  status: OrderStatus;
-  lines: PurchaseOrderLine[];
-  projectId?: string;
-}
-
 export interface Supplier {
   id: string;
   name: string;
@@ -1621,21 +701,6 @@ export interface Supplier {
   email: string;
   phone?: string;
   companyId: string;
-}
-
-export interface QuotationResponse {
-  supplierId: string;
-  answeredAt: Date;
-  price?: number;
-  deliveryDate?: Date;
-  validUntil?: Date;
-  storageCondition?: string;
-  isHazardous?: boolean;
-  hazardousCategory?: string;
-  designatedQuantity?: number;
-  packageSize?: number;
-  packageUnit?: string;
-  notes?: string;
 }
 
 export interface Quotation {
@@ -1647,16 +712,10 @@ export interface Quotation {
   quantity: number;
   supplierIds: string[];
   requestDate: Date;
-  status: QuotationStatus;
-  responses: QuotationResponse[];
+  status: any; // QuotationStatus
+  responses: any[]; // QuotationResponse[]
   quotationToken: string;
   tokenExpiresAt: Date;
-}
-
-export interface InquiryResponse {
-    supplierId: string;
-    respondedAt: Date;
-    message: string;
 }
 
 export interface Inquiry {
@@ -1667,8 +726,8 @@ export interface Inquiry {
   message: string;
   supplierIds: string[];
   requestDate: Date;
-  status: InquiryStatus;
-  responses: InquiryResponse[];
+  status: any; // InquiryStatus
+  responses: any[]; // InquiryResponse[]
   isRead: boolean;
 }
 
@@ -1690,27 +749,6 @@ export interface InventorySnapshot {
   notes?: string;
 }
 
-export interface ConsumableNotification {
-  id: string;
-  consumableId: string;
-  consumableName: string;
-  consumableNameJP: string;
-  consumableNameEN: string;
-  location: string;
-  currentStock: number;
-  minimumStock: number;
-  unit: string;
-  reportedBy: string;
-  reportedDate: Date;
-  acknowledgedBy?: string;
-  acknowledgedDate?: Date;
-  restockedDate?: Date;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-  status: 'REPORTED' | 'ACKNOWLEDGED' | 'RESTOCKING' | 'COMPLETED';
-  notes?: string;
-}
-
-
 // --- Enums & Types from reports.ts ---
 
 export interface MonthlyReport {
@@ -1719,42 +757,4 @@ export interface MonthlyReport {
   generatedAt: Date;
   generatedByUserId: string;
   markdownContent: string;
-}
-
-// --- Enums & Types from supplier.ts ---
-
-export interface QuotationRequest {
-  id: string;
-  requesterId: string;
-  supplierId: string;
-  items: QuotationItem[];
-  requestDate: Date;
-  dueDate: Date;
-  status: 'PENDING' | 'QUOTED' | 'ACCEPTED' | 'REJECTED';
-  notes?: string;
-}
-
-export interface QuotationItem {
-  productName: string;
-  quantity: number;
-  unit: string;
-  specifications?: string;
-}
-
-export interface SupplierQuotationResponse {
-  id: string;
-  requestId: string;
-  supplierId: string;
-  items: QuotedItem[];
-  responseDate: Date;
-  validUntil: Date;
-  totalPrice: number;
-  deliveryDays: number;
-  notes?: string;
-}
-
-export interface QuotedItem extends QuotationItem {
-  unitPrice: number;
-  totalPrice: number;
-  leadTime: number;
 }

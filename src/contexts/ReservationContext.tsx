@@ -8,8 +8,8 @@ interface ReservationContextValue {
   loading: boolean;
 }
 
-export const ReservationsDataContext = createContext<Reservation[]>([]);
-export const ReservationsLoadingContext = createContext<boolean>(true);
+const ReservationsDataContext = createContext<Reservation[]>([]);
+const ReservationsLoadingContext = createContext<boolean>(true);
 
 export const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -38,14 +38,6 @@ export const useReservations = () => {
     const context = useContext(ReservationsDataContext);
     if (context === undefined) {
         throw new Error('useReservations must be used within a ReservationProvider');
-    }
-    return context;
-}
-
-export const useReservationsLoading = () => {
-    const context = useContext(ReservationsLoadingContext);
-    if (context === undefined) {
-        throw new Error('useReservationsLoading must be used within a ReservationProvider');
     }
     return context;
 }

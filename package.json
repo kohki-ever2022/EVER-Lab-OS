@@ -12,16 +12,16 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
     "emulators": "firebase emulators:start",
-    "dev:all": "concurrently \"npm run dev\" \"npm run emulators\" --names \"APP,EMU\" --prefix-colors \"cyan,yellow\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run emulators\" --names \"APP,EMU\" --prefix-colors \"cyan,yellow\"",
+    "analyze": "npm run analyze:circular && npm run analyze:duplicates && npm run analyze:unused",
+    "analyze:circular": "madge --circular --extensions ts,tsx src",
+    "analyze:duplicates": "jscpd src",
+    "analyze:unused": "knip"
   },
   "dependencies": {
     "@google/genai": "^1.25.0",
     "@testing-library/react": "^16.3.0",
-    "date-fns": "^2.30.0",
-    "emoji-picker-react": "^4.14.1",
     "firebase": "^10.7.0",
-    "framer-motion": "^10.16.0",
-    "lucide-react": "^0.263.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.20.0"
@@ -38,6 +38,10 @@
     "eslint-plugin-react-hooks": "^7.0.0",
     "eslint-plugin-react-refresh": "^0.4.24",
     "firebase-tools": "^13.0.0",
+    "jscpd": "^4.0.5",
+    "jsdom": "^27.0.0",
+    "knip": "^5.66.0",
+    "madge": "^8.0.0",
     "postcss": "^8.4.0",
     "prettier": "^3.1.0",
     "tailwindcss": "^3.4.0",

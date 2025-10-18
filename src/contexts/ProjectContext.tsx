@@ -3,11 +3,11 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useRe
 import { Project, Task, LabNotebookEntry, Protocol } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-export const ProjectsDataContext = createContext<Project[]>([]);
-export const TasksDataContext = createContext<Task[]>([]);
-export const LabNotebookEntriesDataContext = createContext<LabNotebookEntry[]>([]);
-export const ProtocolsDataContext = createContext<Protocol[]>([]);
-export const ProjectLoadingContext = createContext<boolean>(true);
+const ProjectsDataContext = createContext<Project[]>([]);
+const TasksDataContext = createContext<Task[]>([]);
+const LabNotebookEntriesDataContext = createContext<LabNotebookEntry[]>([]);
+const ProtocolsDataContext = createContext<Protocol[]>([]);
+const ProjectLoadingContext = createContext<boolean>(true);
 
 export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();

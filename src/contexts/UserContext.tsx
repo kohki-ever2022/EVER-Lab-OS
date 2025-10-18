@@ -8,8 +8,8 @@ export interface UserContextValue {
   loading: boolean;
 }
 
-export const UsersDataContext = createContext<User[]>([]);
-export const UsersLoadingContext = createContext<boolean>(true);
+const UsersDataContext = createContext<User[]>([]);
+const UsersLoadingContext = createContext<boolean>(true);
 
 export const UserContext = createContext<UserContextValue | null>(null);
 
@@ -40,14 +40,6 @@ export const useUsers = () => {
   const context = useContext(UsersDataContext);
   if (context === undefined) {
     throw new Error('useUsers must be used within a UserProvider');
-  }
-  return context;
-};
-
-export const useUsersLoading = () => {
-  const context = useContext(UsersLoadingContext);
-  if (context === undefined) {
-    throw new Error('useUsersLoading must be used within a UserProvider');
   }
   return context;
 };

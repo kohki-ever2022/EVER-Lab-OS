@@ -41,11 +41,3 @@ export const useEquipment = () => {
     }
     return context;
 };
-
-export const useEquipmentLoading = () => {
-    const context = useContext(EquipmentLoadingContext);
-    if (context === undefined) {
-        throw new Error('useEquipmentLoading must be used within an EquipmentProvider');
-    }
-    return context;
-};

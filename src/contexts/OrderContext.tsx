@@ -3,8 +3,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Order } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-export const OrdersDataContext = createContext<Order[]>([]);
-export const OrdersLoadingContext = createContext<boolean>(true);
+const OrdersDataContext = createContext<Order[]>([]);
+const OrdersLoadingContext = createContext<boolean>(true);
 
 export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -27,20 +27,4 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       </OrdersLoadingContext.Provider>
     </OrdersDataContext.Provider>
   );
-};
-
-export const useOrders = () => {
-  const context = useContext(OrdersDataContext);
-  if (context === undefined) {
-    throw new Error('useOrders must be used within an OrderProvider');
-  }
-  return context;
-};
-
-export const useOrdersLoading = () => {
-  const context = useContext(OrdersLoadingContext);
-  if (context === undefined) {
-    throw new Error('useOrdersLoading must be used within an OrderProvider');
-  }
-  return context;
 };

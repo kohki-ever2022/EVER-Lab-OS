@@ -3,8 +3,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { MaintenanceLog } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-export const MaintenanceLogsDataContext = createContext<MaintenanceLog[]>([]);
-export const MaintenanceLogsLoadingContext = createContext<boolean>(true);
+const MaintenanceLogsDataContext = createContext<MaintenanceLog[]>([]);
+const MaintenanceLogsLoadingContext = createContext<boolean>(true);
 
 export const MaintenanceLogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();
@@ -33,14 +33,6 @@ export const useMaintenanceLogs = () => {
   const context = useContext(MaintenanceLogsDataContext);
   if (context === undefined) {
     throw new Error('useMaintenanceLogs must be used within a MaintenanceLogProvider');
-  }
-  return context;
-};
-
-export const useMaintenanceLogsLoading = () => {
-  const context = useContext(MaintenanceLogsLoadingContext);
-  if (context === undefined) {
-    throw new Error('useMaintenanceLogsLoading must be used within a MaintenanceLogProvider');
   }
   return context;
 };

@@ -1,9 +1,7 @@
 // src/hooks/useReservationActions.ts
 import { useCallback, useMemo } from 'react';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
-import { useLabStateContext } from '../contexts/AppProviders';
-import { useSessionContext } from '../contexts/SessionContext';
-import { Reservation, ReservationStatus, Usage, WaitlistEntry, WaitlistStatus } from '../types';
+import { Reservation, ReservationStatus, Usage } from '../types';
 import { Result } from '../types';
 import { useReservations } from '../contexts/ReservationContext';
 import { validateDateRange } from '../utils/validation';
@@ -11,8 +9,6 @@ import { validateDateRange } from '../utils/validation';
 export const useReservationActions = () => {
     const adapter = useDataAdapter();
     const reservations = useReservations();
-    const { setWaitlist } = useLabStateContext();
-    const { currentUser } = useSessionContext();
 
     const addReservation = useCallback(async (reservation: Omit<Reservation, 'id'>): Promise<Result<Reservation, Error>> => {
         try {
@@ -71,25 +67,5 @@ export const useReservationActions = () => {
         return adapter.createUsage(usage);
     }, [adapter, reservations]);
     
-    const addToWaitlist = useCallback(async (equipmentId: string, requestedStartTime: Date, requestedEndTime: Date): Promise<Result<WaitlistEntry, Error>> => {
-        if (!currentUser) return { success: false, error: new Error("Not logged in") };
-        const newEntry: WaitlistEntry = {
-            id: `waitlist-${Date.now()}`,
-            userId: currentUser.id,
-            equipmentId,
-            requestedStartTime,
-            requestedEndTime,
-            createdAt: new Date(),
-            status: WaitlistStatus.Pending,
-        };
-        setWaitlist(prev => [...prev, newEntry]); // Mock behavior
-        return { success: true, data: newEntry };
-    }, [currentUser, setWaitlist]);
-
-    const removeFromWaitlist = useCallback(async (waitlistId: string): Promise<Result<void, Error>> => {
-        setWaitlist(prev => prev.filter(w => w.id !== waitlistId)); // Mock behavior
-        return { success: true, data: undefined };
-    }, [setWaitlist]);
-    
-    return useMemo(() => ({ addReservation, updateReservation, checkOutReservation, addToWaitlist, removeFromWaitlist }), [addReservation, updateReservation, checkOutReservation, addToWaitlist, removeFromWaitlist]);
+    return useMemo(() => ({ addReservation, updateReservation, checkOutReservation }), [addReservation, updateReservation, checkOutReservation]);
 };

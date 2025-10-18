@@ -1,46 +1,81 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ヘルパー関数
+    // Helper Functions
     function isSignedIn() {
       return request.auth != null;
     }
-    
+
     function isOwner(uid) {
       return isSignedIn() && request.auth.uid == uid;
     }
     
-    // ユーザードキュメント
+    function isLabManager() {
+        return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['FACILITY_ADMIN', 'LAB_MANAGER'];
+    }
+
+    // User Documents
     match /users/{userId} {
       allow read: if isSignedIn();
       allow write: if isOwner(userId);
     }
-    
-    // 企業ドキュメント
+
+    // Company Documents
     match /companies/{companyId} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn() && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['FACILITY_ADMIN', 'LAB_MANAGER'];
+      allow write: if isLabManager();
     }
-    
-    // チャットルーム
+
+    // Chat Rooms
     match /chatRooms/{roomId} {
-      allow read: if isSignedIn() && 
-        request.auth.uid in resource.data.memberIds;
+      allow read: if isSignedIn() && request.auth.uid in resource.data.memberIds;
       allow create: if isSignedIn();
-      allow update: if isSignedIn() && 
-        request.auth.uid in resource.data.memberIds;
-      
-      // チャットメッセージ
+      allow update: if isSignedIn() && request.auth.uid in resource.data.memberIds;
+
+      // Chat Messages
       match /messages/{messageId} {
-        allow read: if isSignedIn() && 
-          request.auth.uid in get(/databases/$(database)/documents/chatRooms/$(roomId)).data.memberIds;
-        allow create: if isSignedIn() && 
-          request.auth.uid in get(/databases/$(database)/documents/chatRooms/$(roomId)).data.memberIds;
+        allow read, create: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/chatRooms/$(roomId)).data.memberIds;
       }
     }
     
-    // その他のコレクション - デフォルトは拒否
+    // --- Development Rules (To be refined) ---
+    // The following rules are broad to unblock development.
+    // They should be replaced with more specific rules before production.
+
+    match /equipment/{equipmentId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /projects/{projectId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /reservations/{reservationId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /consumables/{consumableId} {
+      allow read, write: if isSignedIn();
+    }
+    
+    match /orders/{orderId} {
+      allow read, write: if isSignedIn();
+    }
+    
+    match /certificates/{certificateId} {
+      allow read, write: if isSignedIn();
+    }
+    
+    match /maintenanceLogs/{logId} {
+      allow read, write: if isSignedIn();
+    }
+    
+    match /announcements/{announcementId} {
+      allow read: if isSignedIn();
+      allow write: if isLabManager();
+    }
+
+    // Fallback rule - Deny all other access
     match /{document=**} {
       allow read, write: if false;
     }

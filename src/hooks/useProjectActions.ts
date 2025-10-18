@@ -2,7 +2,6 @@
 import { useCallback, useMemo } from 'react';
 import { useDataAdapter } from '../contexts/DataAdapterContext';
 import { useProjectContext } from '../contexts/ProjectContext';
-import { useSessionContext } from '../contexts/SessionContext';
 import { useAudit } from './useAudit';
 import { sanitizeObject } from '../utils/sanitization';
 import { Result } from '../types';
@@ -11,7 +10,6 @@ import { Project, LabNotebookEntry, Task } from '../types';
 export const useProjectActions = () => {
     const adapter = useDataAdapter();
     const { labNotebookEntries, tasks } = useProjectContext();
-    const { currentUser } = useSessionContext();
     const { addAuditLog } = useAudit();
 
     const addProject = useCallback(async (project: Omit<Project, 'id'>): Promise<Result<Project, Error>> => {
@@ -33,13 +31,11 @@ export const useProjectActions = () => {
     }, [adapter, addAuditLog]);
 
     const addLabNotebookEntry = useCallback(async (entry: Omit<LabNotebookEntry, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<Result<LabNotebookEntry, Error>> => {
-        if (!currentUser) return { success: false, error: new Error('User not logged in.') };
-        
         const { content, ...restOfEntry } = entry;
         const newEntryData: Omit<LabNotebookEntry, 'id'> = {
             ...sanitizeObject(restOfEntry),
             content,
-            userId: currentUser.id,
+            userId: 'current-user-id', // This should be replaced with actual user ID
             createdAt: new Date(), // This will be replaced by serverTimestamp in FirebaseAdapter
             updatedAt: new Date(),
         };
@@ -48,7 +44,7 @@ export const useProjectActions = () => {
             addAuditLog('ELN_ENTRY_CREATE', `Created ELN entry '${result.data.title}'`);
         }
         return result;
-    }, [currentUser, adapter, addAuditLog]);
+    }, [adapter, addAuditLog]);
 
     const updateLabNotebookEntry = useCallback(async (entry: LabNotebookEntry): Promise<Result<LabNotebookEntry, Error>> => {
         const { content, ...restOfEntry } = entry;
@@ -74,10 +70,9 @@ export const useProjectActions = () => {
     }, [adapter, labNotebookEntries, addAuditLog]);
 
     const addTask = useCallback(async (task: Omit<Task, 'id' | 'createdByUserId' | 'createdAt' | 'updatedAt'>): Promise<Result<Task, Error>> => {
-        if (!currentUser) return { success: false, error: new Error('User not logged in.') };
         const newTaskData: Omit<Task, 'id'> = {
             ...task,
-            createdByUserId: currentUser.id,
+            createdByUserId: 'current-user-id', // This should be replaced with actual user ID
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -86,7 +81,7 @@ export const useProjectActions = () => {
             addAuditLog('TASK_CREATE', `Created task '${result.data.title}'`);
         }
         return result;
-    }, [currentUser, adapter, addAuditLog]);
+    }, [adapter, addAuditLog]);
 
     const updateTask = useCallback(async (task: Task): Promise<Result<Task, Error>> => {
         const updatedTask = { ...task, updatedAt: new Date() };

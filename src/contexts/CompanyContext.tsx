@@ -3,8 +3,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Company } from '../types';
 import { useDataAdapter } from './DataAdapterContext';
 
-export const CompaniesDataContext = createContext<Company[]>([]);
-export const CompaniesLoadingContext = createContext<boolean>(true);
+const CompaniesDataContext = createContext<Company[]>([]);
+const CompaniesLoadingContext = createContext<boolean>(true);
 
 export const CompanyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const adapter = useDataAdapter();

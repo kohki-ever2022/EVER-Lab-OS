@@ -34,7 +34,6 @@ const MemberManagement = lazy(() => import('./components/user/MemberManagement')
 const ManualManagement = lazy(() => import('./components/qms/ManualManagement'));
 const LabRuleManagement = lazy(() => import('./components/qms/LabRuleManagement'));
 const FacilityConsumableNotification = lazy(() => import('./components/facility/FacilityConsumableNotification'));
-const ChatInterface = lazy(() => import('./components/chat/ChatInterface'));
 const InventoryLockManager = lazy(() => import('./components/admin/InventoryLockManager'));
 const MonthlyReportGenerator = lazy(() => import('./components/admin/MonthlyReportGenerator'));
 const HazardousMaterialsDashboard = lazy(() => import('./components/inventory/HazardousMaterialsDashboard'));
@@ -97,7 +96,6 @@ export const App: React.FC = () => {
                     <Route path="manuals" element={<ManualManagement />} />
                     <Route path="rules" element={<LabRuleManagement />} />
                     <Route path="facilityConsumableNotification" element={<FacilityConsumableNotification />} />
-                    <Route path="chat" element={<ChatInterface />} />
 
                     {/* Tenant Routes */}
                     <Route path="dashboard" element={<Dashboard />} />
