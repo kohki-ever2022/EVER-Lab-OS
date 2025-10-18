@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
 
 if (admin.apps.length === 0) {
@@ -7,10 +7,12 @@ if (admin.apps.length === 0) {
 
 const client = new admin.firestore.v1.FirestoreAdminClient();
 
-export const scheduledFirestoreBackup = functions.pubsub
-  .schedule('0 2 * * *') // 毎日午前2時(JST)
-  .timeZone('Asia/Tokyo')
-  .onRun(async () => {
+export const scheduledFirestoreBackup = onSchedule(
+  {
+    schedule: '0 2 * * *', // 毎日午前2時(JST)
+    timeZone: 'Asia/Tokyo',
+  },
+  async () => {
     const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
     if (!projectId) {
       console.error('GCP project ID not set.');
@@ -30,15 +32,9 @@ export const scheduledFirestoreBackup = functions.pubsub
 
       const operation = responses[0];
       console.log(`Backup operation name: ${operation.name}`);
-      return { status: 'success', operation: operation.name };
     } catch (error) {
       console.error('Backup failed:', error);
-      if (error instanceof Error) {
-        throw new functions.https.HttpsError('internal', error.message);
-      }
-      throw new functions.https.HttpsError(
-        'internal',
-        'バックアップに失敗しました'
-      );
+      throw error;
     }
-  });
+  }
+);

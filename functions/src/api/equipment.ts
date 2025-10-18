@@ -1,16 +1,16 @@
-import * as functions from 'firebase-functions';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
 }
 
-export const getEquipment = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', '認証が必要です');
+export const getEquipment = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', '認証が必要です');
   }
 
-  const { category, status } = data;
+  const { category, status } = request.data;
   const db = admin.firestore();
   let query: admin.firestore.Query = db.collection('equipment');
 
