@@ -1,0 +1,1 @@
+import{j as t}from"./index-B-QOVXil.js";const n=()=>t.jsxs("div",{children:[t.jsx("h2",{className:"text-3xl font-bold text-ever-black mb-6",children:"CO2 Incubator Management"}),t.jsx("p",{children:"This component is under construction."})]});export{n as default};
