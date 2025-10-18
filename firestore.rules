@@ -14,70 +14,75 @@ service cloud.firestore {
         return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['FACILITY_ADMIN', 'LAB_MANAGER'];
     }
 
-    // User Documents
+    // User Documents: Users can read any profile, but only write to their own.
     match /users/{userId} {
       allow read: if isSignedIn();
       allow write: if isOwner(userId);
     }
 
-    // Company Documents
+    // Company Documents: Any signed in user can read, only lab managers can write.
     match /companies/{companyId} {
       allow read: if isSignedIn();
       allow write: if isLabManager();
     }
 
-    // Chat Rooms
+    // Chat Rooms: Members can read/update rooms they are part of. Any signed in user can create a new room.
     match /chatRooms/{roomId} {
-      allow read: if isSignedIn() && request.auth.uid in resource.data.memberIds;
+      allow read, update: if isSignedIn() && request.auth.uid in resource.data.memberIds;
       allow create: if isSignedIn();
-      allow update: if isSignedIn() && request.auth.uid in resource.data.memberIds;
 
-      // Chat Messages
+      // Chat Messages: Members of a chat room can read/create messages within it.
       match /messages/{messageId} {
         allow read, create: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/chatRooms/$(roomId)).data.memberIds;
       }
     }
     
-    // --- Development Rules (To be refined) ---
-    // The following rules are broad to unblock development.
-    // They should be replaced with more specific rules before production.
-
+    // Equipment: Any signed in user can read, only lab managers can write.
     match /equipment/{equipmentId} {
-      allow read, write: if isSignedIn();
-    }
-
-    match /projects/{projectId} {
-      allow read, write: if isSignedIn();
-    }
-
-    match /reservations/{reservationId} {
-      allow read, write: if isSignedIn();
-    }
-
-    match /consumables/{consumableId} {
-      allow read, write: if isSignedIn();
-    }
-    
-    match /orders/{orderId} {
-      allow read, write: if isSignedIn();
-    }
-    
-    match /certificates/{certificateId} {
-      allow read, write: if isSignedIn();
-    }
-    
-    match /maintenanceLogs/{logId} {
-      allow read, write: if isSignedIn();
-    }
-    
-    match /announcements/{announcementId} {
       allow read: if isSignedIn();
       allow write: if isLabManager();
     }
 
-    // Fallback rule - Deny all other access
-    match /{document=**} {
-      allow read, write: if false;
+    // Projects: Users can read/write projects they are a part of (assuming a memberIds field).
+    match /projects/{projectId} {
+      allow read, write: if isSignedIn() && request.auth.uid in resource.data.memberIds;
+    }
+
+    // Reservations: Users can read/write their own reservations. Lab managers can read all.
+    match /reservations/{reservationId} {
+      allow read: if isSignedIn() && (request.auth.uid == resource.data.userId || isLabManager());
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    // Consumables & Orders: Any signed in user can read, only lab managers can write.
+    match /consumables/{consumableId} {
+      allow read: if isSignedIn();
+      allow write: if isLabManager();
+    }
+    
+    match /orders/{orderId} {
+      allow read: if isSignedIn();
+      allow write: if isLabManager();
+    }
+    
+    // Certificates: Any signed in user can read, only lab managers can upload.
+    match /certificates/{certificateId} {
+      allow read: if isSignedIn();
+      allow create: if isLabManager();
+      allow update, delete: if isLabManager();
+    }
+    
+    // Maintenance Logs: Any signed in user can read, only lab managers can write.
+    match /maintenanceLogs/{logId} {
+      allow read: if isSignedIn();
+      allow write: if isLabManager();
+    }
+    
+    // Announcements: Any signed in user can read, only lab managers can write.
+    match /announcements/{announcementId} {
+      allow read: if isSignedIn();
+      allow write: if isLabManager();
     }
   }
 }
